@@ -1,9 +1,10 @@
 #include "gnuplot-iostream/gnuplot-iostream.h"
-#include "../board.h"
 
 #define HIGH 1
-#define LOW 1
+#define LOW 0
 #define OUTPUT 0
+
+#include "../board.h"
 
 int step = 0;
 
@@ -21,14 +22,17 @@ int main() {
 	std::vector< std::pair<double, double> > pts;
 
 	Motor motor = Motor(1, 2, 3, false);
-	motor.min_speed = 0;
+	motor.min_speed = 100;
 	motor.max_acceleration = 1000;
-	motor.move(400, 800*4096);
+	motor.move(-1600, 1200*4096);
 
-	for (size_t i = 0; i < 10000; i++) {
+	for (size_t i = 0; i < 15000; i++) {
 		motor.update();
-		//motor.clear_pulse();
-		pts.push_back(std::pair<double, double>(i, step/2));
+		motor.clearPulse();
+		pts.push_back(std::pair<double, double>(i, step));
+		if(motor.finished() && step < 1000)
+			motor.move(-800, 800*4096);
+		std::cout << step << '\n';
 	}
 
 	gp << "plot '-' with lines\n";

@@ -1,13 +1,15 @@
-#include "board.h"
-
 #ifndef MOTOR_HPP
 #define MOTOR_HPP
 
+#include "board.h"
+#include "robotconf.h"
+
 #define SIGN(a) (a > 0 ? 1 : -1)
+#define ABS(a) (a > 0 ? a : -a)
 
 // maximum speed (must be a power of 2, speed exceeding this value leads to an erronous behaviour)
 #define MAX_SPEED 0x1000LL
-// with integers, even a max_acceleration of 1 is too fast, so increment speed only on sub_speed overflow (> SUB_SPEED_MAX)
+// with integers, even a max_acceleration of 1 is too fast, so increment speed only on sub_speed overflow (> MAX_SUB_SPEED)
 #define MAX_SUB_SPEED ((int16_t) 0x1000LL)
 
 // to allow speed control, position is incremented by a small value at each update,
@@ -20,19 +22,13 @@ private:
 	const bool inv_dir;
 	int16_t target_speed, last_speed;
 	int16_t sub_speed, max_speed_change;
-	int32_t position, break_position, goal_position;
+	uint32_t position, break_position, goal_position;
 
 	// limit acceleration by limiting speed change
-	int16_t acceleration_limiter(int16_t speed) {
-		if(abs(last_speed) <= min_speed) { // between -min_speed and min_speed, acceleration limiter is disengaged
-			if(abs(speed) >= min_speed) {
-				last_speed = min_speed*SIGN(speed);
-			} else {
-				last_speed = speed;
-			}
-		}
-
-		if(speed - last_speed > max_speed_change) {
+	int16_t accelerationLimiter(int16_t speed) {
+		if(ABS(last_speed) <= min_speed) { // between -min_speed and min_speed, acceleration limiter is disengaged
+			last_speed = ABS(speed) > min_speed ? (min_speed+1)*SIGN(speed) : speed;
+		} else if(speed - last_speed > max_speed_change) {
 			sub_speed += max_acceleration;
 			while(sub_speed >= MAX_SUB_SPEED) {
 				sub_speed -= MAX_SUB_SPEED;
@@ -60,49 +56,51 @@ public:
 		pinMode(dir_pin, OUTPUT);
 		pinMode(clock_pin, OUTPUT);
 
-		digitalWrite(enable_pin, MOTOR_IDLE_LEVEL);
+		digitalWrite(enable_pin, MOTOR_ACTIVE_LEVEL);
 		digitalWrite(clock_pin, MOTOR_IDLE_LEVEL);
 	}
 
 	void update() {
-		if((position & MOTOR_SUB_STEP_MASK) == (goal_position & MOTOR_SUB_STEP_MASK)) // goal position has been reached, stop
+		if(position >= goal_position) // goal position has been reached, stop
 			target_speed = 0;
-		else if(position >= break_position) // start breaking with speed > 0
-			target_speed = min_speed;
-		else if(position <= -break_position) // start breaking with speed < 0
-			target_speed = -min_speed;
+		else if(position >= break_position) // start breaking
+			target_speed = min_speed*SIGN(last_speed);
 
-		int32_t delta_position = acceleration_limiter(target_speed);
+		accelerationLimiter(target_speed);
 
 		// send a tick when we completed a step
-		if( ((position + delta_position) & MOTOR_SUB_STEP_MASK) != (position & MOTOR_SUB_STEP_MASK) ) {
+		if((position & (MAX_SUB_SPEED - 1)) + ABS(last_speed) >= MAX_SUB_SPEED) {
 			digitalWrite(dir_pin, (last_speed < 0) ^ inv_dir ? MOTOR_IDLE_LEVEL : MOTOR_ACTIVE_LEVEL);
 			digitalWrite(clock_pin, MOTOR_ACTIVE_LEVEL);
 		}
-		position += delta_position;
+		position += ABS(last_speed);
 	}
 
-	void clear_pulse() {
+	void clearPulse() {
 		digitalWrite(dir_pin, (last_speed < 0) ^ inv_dir ? MOTOR_ACTIVE_LEVEL : MOTOR_IDLE_LEVEL);
 		digitalWrite(clock_pin, MOTOR_IDLE_LEVEL);
 	}
 
 	void move(int16_t speed, int32_t distance) {
-		position = sub_speed = 0;
-		goal_position = distance;
-		target_speed = abs(speed) > MAX_SPEED ? MAX_SPEED*SIGN(speed) : speed;
+		digitalWrite(enable_pin, MOTOR_IDLE_LEVEL); // enable motors on first move
+
+		position = 0;
+		sub_speed = 0;
+		goal_position = ABS(distance);// + (speed < 0 ? MAX_SPEED : 0);
+		target_speed = ABS(speed) > MAX_SPEED ? MAX_SPEED*SIGN(speed) : speed;
 
 		// compute the position (abs value) where we will start to slow down
-		break_position = (((uint32_t) target_speed)*((uint32_t) target_speed) - ((uint32_t) min_speed)*((uint32_t) min_speed))*MAX_SUB_SPEED/(2*max_acceleration);
-		if(break_position > distance/2) // small move where we don't reach target speed
-			break_position = abs(distance)/2;
+		break_position = (((int32_t) target_speed)*((int32_t) target_speed) - ((int32_t) min_speed)*((int32_t) min_speed))/(2*max_acceleration);
+		break_position = break_position*MAX_SUB_SPEED; // computation in 2 steps to avoid int overflow
+		if(break_position > goal_position/2) // small move where we don't reach target speed
+			break_position = goal_position/2;
 		else
-			break_position = abs(distance) - break_position;
+			break_position = goal_position - break_position;
 
 		max_speed_change = max_acceleration/MAX_SUB_SPEED; // maximum speed delta from one iteration to the next
 	}
 
-	bool finished() { return target_speed == 0; }
+	bool finished() { return position >= goal_position; }
 
 	int16_t max_acceleration;
 	uint16_t min_speed;
