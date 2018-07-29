@@ -1,42 +1,46 @@
 #include "gnuplot-iostream/gnuplot-iostream.h"
 
-#define HIGH 1
-#define LOW 0
-#define OUTPUT 0
-
+#include "arduino.h"
 #include "../board.h"
+#include "../RobotMotion.hpp"
+#include "stepper.hpp"
 
-int step = 0;
+stepper_motor fl_stepper(FL_EN, FL_DIR, FL_CK, FL_INV);
+stepper_motor fr_stepper(FR_EN, FR_DIR, FR_CK, FR_INV);
+stepper_motor rl_stepper(RL_EN, RL_DIR, RL_CK, RL_INV);
+stepper_motor rr_stepper(RR_EN, RR_DIR, RR_CK, RR_INV);
 
-void pinMode(int pin, int mode) {}
-void digitalWrite(int pin, int value) {
-	if(pin == 3 && value == MOTOR_ACTIVE_LEVEL) {
-		step++;
-	}
+void updateMotors() {
+	fl_stepper.update();
+	fr_stepper.update();
+	rl_stepper.update();
+	rr_stepper.update();
 }
-
-#include "../Motor.hpp"
 
 int main() {
 	Gnuplot gp;
-	std::vector< std::pair<double, double> > pts;
 
-	Motor motor = Motor(1, 2, 3, false);
-	motor.min_speed = 100;
-	motor.max_acceleration = 1000;
-	motor.move(-1600, 1200*4096);
+	delay_callback = updateMotors;
+	RobotMotion motion;
+	motion.move(200, 135, 200);
 
-	for (size_t i = 0; i < 15000; i++) {
-		motor.update();
-		motor.clearPulse();
-		pts.push_back(std::pair<double, double>(i, step));
-		if(motor.finished() && step < 1000)
-			motor.move(-800, 800*4096);
-		std::cout << step << '\n';
+	for(int t = 0; t < 6000; t++) {
+		motion.update();
+		fl_stepper.log(t);
+		fr_stepper.log(t);
+		rl_stepper.log(t);
+		rr_stepper.log(t);
 	}
 
-	gp << "plot '-' with lines\n";
-	gp.send1d(pts);
+	gp << "set multiplot layout 2,2 rowsfirst\n";
+	gp << "plot '-' with lines lc rgb \"blue\"\n";
+	gp.send1d(fl_stepper.speeds);
+	gp << "plot '-' with lines lc rgb \"red\"\n";
+	gp.send1d(fr_stepper.speeds);
+	gp << "plot '-' with lines lc rgb \"green\"\n";
+	gp.send1d(rl_stepper.speeds);
+	gp << "plot '-' with lines lc rgb \"orange\"\n";
+	gp.send1d(rr_stepper.speeds);
 
 	return 0;
 }
