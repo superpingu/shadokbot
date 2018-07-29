@@ -2,13 +2,15 @@
 #define ROBOTMOTION_H
 
 #include "Motor.hpp"
+#include "board.h"
+#include "robotconf.h"
 
 class RobotMotion {
 private:
 	Motor *motor_FL, *motor_FR, *motor_RL, *motor_RR;
 
 	int16_t max_acceleration;
-	uint16_t min_speed;
+	int16_t min_speed;
 
 	void (*move_finished)(); // called when a move is finished
 public:
@@ -58,17 +60,21 @@ public:
 	}
 
 	// get or set minimum speed of the robot
-	uint16_t minSpeed(uint16_t speed = 0) {
+	uint16_t minSpeed(int16_t speed = 0) {
 		min_speed = speed == 0 ? min_speed : speed;
 		motor_FL->min_speed = motor_FR->min_speed = speed;
 		motor_RL->min_speed = motor_RR->min_speed = speed;
 		return min_speed;
 	}
 
+	// call a function when an operation (a turn or a move) finishes
 	void moveFinished(void (*func)()) {
 		move_finished = func;
 	}
 
+	// turn without moving (no translation)
+	//   angle: rotation in deg, relative, positive is counter-clockwise
+	//   angular_speed: rotation speed in deg/s (should be positive)
 	void turn(int16_t angle, uint16_t angular_speed) {
 		uint32_t dist = ABS(angle)*DEG_TO_SUBSTEP;
 		uint16_t speed = speed*DEG_PER_S_TO_SUBSTEP_PER_PERIOD*SIGN(angle);
@@ -77,6 +83,25 @@ public:
 		motor_FR->move(speed, dist);
 		motor_RL->move(-speed, dist);
 		motor_RR->move(speed, dist);
+	}
+
+	// move the robot with a linear translation
+	//   distance: distance to move in mm (must be > 0)
+	//   angle: direction in deg (0 is forward, 90 is leftward, -90 or 270 is rightward, ...)
+	//   speed: translation cruise speed (ramp-up and ramp-down excluded), in mm/s (must be > 0)
+	void move(uint16_t distance, int16_t angle, uint16_t speed) {
+		float y_coeff = cos(angle*3.1416/180);
+		int16_t y_speed = speed*MM_PER_S_TO_SUBSTEP_PER_PERIOD*y_coeff;
+		int32_t y_dist = distance*MM_TO_SUBSTEP*y_coeff;
+
+		float x_coeff = sin(angle*3.1416/180);
+		int16_t x_speed = speed*MM_PER_S_TO_SUBSTEP_PER_PERIOD*x_coeff;
+		int32_t x_dist = distance*MM_TO_SUBSTEP*x_coeff;
+
+		motor_FL->move(y_speed - x_speed, ABS(y_dist - x_dist));
+		motor_FR->move(y_speed + x_speed, ABS(y_dist + x_dist));
+		motor_RL->move(y_speed + x_speed, ABS(y_dist + x_dist));
+		motor_RR->move(y_speed - x_speed, ABS(y_dist - x_dist));
 	}
 };
 

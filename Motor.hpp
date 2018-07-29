@@ -87,7 +87,7 @@ public:
 		position = 0;
 		sub_speed = 0;
 		goal_position = ABS(distance);// + (speed < 0 ? MAX_SPEED : 0);
-		target_speed = ABS(speed) > MAX_SPEED ? MAX_SPEED*SIGN(speed) : speed;
+		target_speed = ABS(speed) > MAX_SPEED ? MAX_SPEED*SIGN(speed) : (ABS(speed) < min_speed ? min_speed*SIGN(speed) : speed);
 
 		// compute the position (abs value) where we will start to slow down
 		break_position = (((int32_t) target_speed)*((int32_t) target_speed) - ((int32_t) min_speed)*((int32_t) min_speed))/(2*max_acceleration);
@@ -103,7 +103,7 @@ public:
 	bool finished() { return position >= goal_position; }
 
 	int16_t max_acceleration;
-	uint16_t min_speed;
+	int16_t min_speed;
 };
 
 #endif
