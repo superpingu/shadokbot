@@ -90,18 +90,18 @@ public:
 	//   angle: direction in deg (0 is forward, 90 is leftward, -90 or 270 is rightward, ...)
 	//   speed: translation cruise speed (ramp-up and ramp-down excluded), in mm/s (must be > 0)
 	void move(uint16_t distance, int16_t angle, uint16_t speed) {
-		float y_coeff = cos(angle*3.1416/180);
-		int16_t y_speed = speed*MM_PER_S_TO_SUBSTEP_PER_PERIOD*y_coeff;
-		int32_t y_dist = distance*MM_TO_SUBSTEP*y_coeff;
+		float y_coeff = cos(angle*M_PI/180);
+		float x_coeff = sin(angle*M_PI/180);
 
-		float x_coeff = sin(angle*3.1416/180);
-		int16_t x_speed = speed*MM_PER_S_TO_SUBSTEP_PER_PERIOD*x_coeff;
-		int32_t x_dist = distance*MM_TO_SUBSTEP*x_coeff;
+		int16_t yx_speed_sum = speed*MM_PER_S_TO_SUBSTEP_PER_PERIOD*(y_coeff + x_coeff);
+		int16_t yx_speed_diff = speed*MM_PER_S_TO_SUBSTEP_PER_PERIOD*(y_coeff - x_coeff);
+		int32_t yx_dist_sum = distance*MM_TO_SUBSTEP*ABS(y_coeff + x_coeff);
+		int32_t yx_dist_diff = distance*MM_TO_SUBSTEP*ABS(y_coeff - x_coeff);
 
-		motor_FL->move(y_speed - x_speed, ABS(y_dist - x_dist));
-		motor_FR->move(y_speed + x_speed, ABS(y_dist + x_dist));
-		motor_RL->move(y_speed + x_speed, ABS(y_dist + x_dist));
-		motor_RR->move(y_speed - x_speed, ABS(y_dist - x_dist));
+		motor_FL->move(yx_speed_diff, ABS(yx_dist_diff));
+		motor_FR->move(yx_speed_sum, ABS(yx_dist_sum));
+		motor_RL->move(yx_speed_sum, ABS(yx_dist_sum));
+		motor_RR->move(yx_speed_diff, ABS(yx_dist_diff));
 	}
 };
 

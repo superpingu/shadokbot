@@ -5,7 +5,7 @@
 #include "robotconf.h"
 
 #define SIGN(a) (a > 0 ? 1 : -1)
-#define ABS(a) (a > 0 ? a : -a)
+#define ABS(a) ((a) > 0 ? (a) : -(a))
 
 // maximum speed (must be a power of 2, speed exceeding this value leads to an erronous behaviour)
 #define MAX_SPEED 0x1000LL
@@ -86,7 +86,7 @@ public:
 
 		position = 0;
 		sub_speed = 0;
-		goal_position = ABS(distance);// + (speed < 0 ? MAX_SPEED : 0);
+		goal_position = ABS(distance) + (speed < 0 ? MAX_SPEED : 0);
 		target_speed = ABS(speed) > MAX_SPEED ? MAX_SPEED*SIGN(speed) : (ABS(speed) < min_speed ? min_speed*SIGN(speed) : speed);
 
 		// compute the position (abs value) where we will start to slow down
