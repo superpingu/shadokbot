@@ -82,8 +82,6 @@ public:
 	}
 
 	void move(int16_t speed, int32_t distance) {
-		digitalWrite(enable_pin, MOTOR_IDLE_LEVEL); // enable motors on first move
-
 		position = 0;
 		sub_speed = 0;
 		goal_position = ABS(distance) + (speed < 0 ? MAX_SPEED : 0);
@@ -98,6 +96,10 @@ public:
 			break_position = goal_position - break_position;
 
 		max_speed_change = max_acceleration/MAX_SUB_SPEED; // maximum speed delta from one iteration to the next
+	}
+
+	void enable(bool enabled) {
+		digitalWrite(enable_pin, enabled ? MOTOR_IDLE_LEVEL : MOTOR_ACTIVE_LEVEL);
 	}
 
 	bool finished() { return position >= goal_position; }

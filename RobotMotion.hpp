@@ -7,13 +7,14 @@
 
 class RobotMotion {
 private:
-	Motor *motor_FL, *motor_FR, *motor_RL, *motor_RR;
 
 	int16_t max_acceleration;
 	int16_t min_speed;
 
 	void (*move_finished)(); // called when a move is finished
 public:
+	Motor *motor_FL, *motor_FR, *motor_RL, *motor_RR;
+	
 	RobotMotion() {
 		// initialize all motors
 		motor_FL = new Motor(FL_EN, FL_DIR, FL_CK, FL_INV);
@@ -65,6 +66,14 @@ public:
 		motor_FL->min_speed = motor_FR->min_speed = speed;
 		motor_RL->min_speed = motor_RR->min_speed = speed;
 		return min_speed;
+	}
+
+	// enable or disable the motors drive
+	void enable(bool enabled) {
+		motor_FL->enable(enabled);
+		motor_FR->enable(enabled);
+		motor_RL->enable(enabled);
+		motor_RR->enable(enabled);
 	}
 
 	// call a function when an operation (a turn or a move) finishes

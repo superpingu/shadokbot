@@ -12,6 +12,8 @@ void setup() {
 	Serial.begin(9600);
 
 	motion = new RobotMotion();
+	motion->enable(true);
+	
 	sh = initCommands(motion);
 }
 
