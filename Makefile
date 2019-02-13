@@ -1,21 +1,30 @@
-# WARNING : platform specific ! use "arduino" for linux,
-# "/Application/Arduino.app/content/MacOS/Arduino" for MacOS (and don't use windows)
-CC = /Applications/Arduino.app/Contents/MacOS/Arduino
-# Arduino's virtual serial port name
-PORT = /dev/tty.usbmodem*
-# target board
-TBOARD = arduino:avr:mega:cpu=atmega2560
-# main sketch
-SKETCH = shadokbot.ino
+# Warning : this Makefile uses Arduino-makefile for compilation and upload
+# See https://github.com/sudar/Arduino-Makefile/ for install
+# to see the available targets, use 'make help'
+PROJECT_DIR = $(abspath .)
+OBJDIR = $(PROJECT_DIR)/build
+SRCDIR = $(PROJECT_DIR)/src
 
-verify:
-	$(CC) --board $(TBOARD) --verify $(SKETCH)
+# The configuration below is platform dependent
+ARDMK_DIR            = /usr/local/Cellar/arduino-mk/HEAD-4452f77
+ARDUINO_DIR          = /Applications/Arduino.app/Contents/Java
+ARDUINO_PACKAGE_DIR := $(HOME)/Library/Arduino15/packages
+MONITOR_PORT = /dev/tty.usbmodem* # Arduino serial port
+# end platform dependent configuration
 
-upload:
-	$(CC) --board $(TBOARD) --port $(PORT) --upload $(SKETCH)
+BOARD_TAG    = arduino_due_x
+ARCHITECTURE = sam
+# prevent verbose logging from Arduino-Makefile
+ARDUINO_QUIET = 1
+# arduino monitor serial port baudrate
+MONITOR_BAUDRATE = 115200
 
-test:
-	g++ -std=c++11 -o test/test test/test.cpp -lboost_iostreams -lboost_system -lboost_filesystem
-	test/test
+CFLAGS_STD = -std=gnu11
+CXXFLAGS_STD = -std=gnu++11 -Wall -Wextra
 
-.PHONY: test
+# main file
+LOCAL_INO_SRCS = $(SRCDIR)/blink.ino
+# project sources
+LOCAL_CPP_SRCS =
+
+include $(ARDMK_DIR)/Sam.mk
