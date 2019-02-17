@@ -20,11 +20,11 @@ ARDUINO_QUIET = 1
 MONITOR_BAUDRATE = 115200
 
 CFLAGS_STD = -std=gnu11
-CXXFLAGS_STD = -std=gnu++11 -Wall -Wextra
+CXXFLAGS_STD = -std=gnu++11 -Wall -Wextra -I$(SRCDIR)
 
 # main file
-LOCAL_INO_SRCS = $(SRCDIR)/blink.ino
+LOCAL_INO_SRCS = $(SRCDIR)/main.ino
 # project sources
-LOCAL_CPP_SRCS =
+LOCAL_CPP_SRCS = $(SRCDIR)/shell/Shell.cpp $(SRCDIR)/shell/commands.cpp $(SRCDIR)/motion/Motion.cpp $(SRCDIR)/motion/Motor.cpp
 
 include $(ARDMK_DIR)/Sam.mk
