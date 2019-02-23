@@ -3,3 +3,4 @@ test/test
 build
 sdk/
 *.zip
+*.o
