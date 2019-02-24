@@ -1,5 +1,7 @@
-test_lidar: test/lidar.cpp test/mockup_CYdLidar.o src/lidar/lidar.o
-	$(CC) $^ -o $@ -I test/ -I sdk/include -I src/lidar -lstdc++
+LDFLAGS = -lm -lstdc++
+
+test_lidar: test/lidar.cpp test/mockup_CYdLidar.o src/lidar/lidar.o src/lidar/obstacle.o
+	$(CC) $^ -o $@ -I test/ -I sdk/include -I src/lidar $(LDFLAGS)
 
 test/mockup_CYdLidar.o: test/mockup_CYdLidar.cpp
 	cp sdk/include/CYdLidar.h test/
