@@ -1,8 +1,10 @@
-test_lidar: test/lidar.cpp test/mockup_CYdLidar.cpp
+test_lidar: test/lidar.cpp test/mockup_CYdLidar.o src/lidar/lidar.o
+	$(CC) $^ -o $@ -I test/ -I sdk/include -I src/lidar -lstdc++
+
+test/mockup_CYdLidar.o: test/mockup_CYdLidar.cpp
 	cp sdk/include/CYdLidar.h test/
 	touch test/utils.h
 	$(CC) -c test/mockup_CYdLidar.cpp -o test/mockup_CYdLidar.o -I test/
-	$(CC) $< test/mockup_CYdLidar.o -o $@ -I test/ -I sdk/include -lstdc++
 
 target:
 	$(CC) $< -o $@ -lydlidar_driver -L ./sdk/lib/ -I ./sdk/include/
