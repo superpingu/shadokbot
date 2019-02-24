@@ -1,4 +1,6 @@
 #include "Shell.hpp"
+#include <stdlib.h>
+#include <Arduino.h>
 
 int str2int(char* str) {
 	uint8_t i = 0;

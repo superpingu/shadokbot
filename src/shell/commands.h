@@ -4,6 +4,6 @@
 #include "Shell.hpp"
 
 // commands available in the shell
-extern const command_t comms[];
+const command_t* getComms();
 
 #endif
