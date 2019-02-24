@@ -1,5 +1,7 @@
 #include "lidar.h"
 #include <stdio.h>
+#include <limits>
+
 #define ABS(x) ((x) > 0 ? (x) : -(x))
 
 template <typename T> typename std::vector<T>::iterator circular_prev(std::vector<T>& vec, typename std::vector<T>::iterator it) {
@@ -36,4 +38,19 @@ int clean_data(std::vector<float>& data) {
   }
 
   return invalid_data_count;
+}
+
+std::tuple<int,float> closest_obstacle(std::vector<float> scan) {
+  std::tuple<int,float> closest (0,std::numeric_limits<float>::max());
+  int index = 0;
+
+  for (std::vector<float>::iterator it = scan.begin(); it != scan.end(); ++it) {
+    if ((*it > 0.01) && (*it < std::get<1>(closest))) {
+      std::get<0>(closest) = index;
+      std::get<1>(closest) = *it;
+    }
+    index++;
+  }
+
+  return closest;
 }

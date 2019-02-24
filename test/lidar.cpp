@@ -16,6 +16,10 @@ int main(int argc, char* argv[]) {
   laser.doProcessSimple(scan, error);
   printf("invalid data: %d\n", clean_data(scan.ranges));
 
+
+  std::tuple<int,float> point = closest_obstacle(scan.ranges);
+  printf("closest point is %d at %f\n", std::get<0>(point), std::get<1>(point));
+
   laser.turnOff();
   laser.disconnecting();
   return 0;
