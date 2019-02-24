@@ -25,6 +25,7 @@ CXXFLAGS_STD = -std=gnu++11 -Wall -Wextra -I$(SRCDIR)
 # main file
 LOCAL_INO_SRCS = $(SRCDIR)/main.ino
 # project sources
-LOCAL_CPP_SRCS = $(SRCDIR)/shell/Shell.cpp $(SRCDIR)/shell/commands.cpp $(SRCDIR)/motion/Motion.cpp $(SRCDIR)/motion/Motor.cpp
+LOCAL_CPP_SRCS = $(SRCDIR)/shell/commands.cpp $(SRCDIR)/shell/Shell.cpp \
+	$(SRCDIR)/ax12/AXcomms.cpp $(SRCDIR)/ax12/AX12.cpp
 
 include $(ARDMK_DIR)/Sam.mk
