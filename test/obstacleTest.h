@@ -2,12 +2,23 @@
 #define OBSTACLE_TEST_H
 
 #include <string>
-#include <cppunit/TestCase.h>
+#include "obstacle.h"
+#include <cppunit/TestFixture.h>
+#include <cppunit/TestAssert.h>
+#include <cppunit/Test.h>
 
-class ObstacleTest : public CppUnit::TestCase {
+class ObstacleTest : public CppUnit::TestFixture {
   public:
-    ObstacleTest(std::string name);
-    void runTest();
+    ObstacleTest();
+    void setUp();
+    void tearDown();
+    void testDistanceHorizontal();
+    void testDistanceVertical();
+    void testDistanceDefault();
+    static CppUnit::Test *suite();
+
+  private:
+    Obstacle *obs1, *obs2, *obs3;
 };
 
 #endif // OBSTACLE_TEST_H
