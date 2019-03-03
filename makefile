@@ -16,6 +16,7 @@ clean:
 	rm -f test_lidar
 	rm -f test/utils.h
 	rm -f test/*.o
+	rm -f src/lidar/*.o
 
 sdk_clean:
 	rm -rf sdk/
