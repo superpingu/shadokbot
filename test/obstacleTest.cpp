@@ -7,7 +7,7 @@ ObstacleTest::ObstacleTest(): CppUnit::TestFixture() {}
 void ObstacleTest::setUp() {
   obs1 = new Obstacle(0, 1, -2, 0, 5);
   obs2 = new Obstacle(1.5, -1, 1.5, 1, 3);
-  obs3 = new Obstacle(1, 0, 5, 1, 3, true);
+  obs3 = new Obstacle(1, 0, 5, 1, 3);
 }
 
 void ObstacleTest::tearDown() {

@@ -6,7 +6,7 @@
  */
 class Obstacle {
 public:
-  Obstacle(float a, float b, float c, float x_min, float x_max, bool vertical = false);
+  Obstacle(float a, float b, float c, float x_min, float x_max);
   float distance(float x, float y);
 private:
   float a;
@@ -14,7 +14,6 @@ private:
   float c;
   float x_min;
   float x_max;
-  bool vertical;
 };
 
 #endif // OBSTACLE_H

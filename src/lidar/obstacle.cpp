@@ -1,13 +1,12 @@
 #include "obstacle.h"
 #include <math.h>
 
-Obstacle::Obstacle(float a, float b, float c, float x_min, float x_max, bool vertical) {
+Obstacle::Obstacle(float a, float b, float c, float x_min, float x_max) {
   this->a = a;
   this->b = b;
   this->c = c;
   this->x_min = x_min;
   this->x_max = x_max;
-  this->vertical = vertical;
 }
 
 float Obstacle::distance(float xA, float yA) {
@@ -15,7 +14,7 @@ float Obstacle::distance(float xA, float yA) {
   float yB;
   float xv = -b;
   float yv = a;
-  if (vertical) {
+  if (b == 0) {
     yB = 0;
   } else {
     yB = -(a * x_min + c) / b;
@@ -26,7 +25,7 @@ float Obstacle::distance(float xA, float yA) {
     return ((std::abs(a*xA + b*yA + c)) / (sqrt(a*a + b*b)));
   } else { // closest point is one of the extremities
     xB = x_min;
-    if (vertical) {
+    if (b == 0) {
       yB = 0;
     } else {
       yB = -(a * xB + c) / b;
@@ -34,7 +33,7 @@ float Obstacle::distance(float xA, float yA) {
     float dist_x_min = std::sqrt((xB-xA)*(xB-xA) + (yB-yA)*(yB-yA));
 
     xB = x_max;
-    if (vertical) {
+    if (b == 0) {
       yB = 0;
     } else {
       yB = -(a * xB + c) / b;
