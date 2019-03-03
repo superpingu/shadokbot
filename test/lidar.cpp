@@ -1,8 +1,28 @@
 #include <CYdLidar.h>
+#include <obstacle.h>
 #include <lidar.h>
+#include "obstacleTest.h"
 
 CYdLidar laser;
 LaserScan scan;
+
+void testObstacle() {
+  Obstacle obs1(0, 1, -2, 0, 5);
+  printf("Distance %f\n", obs1.distance(0,0));
+  printf("Distance %f\n", obs1.distance(10,2));
+  printf("Distance %f\n", obs1.distance(5,2));
+  printf("Distance %f\n", obs1.distance(2.5,0.5));
+  printf("\n");
+
+  Obstacle obs2(1.5, -1, 1.5, 1, 3);
+  printf("Distance %f\n", obs2.distance(0,0));
+  printf("Distance %f\n", obs2.distance(2,1));
+  printf("\n");
+
+  Obstacle obs3(1, 0, 5, 1, 3, true);
+  printf("Distance %f\n", obs3.distance(0,0));
+
+}
 
 int main(int argc, char* argv[]) {
   bool error = false;
@@ -22,5 +42,9 @@ int main(int argc, char* argv[]) {
 
   laser.turnOff();
   laser.disconnecting();
+
+  ObstacleTest test("Obstacle test");
+  test.runTest();
+
   return 0;
 }

@@ -1,7 +1,8 @@
-LDFLAGS = -lm -lstdc++
+LDFLAGS = -lm -lstdc++ -lcppunit
+CPPFLAGS = -I test/ -I sdk/include -I src/lidar
 
-test_lidar: test/lidar.cpp test/mockup_CYdLidar.o src/lidar/lidar.o src/lidar/obstacle.o
-	$(CC) $^ -o $@ -I test/ -I sdk/include -I src/lidar $(LDFLAGS)
+test_lidar: test/lidar.cpp test/mockup_CYdLidar.o src/lidar/lidar.o src/lidar/obstacle.o test/obstacleTest.o
+	$(CC) $^ -o $@  $(CPPFLAGS) $(LDFLAGS)
 
 test/mockup_CYdLidar.o: test/mockup_CYdLidar.cpp
 	cp sdk/include/CYdLidar.h test/
