@@ -29,3 +29,9 @@ LOCAL_CPP_SRCS = $(SRCDIR)/shell/commands.cpp $(SRCDIR)/shell/Shell.cpp \
 	$(SRCDIR)/ax12/AXcomms.cpp $(SRCDIR)/ax12/AX12.cpp
 
 include $(ARDMK_DIR)/Sam.mk
+
+AX12:
+	make LOCAL_INO_SRCS=AX12console/AX12console.ino
+
+AX12upload:
+	make upload LOCAL_INO_SRCS=AX12console/AX12console.ino

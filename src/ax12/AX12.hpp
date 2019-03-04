@@ -28,9 +28,9 @@ public:
 	// must be called periodically to detect end of moves and call callbacks
 	static void update();
 
-	// control the AX12 with the provided axid. The function also sets a defaut config:
-	//   AX12 response : all instruction
-	//   response delay : 6us
+	// control the AX12 with the provided axid. The function also sets a default config:
+	//   AX12 response : respond to all instructions
+	//   response delay : 10us
 	//   alarm shutdown : torque OFF on overheating, overload, voltage error
 	//   alarm LED : LED blinks on overheating, overload, voltage error
 	//   mode : default

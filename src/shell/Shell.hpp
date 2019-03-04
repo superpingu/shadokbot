@@ -7,7 +7,10 @@
 
 #define SHELL_BUFFER_SIZE 50 // maximum number of characters for a single command
 #define MAX_ARG_NUMBER 5 // maximum number of arguments + 1
+
+#ifndef SHELL_INVITE
 #define SHELL_INVITE " > "
+#endif
 
 // type for describing commands : when the user enters <command> <arg1> <arg2> ...
 // if the command matches name, callback is called.
@@ -29,12 +32,17 @@ private:
 	uint8_t index;
 	char* argv[MAX_ARG_NUMBER];
 	uint8_t argc = 0;
+	void (*onUnknownComm)(void);
 
 	void processCommand();
 public:
 	// Shell initializes Arduino's Serial at baudrate and will accept the provided commands
 	// last command must be followed by the entry {NULL, NULL} to end the list
 	Shell(uint32_t baudrate, const command_t* _commands);
+
+	// if different from NULL, callback will be called when an unknown or void command is entered
+	// by default just prints "Unknown command"
+	void onUnknownCommand(void (*callback)(void));
 
 	// call in the main loop to process input from serial port
 	void update();

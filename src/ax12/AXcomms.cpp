@@ -122,6 +122,10 @@ int AXcomms::transaction(uint8_t instruction, uint8_t command, uint16_t arg, int
 			break;
 		}
 	}
+
+	// wait some time for the AX12 to be ready for next command
+	delayMicroseconds(400);
+
 	return code;
 }
 

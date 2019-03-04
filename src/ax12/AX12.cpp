@@ -30,6 +30,9 @@ void AX12::update() {
 }
 
 AX12::AX12(uint8_t axid) : AXcomms(axid) {
+	endOfMoveCallback = NULL;
+	noMotionCounter = 0;
+	
 	// register this instance
 	instances[instanceNumber++] = this;
 

@@ -32,12 +32,17 @@ void Shell::processCommand() {
 		}
 		i++;
 	}
-	Serial.print("Unknown command\n");
+
+	if(onUnknownComm == NULL)
+		Serial.print("Unknown command\n");
+	else
+		onUnknownComm();
 }
 
 Shell::Shell(uint32_t baudrate, const command_t* _commands) {
 	index = 0;
 	commands = _commands;
+	onUnknownComm = NULL;
 	Serial.begin(baudrate);
 	Serial.print(SHELL_INVITE);
 }
@@ -65,4 +70,8 @@ void Shell::update() {
 			buffer[index++] = newchar;
 		}
 	}
+}
+
+void Shell::onUnknownCommand(void (*callback)(void)) {
+	onUnknownComm = callback;
 }
