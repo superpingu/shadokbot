@@ -8,6 +8,7 @@ public:
   float b;
   float c;
   bool isValid();
+  float getY(float x);
 };
 
 /**
@@ -18,11 +19,11 @@ public:
   Obstacle(float a, float b, float c, float x_min, float x_max);
   Obstacle(Line line, float x_min, float x_max);
   float distance(float x, float y);
-  bool intersect(Line ext_line);
+  bool intersect(Line &ext_line);
 private:
   Line line;
-  float x_min;
-  float x_max;
+  float min;
+  float max;
 };
 
 #endif // OBSTACLE_H
