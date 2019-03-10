@@ -84,7 +84,7 @@ bool Obstacle::intersect(Line &ext_line) {
         return false;
       }
     } else {
-      x = (ext_line.c - (ext_line.b * this->line.c / this->line.b)) / (ext_line.a - (ext_line.b * this->line.a / this->line.b));
+      x = -(ext_line.c - (ext_line.b * this->line.c / this->line.b)) / (ext_line.a - (ext_line.b * this->line.a / this->line.b));
       if ((x >= this->min) && (x <= this->max)) {
         return true;
       } else {
