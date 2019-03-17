@@ -3,3 +3,14 @@ test/test
 build
 *.zip
 *.o
+test/CYdLidar.h
+test/utils.h
+sdk/CMakeCache.txt
+sdk/CMakeFiles/
+sdk/Makefile
+sdk/cmake_install.cmake
+sdk/lib/
+sdk/samples/CMakeFiles/
+sdk/samples/Makefile
+sdk/samples/cmake_install.cmake
+sdk/samples/ydlidar_test
