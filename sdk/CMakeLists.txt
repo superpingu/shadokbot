@@ -2,24 +2,32 @@
 add_definitions(-std=c++11) # Use C++11
 include_directories(include)
 include_directories(src)
+option(ARDUINO "Build for Arduino" OFF)
 
-IF (WIN32)
-FILE(GLOB SDK_SRC 
+IF (ARDUINO)
+FILE(GLOB SDK_SRC
+  "src/*.cpp"
+  "src/*.h"
+  "src/impl/arduino/*cpp"
+  "src/impl/arduino/*h"
+  )
+ELSEIF (WIN32)
+FILE(GLOB SDK_SRC
   "src/*.cpp"
   "src/*.h"
   "src/impl/windows/*.cpp"
   "src/impl/windows/*.h"
 )
-	
+
 ELSE()
-FILE(GLOB SDK_SRC 
+FILE(GLOB SDK_SRC
   "src/*.cpp"
   "src/*.h"
   "src/impl/unix/*.cpp"
   "src/impl/unix/*.h"
 )
 
-	
+
 ENDIF()
 
 add_subdirectory(samples)
@@ -29,4 +37,4 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 IF (WIN32)
 ELSE()
 target_link_libraries(ydlidar_driver rt pthread)
-ENDIF()                    
+ENDIF()
