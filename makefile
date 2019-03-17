@@ -17,6 +17,17 @@ clean:
 	rm -f test/utils.h
 	rm -f test/*.o
 	rm -f src/lidar/*.o
+	rm -f test/CYdLidar.h
+	rm -f test/utils.h
+	rm -f sdk/CMakeCache.txt
+	rm -rf sdk/CMakeFiles/
+	rm -f sdk/Makefile
+	rm -f sdk/cmake_install.cmake
+	rm -rf sdk/lib/
+	rm -rf sdk/samples/CMakeFiles/
+	rm -f sdk/samples/Makefile
+	rm -f sdk/samples/cmake_install.cmake
+	rm -f sdk/samples/ydlidar_test
 
 sdk_clean:
 	rm -rf sdk/
@@ -24,11 +35,13 @@ sdk_clean:
 dir_clean: clean sdk_clean
 	rm sdk.zip
 
+lib: sdk
+	cd sdk/ && cmake CMakeLists.txt -DARDUINO:BOOL=ON && make
+
 sdk: sdk.zip
 	unzip sdk.zip
 	unzip SDK/SDK╟¤╢п░№/sdk_v1.3.0.zip
 	rm -rf SDK/
-	cd sdk/ && cmake CMakeLists.txt && make
 
 sdk.zip:
 	wget http://www.ydlidar.com/en/download/11
