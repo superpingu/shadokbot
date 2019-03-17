@@ -1,0 +1,236 @@
+\hypertarget{classydlidar_1_1_y_dlidar_driver}{}\section{ydlidar\+:\+:Y\+Dlidar\+Driver Class Reference}
+\label{classydlidar_1_1_y_dlidar_driver}\index{ydlidar\+::\+Y\+Dlidar\+Driver@{ydlidar\+::\+Y\+Dlidar\+Driver}}
+
+
+Collaboration diagram for ydlidar\+:\+:Y\+Dlidar\+Driver\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classydlidar_1_1_y_dlidar_driver__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ {\bfseries D\+E\+F\+A\+U\+L\+T\+\_\+\+T\+I\+M\+E\+O\+UT} = 2000, 
+{\bfseries D\+E\+F\+A\+U\+L\+T\+\_\+\+H\+E\+A\+R\+T\+\_\+\+B\+E\+AT} = 1000, 
+{\bfseries M\+A\+X\+\_\+\+S\+C\+A\+N\+\_\+\+N\+O\+D\+ES} = 2048
+ \}\hypertarget{classydlidar_1_1_y_dlidar_driver_a13a4f2dc4067b43794b2c47c06d5d27a}{}\label{classydlidar_1_1_y_dlidar_driver_a13a4f2dc4067b43794b2c47c06d5d27a}
+
+\item 
+enum \{ \\*
+{\bfseries Y\+D\+L\+I\+D\+A\+R\+\_\+\+F4} =1, 
+{\bfseries Y\+D\+L\+I\+D\+A\+R\+\_\+\+T1} =2, 
+{\bfseries Y\+D\+L\+I\+D\+A\+R\+\_\+\+F2} =3, 
+{\bfseries Y\+D\+L\+I\+D\+A\+R\+\_\+\+S4} =4, 
+\\*
+{\bfseries Y\+D\+L\+I\+D\+A\+R\+\_\+\+G4} =5, 
+{\bfseries Y\+D\+L\+I\+D\+A\+R\+\_\+\+X4} =6
+ \}\hypertarget{classydlidar_1_1_y_dlidar_driver_abbb612f1ac6a9f6dfdcfeafb149dd0da}{}\label{classydlidar_1_1_y_dlidar_driver_abbb612f1ac6a9f6dfdcfeafb149dd0da}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+result\+\_\+t {\bfseries connect} (const char $\ast$port\+\_\+path, uint32\+\_\+t baudrate)\hypertarget{classydlidar_1_1_y_dlidar_driver_a2c5eeecccaa6ed874635de1617e8d7d8}{}\label{classydlidar_1_1_y_dlidar_driver_a2c5eeecccaa6ed874635de1617e8d7d8}
+
+\item 
+void {\bfseries disconnect} ()\hypertarget{classydlidar_1_1_y_dlidar_driver_aa26790ae49d33936229fa67739a8ff5f}{}\label{classydlidar_1_1_y_dlidar_driver_aa26790ae49d33936229fa67739a8ff5f}
+
+\item 
+const bool {\bfseries isscanning} ()\hypertarget{classydlidar_1_1_y_dlidar_driver_ab6e35a7ba1eea55dc7ff1d03e0de9a46}{}\label{classydlidar_1_1_y_dlidar_driver_ab6e35a7ba1eea55dc7ff1d03e0de9a46}
+
+\item 
+const bool {\bfseries isconnected} ()\hypertarget{classydlidar_1_1_y_dlidar_driver_ad4eee87f94cdbeabb3866b7dca08249f}{}\label{classydlidar_1_1_y_dlidar_driver_ad4eee87f94cdbeabb3866b7dca08249f}
+
+\item 
+void {\bfseries set\+Intensities} (const bool isintensities)\hypertarget{classydlidar_1_1_y_dlidar_driver_a406ae191df8a2a2fa90de4175cfe9d4c}{}\label{classydlidar_1_1_y_dlidar_driver_a406ae191df8a2a2fa90de4175cfe9d4c}
+
+\item 
+const bool {\bfseries get\+Heart\+Beat} ()\hypertarget{classydlidar_1_1_y_dlidar_driver_acbfb9ad990b09902afee8d868a473f68}{}\label{classydlidar_1_1_y_dlidar_driver_acbfb9ad990b09902afee8d868a473f68}
+
+\item 
+void {\bfseries set\+Heart\+Beat} (const bool enable)\hypertarget{classydlidar_1_1_y_dlidar_driver_ab2bf62735be18019864c12f0e462c4a2}{}\label{classydlidar_1_1_y_dlidar_driver_ab2bf62735be18019864c12f0e462c4a2}
+
+\item 
+result\+\_\+t {\bfseries send\+Heart\+Beat} ()\hypertarget{classydlidar_1_1_y_dlidar_driver_a6e7dc7cd2a73d24a763cebde840a5d30}{}\label{classydlidar_1_1_y_dlidar_driver_a6e7dc7cd2a73d24a763cebde840a5d30}
+
+\item 
+result\+\_\+t {\bfseries get\+Health} (\hyperlink{structdevice__health}{device\+\_\+health} \&health, uint32\+\_\+t timeout=D\+E\+F\+A\+U\+L\+T\+\_\+\+T\+I\+M\+E\+O\+UT)\hypertarget{classydlidar_1_1_y_dlidar_driver_a9fe6f8b842a2aff2c3ae13f8423b03f4}{}\label{classydlidar_1_1_y_dlidar_driver_a9fe6f8b842a2aff2c3ae13f8423b03f4}
+
+\item 
+result\+\_\+t {\bfseries get\+Device\+Info} (\hyperlink{structdevice__info}{device\+\_\+info} \&info, uint32\+\_\+t timeout=D\+E\+F\+A\+U\+L\+T\+\_\+\+T\+I\+M\+E\+O\+UT)\hypertarget{classydlidar_1_1_y_dlidar_driver_ab75303116c4ccb144ecc215e94114e1a}{}\label{classydlidar_1_1_y_dlidar_driver_ab75303116c4ccb144ecc215e94114e1a}
+
+\item 
+result\+\_\+t {\bfseries start\+Scan} (bool force=false, uint32\+\_\+t timeout=D\+E\+F\+A\+U\+L\+T\+\_\+\+T\+I\+M\+E\+O\+UT)\hypertarget{classydlidar_1_1_y_dlidar_driver_a62888da8520422b7daaae89c2935460b}{}\label{classydlidar_1_1_y_dlidar_driver_a62888da8520422b7daaae89c2935460b}
+
+\item 
+result\+\_\+t {\bfseries stop} ()\hypertarget{classydlidar_1_1_y_dlidar_driver_a7aa354e88eeb6984be4d18eae6367a0b}{}\label{classydlidar_1_1_y_dlidar_driver_a7aa354e88eeb6984be4d18eae6367a0b}
+
+\item 
+result\+\_\+t {\bfseries grab\+Scan\+Data} (\hyperlink{structnode__info}{node\+\_\+info} $\ast$nodebuffer, size\+\_\+t \&count, uint32\+\_\+t timeout=D\+E\+F\+A\+U\+L\+T\+\_\+\+T\+I\+M\+E\+O\+UT)\hypertarget{classydlidar_1_1_y_dlidar_driver_a6d6e04efa9d7e5d4aea41ee53d4ea8af}{}\label{classydlidar_1_1_y_dlidar_driver_a6d6e04efa9d7e5d4aea41ee53d4ea8af}
+
+\item 
+result\+\_\+t {\bfseries ascend\+Scan\+Data} (\hyperlink{structnode__info}{node\+\_\+info} $\ast$nodebuffer, size\+\_\+t count)\hypertarget{classydlidar_1_1_y_dlidar_driver_a6494501f3fee2f6dc410f869bbc18cb9}{}\label{classydlidar_1_1_y_dlidar_driver_a6494501f3fee2f6dc410f869bbc18cb9}
+
+\item 
+void {\bfseries simple\+Scan\+Data} (std\+::vector$<$ \hyperlink{structscan_dot}{scan\+Dot} $>$ $\ast$scan\+\_\+data, \hyperlink{structnode__info}{node\+\_\+info} $\ast$buffer, size\+\_\+t count)\hypertarget{classydlidar_1_1_y_dlidar_driver_a797de2678c6c81c84a8126cf184a0254}{}\label{classydlidar_1_1_y_dlidar_driver_a797de2678c6c81c84a8126cf184a0254}
+
+\item 
+result\+\_\+t {\bfseries reset} (uint32\+\_\+t timeout=D\+E\+F\+A\+U\+L\+T\+\_\+\+T\+I\+M\+E\+O\+UT)\hypertarget{classydlidar_1_1_y_dlidar_driver_a3dd4086c5685163f7c7487ea0f5af08c}{}\label{classydlidar_1_1_y_dlidar_driver_a3dd4086c5685163f7c7487ea0f5af08c}
+
+\item 
+result\+\_\+t {\bfseries start\+Motor} ()\hypertarget{classydlidar_1_1_y_dlidar_driver_a2e686ef1ce60f3241352a798330f760b}{}\label{classydlidar_1_1_y_dlidar_driver_a2e686ef1ce60f3241352a798330f760b}
+
+\item 
+result\+\_\+t {\bfseries stop\+Motor} ()\hypertarget{classydlidar_1_1_y_dlidar_driver_a6cdf0c5a7ddf2375c1392c3a0e65edfe}{}\label{classydlidar_1_1_y_dlidar_driver_a6cdf0c5a7ddf2375c1392c3a0e65edfe}
+
+\item 
+result\+\_\+t {\bfseries get\+Scan\+Frequency} (\hyperlink{structscan__frequency}{scan\+\_\+frequency} \&frequency, uint32\+\_\+t timeout=D\+E\+F\+A\+U\+L\+T\+\_\+\+T\+I\+M\+E\+O\+UT)\hypertarget{classydlidar_1_1_y_dlidar_driver_a76efb701e137121b213f61028e3f235e}{}\label{classydlidar_1_1_y_dlidar_driver_a76efb701e137121b213f61028e3f235e}
+
+\item 
+result\+\_\+t {\bfseries set\+Scan\+Frequency\+Add} (\hyperlink{structscan__frequency}{scan\+\_\+frequency} \&frequency, uint32\+\_\+t timeout=D\+E\+F\+A\+U\+L\+T\+\_\+\+T\+I\+M\+E\+O\+UT)\hypertarget{classydlidar_1_1_y_dlidar_driver_a0feea99573991bb4eb6f8e1718a71435}{}\label{classydlidar_1_1_y_dlidar_driver_a0feea99573991bb4eb6f8e1718a71435}
+
+\item 
+result\+\_\+t {\bfseries set\+Scan\+Frequency\+Dis} (\hyperlink{structscan__frequency}{scan\+\_\+frequency} \&frequency, uint32\+\_\+t timeout=D\+E\+F\+A\+U\+L\+T\+\_\+\+T\+I\+M\+E\+O\+UT)\hypertarget{classydlidar_1_1_y_dlidar_driver_a811e3e1f0012925c8a90aebda9716738}{}\label{classydlidar_1_1_y_dlidar_driver_a811e3e1f0012925c8a90aebda9716738}
+
+\item 
+result\+\_\+t {\bfseries set\+Scan\+Frequency\+Add\+Mic} (\hyperlink{structscan__frequency}{scan\+\_\+frequency} \&frequency, uint32\+\_\+t timeout=D\+E\+F\+A\+U\+L\+T\+\_\+\+T\+I\+M\+E\+O\+UT)\hypertarget{classydlidar_1_1_y_dlidar_driver_aa801f64f5ca2ce1e70ee096eb0b4b612}{}\label{classydlidar_1_1_y_dlidar_driver_aa801f64f5ca2ce1e70ee096eb0b4b612}
+
+\item 
+result\+\_\+t {\bfseries set\+Scan\+Frequency\+Dis\+Mic} (\hyperlink{structscan__frequency}{scan\+\_\+frequency} \&frequency, uint32\+\_\+t timeout=D\+E\+F\+A\+U\+L\+T\+\_\+\+T\+I\+M\+E\+O\+UT)\hypertarget{classydlidar_1_1_y_dlidar_driver_a00e69cf360eeca890dbaf964ab6f67b7}{}\label{classydlidar_1_1_y_dlidar_driver_a00e69cf360eeca890dbaf964ab6f67b7}
+
+\item 
+result\+\_\+t {\bfseries get\+Sampling\+Rate} (\hyperlink{structsampling__rate}{sampling\+\_\+rate} \&rate, uint32\+\_\+t timeout=D\+E\+F\+A\+U\+L\+T\+\_\+\+T\+I\+M\+E\+O\+UT)\hypertarget{classydlidar_1_1_y_dlidar_driver_a7b7812329013f119235abf74da397aaa}{}\label{classydlidar_1_1_y_dlidar_driver_a7b7812329013f119235abf74da397aaa}
+
+\item 
+result\+\_\+t {\bfseries set\+Sampling\+Rate} (\hyperlink{structsampling__rate}{sampling\+\_\+rate} \&rate, uint32\+\_\+t timeout=D\+E\+F\+A\+U\+L\+T\+\_\+\+T\+I\+M\+E\+O\+UT)\hypertarget{classydlidar_1_1_y_dlidar_driver_a30f9219bcf3aa3a8df2bbdae983ccd02}{}\label{classydlidar_1_1_y_dlidar_driver_a30f9219bcf3aa3a8df2bbdae983ccd02}
+
+\item 
+result\+\_\+t {\bfseries set\+Rotation\+Positive} (\hyperlink{structscan__rotation}{scan\+\_\+rotation} \&rotation, uint32\+\_\+t timeout=D\+E\+F\+A\+U\+L\+T\+\_\+\+T\+I\+M\+E\+O\+UT)\hypertarget{classydlidar_1_1_y_dlidar_driver_ae6645c26b9b46b2aa4aaae87521a38f1}{}\label{classydlidar_1_1_y_dlidar_driver_ae6645c26b9b46b2aa4aaae87521a38f1}
+
+\item 
+result\+\_\+t {\bfseries set\+Rotation\+Inversion} (\hyperlink{structscan__rotation}{scan\+\_\+rotation} \&rotation, uint32\+\_\+t timeout=D\+E\+F\+A\+U\+L\+T\+\_\+\+T\+I\+M\+E\+O\+UT)\hypertarget{classydlidar_1_1_y_dlidar_driver_a1569723d0e46b801aee5284455f3b1d1}{}\label{classydlidar_1_1_y_dlidar_driver_a1569723d0e46b801aee5284455f3b1d1}
+
+\item 
+result\+\_\+t {\bfseries enable\+Lower\+Power} (\hyperlink{structfunction__state}{function\+\_\+state} \&state, uint32\+\_\+t timeout=D\+E\+F\+A\+U\+L\+T\+\_\+\+T\+I\+M\+E\+O\+UT)\hypertarget{classydlidar_1_1_y_dlidar_driver_a85a9af2aff7201a42f000299990b0ce5}{}\label{classydlidar_1_1_y_dlidar_driver_a85a9af2aff7201a42f000299990b0ce5}
+
+\item 
+result\+\_\+t {\bfseries disable\+Lower\+Power} (\hyperlink{structfunction__state}{function\+\_\+state} \&state, uint32\+\_\+t timeout=D\+E\+F\+A\+U\+L\+T\+\_\+\+T\+I\+M\+E\+O\+UT)\hypertarget{classydlidar_1_1_y_dlidar_driver_a18895e94f42ce61890b4912727cdfbd8}{}\label{classydlidar_1_1_y_dlidar_driver_a18895e94f42ce61890b4912727cdfbd8}
+
+\item 
+result\+\_\+t {\bfseries get\+Motor\+State} (\hyperlink{structfunction__state}{function\+\_\+state} \&state, uint32\+\_\+t timeout=D\+E\+F\+A\+U\+L\+T\+\_\+\+T\+I\+M\+E\+O\+UT)\hypertarget{classydlidar_1_1_y_dlidar_driver_af5d460ababe4b8a34b02d33268f24d4d}{}\label{classydlidar_1_1_y_dlidar_driver_af5d460ababe4b8a34b02d33268f24d4d}
+
+\item 
+result\+\_\+t {\bfseries enable\+Const\+Freq} (\hyperlink{structfunction__state}{function\+\_\+state} \&state, uint32\+\_\+t timeout=D\+E\+F\+A\+U\+L\+T\+\_\+\+T\+I\+M\+E\+O\+UT)\hypertarget{classydlidar_1_1_y_dlidar_driver_a1e5c25618be9867dfdb1aa2f5e9cb93c}{}\label{classydlidar_1_1_y_dlidar_driver_a1e5c25618be9867dfdb1aa2f5e9cb93c}
+
+\item 
+result\+\_\+t {\bfseries disable\+Const\+Freq} (\hyperlink{structfunction__state}{function\+\_\+state} \&state, uint32\+\_\+t timeout=D\+E\+F\+A\+U\+L\+T\+\_\+\+T\+I\+M\+E\+O\+UT)\hypertarget{classydlidar_1_1_y_dlidar_driver_ae4b3883dd18bf01737bc4783d2dae974}{}\label{classydlidar_1_1_y_dlidar_driver_ae4b3883dd18bf01737bc4783d2dae974}
+
+\item 
+result\+\_\+t {\bfseries set\+Save\+Low\+Exposure} (\hyperlink{structscan__exposure}{scan\+\_\+exposure} \&low\+\_\+exposure, uint32\+\_\+t timeout=D\+E\+F\+A\+U\+L\+T\+\_\+\+T\+I\+M\+E\+O\+UT)\hypertarget{classydlidar_1_1_y_dlidar_driver_a73ef6628afc1eadf2f3079db99b383c6}{}\label{classydlidar_1_1_y_dlidar_driver_a73ef6628afc1eadf2f3079db99b383c6}
+
+\item 
+result\+\_\+t {\bfseries set\+Low\+Exposure} (\hyperlink{structscan__exposure}{scan\+\_\+exposure} \&low\+\_\+exposure, uint32\+\_\+t timeout=D\+E\+F\+A\+U\+L\+T\+\_\+\+T\+I\+M\+E\+O\+UT)\hypertarget{classydlidar_1_1_y_dlidar_driver_a02257e37b792870a9c42f8abfbe543ad}{}\label{classydlidar_1_1_y_dlidar_driver_a02257e37b792870a9c42f8abfbe543ad}
+
+\item 
+result\+\_\+t {\bfseries set\+Low\+Exposure\+Add} (\hyperlink{structscan__exposure}{scan\+\_\+exposure} \&exposure, uint32\+\_\+t timeout=D\+E\+F\+A\+U\+L\+T\+\_\+\+T\+I\+M\+E\+O\+UT)\hypertarget{classydlidar_1_1_y_dlidar_driver_a3f34ad1119b9b97c4af3936e80c182f4}{}\label{classydlidar_1_1_y_dlidar_driver_a3f34ad1119b9b97c4af3936e80c182f4}
+
+\item 
+result\+\_\+t {\bfseries set\+Low\+Exposurer\+Dis} (\hyperlink{structscan__exposure}{scan\+\_\+exposure} \&exposure, uint32\+\_\+t timeout=D\+E\+F\+A\+U\+L\+T\+\_\+\+T\+I\+M\+E\+O\+UT)\hypertarget{classydlidar_1_1_y_dlidar_driver_aece83871e5912d19bc7677676a5511f8}{}\label{classydlidar_1_1_y_dlidar_driver_aece83871e5912d19bc7677676a5511f8}
+
+\item 
+result\+\_\+t {\bfseries set\+Scan\+Heartbeat} (\hyperlink{structscan__heart__beat}{scan\+\_\+heart\+\_\+beat} \&beat, uint32\+\_\+t timeout=D\+E\+F\+A\+U\+L\+T\+\_\+\+T\+I\+M\+E\+O\+UT)\hypertarget{classydlidar_1_1_y_dlidar_driver_ab2d5434c9b640a38f9d3b43b07c0b3eb}{}\label{classydlidar_1_1_y_dlidar_driver_ab2d5434c9b640a38f9d3b43b07c0b3eb}
+
+\item 
+result\+\_\+t {\bfseries set\+Points\+For\+One\+Ring\+Flag} (\hyperlink{structscan__points}{scan\+\_\+points} \&points, uint32\+\_\+t timeout=D\+E\+F\+A\+U\+L\+T\+\_\+\+T\+I\+M\+E\+O\+UT)\hypertarget{classydlidar_1_1_y_dlidar_driver_a1c8d40889885386e6c5a7827b7747696}{}\label{classydlidar_1_1_y_dlidar_driver_a1c8d40889885386e6c5a7827b7747696}
+
+\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \hyperlink{classydlidar_1_1_y_dlidar_driver}{Y\+Dlidar\+Driver} $\ast$ {\bfseries singleton} ()\hypertarget{classydlidar_1_1_y_dlidar_driver_ae647504b6232c8fce584ca2d011a07d3}{}\label{classydlidar_1_1_y_dlidar_driver_ae647504b6232c8fce584ca2d011a07d3}
+
+\item 
+static void {\bfseries init\+Driver} ()\hypertarget{classydlidar_1_1_y_dlidar_driver_a15629ca7d39a463d1b18a5e35300dfe7}{}\label{classydlidar_1_1_y_dlidar_driver_a15629ca7d39a463d1b18a5e35300dfe7}
+
+\item 
+static void {\bfseries done} ()\hypertarget{classydlidar_1_1_y_dlidar_driver_a167ea8a27d77fae98488f1ba7f31969c}{}\label{classydlidar_1_1_y_dlidar_driver_a167ea8a27d77fae98488f1ba7f31969c}
+
+\item 
+static std\+::string {\bfseries get\+S\+D\+K\+Version} ()\hypertarget{classydlidar_1_1_y_dlidar_driver_a542dc18ac8dbcda2a51657cf9bd44ae0}{}\label{classydlidar_1_1_y_dlidar_driver_a542dc18ac8dbcda2a51657cf9bd44ae0}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::atomic$<$ bool $>$ {\bfseries is\+Connected}\hypertarget{classydlidar_1_1_y_dlidar_driver_a4457578961d36ce22035d778c0fd7f06}{}\label{classydlidar_1_1_y_dlidar_driver_a4457578961d36ce22035d778c0fd7f06}
+
+\item 
+std\+::atomic$<$ bool $>$ {\bfseries is\+Scanning}\hypertarget{classydlidar_1_1_y_dlidar_driver_a245115a8c8a4f98d988fbee06810d0a4}{}\label{classydlidar_1_1_y_dlidar_driver_a245115a8c8a4f98d988fbee06810d0a4}
+
+\item 
+std\+::atomic$<$ bool $>$ {\bfseries is\+Heartbeat}\hypertarget{classydlidar_1_1_y_dlidar_driver_a8a57494e849e7735fe8bf46d00b63077}{}\label{classydlidar_1_1_y_dlidar_driver_a8a57494e849e7735fe8bf46d00b63077}
+
+\item 
+\hyperlink{structnode__info}{node\+\_\+info} {\bfseries scan\+\_\+node\+\_\+buf} \mbox{[}2048\mbox{]}\hypertarget{classydlidar_1_1_y_dlidar_driver_aeaefa47c69cbb0439b1259bdc6ccb29e}{}\label{classydlidar_1_1_y_dlidar_driver_aeaefa47c69cbb0439b1259bdc6ccb29e}
+
+\item 
+size\+\_\+t {\bfseries scan\+\_\+node\+\_\+count}\hypertarget{classydlidar_1_1_y_dlidar_driver_a106fc563bb42f19e84e8d9db1e7856fe}{}\label{classydlidar_1_1_y_dlidar_driver_a106fc563bb42f19e84e8d9db1e7856fe}
+
+\item 
+\hyperlink{class_event}{Event} {\bfseries \+\_\+data\+Event}\hypertarget{classydlidar_1_1_y_dlidar_driver_afd2b3835a0e450d9b88d28d8f574148d}{}\label{classydlidar_1_1_y_dlidar_driver_afd2b3835a0e450d9b88d28d8f574148d}
+
+\item 
+\hyperlink{class_locker}{Locker} {\bfseries \+\_\+lock}\hypertarget{classydlidar_1_1_y_dlidar_driver_a1bb836661c8c39c2b71c9a0de8755c5c}{}\label{classydlidar_1_1_y_dlidar_driver_a1bb836661c8c39c2b71c9a0de8755c5c}
+
+\item 
+\hyperlink{class_thread}{Thread} {\bfseries \+\_\+thread}\hypertarget{classydlidar_1_1_y_dlidar_driver_a9fbd1b3471c1aa4959d74524b9a92410}{}\label{classydlidar_1_1_y_dlidar_driver_a9fbd1b3471c1aa4959d74524b9a92410}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+result\+\_\+t {\bfseries create\+Thread} ()\hypertarget{classydlidar_1_1_y_dlidar_driver_a2d2b317fa6381009222e03670812e917}{}\label{classydlidar_1_1_y_dlidar_driver_a2d2b317fa6381009222e03670812e917}
+
+\item 
+result\+\_\+t {\bfseries wait\+Package} (\hyperlink{structnode__info}{node\+\_\+info} $\ast$node, uint32\+\_\+t timeout=D\+E\+F\+A\+U\+L\+T\+\_\+\+T\+I\+M\+E\+O\+UT)\hypertarget{classydlidar_1_1_y_dlidar_driver_aaf78903693f58c7f739dfa493573b3b1}{}\label{classydlidar_1_1_y_dlidar_driver_aaf78903693f58c7f739dfa493573b3b1}
+
+\item 
+result\+\_\+t {\bfseries wait\+Scan\+Data} (\hyperlink{structnode__info}{node\+\_\+info} $\ast$nodebuffer, size\+\_\+t \&count, uint32\+\_\+t timeout=D\+E\+F\+A\+U\+L\+T\+\_\+\+T\+I\+M\+E\+O\+UT)\hypertarget{classydlidar_1_1_y_dlidar_driver_a574996217284ce34191a2f3675a9f17b}{}\label{classydlidar_1_1_y_dlidar_driver_a574996217284ce34191a2f3675a9f17b}
+
+\item 
+int {\bfseries cache\+Scan\+Data} ()\hypertarget{classydlidar_1_1_y_dlidar_driver_ab462b22dc3a4d39fef4f722345a87d5e}{}\label{classydlidar_1_1_y_dlidar_driver_ab462b22dc3a4d39fef4f722345a87d5e}
+
+\item 
+result\+\_\+t {\bfseries send\+Command} (uint8\+\_\+t cmd, const void $\ast$payload=N\+U\+LL, size\+\_\+t payloadsize=0)\hypertarget{classydlidar_1_1_y_dlidar_driver_ab096ecdc3642c04e3e8b000e210c0962}{}\label{classydlidar_1_1_y_dlidar_driver_ab096ecdc3642c04e3e8b000e210c0962}
+
+\item 
+result\+\_\+t {\bfseries wait\+Response\+Header} (\hyperlink{structlidar__ans__header}{lidar\+\_\+ans\+\_\+header} $\ast$header, uint32\+\_\+t timeout=D\+E\+F\+A\+U\+L\+T\+\_\+\+T\+I\+M\+E\+O\+UT)\hypertarget{classydlidar_1_1_y_dlidar_driver_a0e089d615193ccef4bf488f63ff8130e}{}\label{classydlidar_1_1_y_dlidar_driver_a0e089d615193ccef4bf488f63ff8130e}
+
+\item 
+result\+\_\+t {\bfseries wait\+For\+Data} (size\+\_\+t data\+\_\+count, uint32\+\_\+t timeout=-\/1, size\+\_\+t $\ast$returned\+\_\+size=N\+U\+LL)\hypertarget{classydlidar_1_1_y_dlidar_driver_a03cb9fc8c33f9486182b44ac97690868}{}\label{classydlidar_1_1_y_dlidar_driver_a03cb9fc8c33f9486182b44ac97690868}
+
+\item 
+result\+\_\+t {\bfseries get\+Data} (uint8\+\_\+t $\ast$data, size\+\_\+t size)\hypertarget{classydlidar_1_1_y_dlidar_driver_ad787e714bc05e5a70a42b096e632c60f}{}\label{classydlidar_1_1_y_dlidar_driver_ad787e714bc05e5a70a42b096e632c60f}
+
+\item 
+result\+\_\+t {\bfseries send\+Data} (const uint8\+\_\+t $\ast$data, size\+\_\+t size)\hypertarget{classydlidar_1_1_y_dlidar_driver_a998ba4b05927d19e8a0d4d29d3d47656}{}\label{classydlidar_1_1_y_dlidar_driver_a998ba4b05927d19e8a0d4d29d3d47656}
+
+\item 
+void {\bfseries disable\+Data\+Grabbing} ()\hypertarget{classydlidar_1_1_y_dlidar_driver_ae66565bee3cdb8b74698b691f2ab1e63}{}\label{classydlidar_1_1_y_dlidar_driver_ae66565bee3cdb8b74698b691f2ab1e63}
+
+\item 
+void {\bfseries set\+D\+TR} ()\hypertarget{classydlidar_1_1_y_dlidar_driver_a88de43cf13058344fc83389cb9df7e21}{}\label{classydlidar_1_1_y_dlidar_driver_a88de43cf13058344fc83389cb9df7e21}
+
+\item 
+void {\bfseries clear\+D\+TR} ()\hypertarget{classydlidar_1_1_y_dlidar_driver_a67fe00d7458cdb52b4160d745b8ecd32}{}\label{classydlidar_1_1_y_dlidar_driver_a67fe00d7458cdb52b4160d745b8ecd32}
+
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+include/ydlidar\+\_\+driver.\+h\item 
+src/ydlidar\+\_\+driver.\+cpp\end{DoxyCompactItemize}
