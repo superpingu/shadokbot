@@ -192,7 +192,7 @@ void setup() {
 	// setup AX12 serial port
 	pinMode(17, OUTPUT); // the electronics uses a nearby IO as low current 3.3V power supply
 	digitalWrite(17, HIGH);
-	AX12::init(&Serial1, 1000000);
+	AX12::init(&Serial1, 115200);
 
 	ax12 = new AX12(0xFE);
 	pinMode(13, OUTPUT);
