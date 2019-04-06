@@ -3,45 +3,39 @@
 
 #include "Motor.hpp"
 
-extern Motion* motion; // pointer to motion instance
-
 class Motion {
 private:
+	void (*moveCallback)(); // called when a move is finished
 
-	int16_t max_acceleration;
-	int16_t min_speed;
-
-	void (*move_finished)(); // called when a move is finished
 public:
 	Motor *motor_FL, *motor_FR, *motor_RL, *motor_RR;
 
 	Motion();
 
-	// send ticks to the stepper motors at the appropriate frequency
+	// update motor speeds, must be called periodically
 	void update();
 
 	// get or set maximum allowed acceleration for the robot
-	int16_t maxAcceleration(int16_t acc = 0);
-
+	void maxAcceleration(int16_t acc);
 	// get or set minimum speed of the robot
-	uint16_t minSpeed(int16_t speed = 0);
-
+	void minSpeed(int16_t speed);
 	// enable or disable the motors drive
 	void enable(bool enabled);
-
-	// call a function when an operation (a turn or a move) finishes
-	void moveFinished(void (*func)());
 
 	// turn without moving (no translation)
 	//   angle: rotation in deg, relative, positive is counter-clockwise
 	//   angular_speed: rotation speed in deg/s (should be positive)
-	void turn(int16_t angle, uint16_t angular_speed);
+	//   callback: function to call when the turn ends
+	void turn(int32_t angle, int32_t angular_speed, void (*callback)()=NULL);
 
 	// move the robot with a linear translation
 	//   distance: distance to move in mm (must be > 0)
 	//   angle: direction in deg (0 is forward, 90 is leftward, -90 or 270 is rightward, ...)
 	//   speed: translation cruise speed (ramp-up and ramp-down excluded), in mm/s (must be > 0)
-	void move(uint16_t distance, int16_t angle, uint16_t speed);
+	//   callback: function to call when the move ends
+	void move(int32_t distance, int32_t angle, int32_t speed, void (*callback)()=NULL);
 };
+
+extern Motion* motion; // pointer to motion instance
 
 #endif

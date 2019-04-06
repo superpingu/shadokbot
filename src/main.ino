@@ -2,17 +2,11 @@
 #include "shell/Shell.hpp"
 #include "shell/commands.h"
 #include "ax12/AX12.hpp"
+#include "motion/Motion.hpp"
+#include "motion/motionconf.h"
+#include "hal/Timer.hpp"
 
 Shell* sh;
-AX12* a;
-
-void lol() {
-	static int pos = 400;
-	Serial.print(a->getVoltage());
-	Serial.print("\n");
-	a->move(pos, lol);
-	pos = 1024 - pos;
-}
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -21,18 +15,14 @@ void setup() {
 	pinMode(17, OUTPUT);
 	digitalWrite(17, HIGH);
 	AX12::init(&Serial1, 115200);
-	a = new AX12(1);
-	a->setSpeed(500);
-	a->move(600, lol);
 
-	//motion = new Motion();
-	//motion->enable(true);
+	motion = new Motion();
+	motion->enable(true);
+	motion->move(100, 180, 600);
 }
 
 // the loop function runs over and over again forever
 void loop() {
-	//motion->update();
-	sh->update();
-	AX12::update();
-	delay(10);
+	delay(5);
+	motion->update();
 }

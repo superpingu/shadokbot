@@ -31,6 +31,22 @@ Timer::Timer(int timerPeriod) : callback(NULL) {
 		timerID = 8;
 	}
 	timerInstances[timerID] = this;
+
+	// Tell the Power Management Controller to disable
+	// the write protection of the timer/Counter registers:
+	pmc_set_writeprotect(false);
+	// Enable clock for the timer
+	pmc_enable_periph_clk((uint32_t)timerData[timerID].irq);
+	// Set up the timer in waveform mode which creates a PWM
+	// in UP mode with automatic trigger on RC Compare
+	// and sets it up with the determined internal clock as clock input.
+	TC_Configure(timerData[timerID].timer, timerData[timerID].channel,
+		TC_CMR_WAVE | TC_CMR_WAVSEL_UP_RC | TC_CMR_TCCLKS_TIMER_CLOCK1);
+	// Enable the RC Compare Interrupt...
+	timerData[timerID].timer->TC_CHANNEL[timerData[timerID].channel].TC_IER=TC_IER_CPCS;
+	// ... and disable all others.
+	timerData[timerID].timer->TC_CHANNEL[timerData[timerID].channel].TC_IDR=~TC_IER_CPCS;
+
 	setPeriod(timerPeriod);
 }
 
@@ -40,23 +56,8 @@ uint32_t Timer::getPeriod() {
 void Timer::setPeriod(uint32_t timerPeriod) {
 	period = timerPeriod;
 
-	// Tell the Power Management Controller to disable
-	// the write protection of the timer/Counter registers:
-	pmc_set_writeprotect(false);
-	// Enable clock for the timer
-	pmc_enable_periph_clk((uint32_t)timerData[timerID].irq);
-
-	// Set up the timer in waveform mode which creates a PWM
-	// in UP mode with automatic trigger on RC Compare
-	// and sets it up with the determined internal clock as clock input.
-	TC_Configure(timerData[timerID].timer, timerData[timerID].channel,
-		TC_CMR_WAVE | TC_CMR_WAVSEL_UP_RC | TC_CMR_TCCLKS_TIMER_CLOCK1);
 	// Reset counter and fire interrupt when RC value is matched:
 	TC_SetRC(timerData[timerID].timer, timerData[timerID].channel, period);
-	// Enable the RC Compare Interrupt...
-	timerData[timerID].timer->TC_CHANNEL[timerData[timerID].channel].TC_IER=TC_IER_CPCS;
-	// ... and disable all others.
-	timerData[timerID].timer->TC_CHANNEL[timerData[timerID].channel].TC_IDR=~TC_IER_CPCS;
 }
 
 // set the function to call when the timer expires, and the argument to pass to the callback
