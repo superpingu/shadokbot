@@ -55,7 +55,6 @@ void Motor::update() {
 }
 
 void Motor::setPulse(bool active) {
-	digitalWrite(dirPin, (cruiseSpeed < 0) ^ invDir ^ active ? MOTOR_ACTIVE_LEVEL : MOTOR_IDLE_LEVEL);
 	digitalWrite(clockPin, active ? MOTOR_ACTIVE_LEVEL : MOTOR_IDLE_LEVEL);
 }
 
@@ -77,6 +76,9 @@ void Motor::move(int32_t speed, uint32_t distance) {
 	update();
 	// start generating pulses to the stepper motor controller
 	motorTimer->start();
+	// set rotation direction
+	digitalWrite(dirPin, (cruiseSpeed < 0) ^ invDir ? MOTOR_ACTIVE_LEVEL : MOTOR_IDLE_LEVEL);
+
 }
 
 void Motor::enable(bool enabled) {

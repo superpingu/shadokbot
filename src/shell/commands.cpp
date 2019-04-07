@@ -1,10 +1,11 @@
 #include "Shell.hpp"
 #include <Arduino.h>
-//#include "motion/Motion.hpp"
+#include "motion/Motion.hpp"
 
-/*static void moveCallback() {
+static void moveCallback() {
+	delay(200);
+	motion->enable(false);
 	Serial.print("\nMove done.\n > ");
-	motion->moveFinished(NULL);
 }
 
 static void moveCommand(int argc, char** argv) {
@@ -12,12 +13,8 @@ static void moveCommand(int argc, char** argv) {
 		Serial.print("Oops ! Syntax: m <dist mm> <angle deg> <speed mm/s>\n");
 		return;
 	}
-	motion->moveFinished(moveCallback);
-	motion->move(str2int(argv[1]), str2int(argv[2]), str2int(argv[3]));
-}*/
-
-void moveCommand(int argc, char** argv) {
-	Serial.print("lool \n\r");
+	motion->enable(true);
+	motion->move(str2int(argv[1]), str2int(argv[2]), str2int(argv[3]), moveCallback);
 }
 
 const command_t comms[] = {

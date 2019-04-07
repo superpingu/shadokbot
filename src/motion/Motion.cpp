@@ -11,10 +11,10 @@ Motion* motion; // pointer to motion instance
 
 Motion::Motion() {
 	// initialize all motors
-	motor_FL = new Motor(FL_EN, FL_DIR, FL_CK, FL_INV);
-	motor_FR = new Motor(FR_EN, FR_DIR, FR_CK, FR_INV);
-	motor_RL = new Motor(RL_EN, RL_DIR, RL_CK, RL_INV);
-	motor_RR = new Motor(RR_EN, RR_DIR, RR_CK, RR_INV);
+	motor_FL = new Motor(FL_EN, FL_DIR, FL_CK, FL_INVDIR);
+	motor_FR = new Motor(FR_EN, FR_DIR, FR_CK, FR_INVDIR);
+	motor_RL = new Motor(RL_EN, RL_DIR, RL_CK, RL_INVDIR);
+	motor_RR = new Motor(RR_EN, RR_DIR, RR_CK, RR_INVDIR);
 
 	moveCallback = NULL;
 }
@@ -25,7 +25,7 @@ void Motion::update() {
 	motor_RL->update();
 	motor_RR->update();
 
-	if(motor_FL->finished() && motor_FR->finished() && motor_RL->finished() && motor_RR->finished() && moveCallback != NULL) {
+	if(motor_FL->finished() && moveCallback != NULL) {
 		// save and set moveCallback to NULL before calling it (a new value might be given during call)
 		void (*callback)() = moveCallback;
 		moveCallback = NULL;
@@ -50,7 +50,7 @@ void Motion::enable(bool enabled) {
 	motor_RR->enable(enabled);
 }
 
-void Motion::turn(int32_t angle, uint32_t angular_speed, void (*callback)()) {
+void Motion::turn(int32_t angle, int32_t angular_speed, void (*callback)()) {
 	uint32_t dist = ABS(angle)*DEG_TO_HALTICK;
 	int32_t speed = angular_speed*DEG_PER_S_TO_HALFTICK_PER_SPEEDTU*SIGN(angle);
 	moveCallback = callback;

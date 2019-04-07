@@ -1,16 +1,26 @@
-#include "board.h"
-#include "shell/Shell.hpp"
-#include "shell/commands.h"
+#include "hal/Timer.hpp"
 #include "ax12/AX12.hpp"
 #include "motion/Motion.hpp"
-#include "motion/motionconf.h"
-#include "hal/Timer.hpp"
 
-Shell* sh;
+#include "shell/Shell.hpp"
+#include "shell/commands.h"
+
+
+Shell* shell;
+
+void lilol() {
+	delay(200);
+	motion->enable(false);
+}
+
+void lol() {
+	delay(100);
+	motion->move(200, 90, 400, lilol);
+}
 
 // the setup function runs once when you press reset or power the board
 void setup() {
-	sh = new Shell(115200, getComms());
+	shell = new Shell(115200, getComms());
 
 	pinMode(17, OUTPUT);
 	digitalWrite(17, HIGH);
@@ -18,11 +28,12 @@ void setup() {
 
 	motion = new Motion();
 	motion->enable(true);
-	motion->move(100, 180, 600);
+	motion->move(200, 270, 400, lol);
 }
 
 // the loop function runs over and over again forever
 void loop() {
 	delay(5);
 	motion->update();
+	shell->update();
 }
