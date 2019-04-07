@@ -11,6 +11,11 @@ ifeq ($(OSTYPE), darwin17)
 	ARDUINO_DIR          = /Applications/Arduino.app/Contents/Java
 	ARDUINO_PACKAGE_DIR := $(HOME)/Library/Arduino15/packages
 	MONITOR_PORT         = /dev/tty.usbmodem* # Arduino serial port
+else
+	ARDMK_DIR            = $(HOME)/Documents/TelecomRobotics/Arduino-Makefile/
+	ARDUINO_DIR          = $(HOME)/Documents/Arduino/arduino-1.8.5/java/bin/java
+	ARDUINO_PACKAGE_DIR  := $(HOME)/.arduino15/packages
+	MONITOR_PORT         = /dev/ttyACM1
 endif
 
 # end platform dependent configuration
