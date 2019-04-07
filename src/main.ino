@@ -5,7 +5,6 @@
 #include "shell/Shell.hpp"
 #include "shell/commands.h"
 
-
 Shell* shell;
 
 void lilol() {

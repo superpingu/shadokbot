@@ -6,10 +6,13 @@ OBJDIR = $(PROJECT_DIR)/build
 SRCDIR = $(PROJECT_DIR)/src
 
 # The configuration below is platform dependent
-ARDMK_DIR            = /usr/local/Cellar/arduino-mk/HEAD-4452f77
-ARDUINO_DIR          = /Applications/Arduino.app/Contents/Java
-ARDUINO_PACKAGE_DIR := $(HOME)/Library/Arduino15/packages
-MONITOR_PORT = /dev/tty.usbmodem* # Arduino serial port
+ifeq ($(OSTYPE), darwin17)
+	ARDMK_DIR            = /usr/local/Cellar/arduino-mk/HEAD-4452f77
+	ARDUINO_DIR          = /Applications/Arduino.app/Contents/Java
+	ARDUINO_PACKAGE_DIR := $(HOME)/Library/Arduino15/packages
+	MONITOR_PORT         = /dev/tty.usbmodem* # Arduino serial port
+endif
+
 # end platform dependent configuration
 
 BOARD_TAG    = arduino_due_x
