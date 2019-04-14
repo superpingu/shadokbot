@@ -3,8 +3,6 @@
 #include <stdio.h>
 #endif
 
-#define ABS(x) ((x) >= 0 ? (x) : -(x))
-
 Lidar::Lidar() :
     buffer(200) {
     stage = IDLE;
@@ -102,7 +100,15 @@ void Lidar::parseFrame() {
         finish_angle += ang_corr;
     }
 
-    angle_step = ABS((finish_angle - start_angle) / (sample_quantity - 1));
+    if (sample_quantity > 1)
+        if (finish_angle >= start_angle)
+            angle_step = (finish_angle - start_angle) / (sample_quantity - 1);
+        else
+            angle_step = (360 + finish_angle - start_angle) / (sample_quantity - 1);
+    else
+        angle_step = 0;
+
+    LOG("Start %d Finish %d Quantity %d Step %d", start_angle, finish_angle, sample_quantity, angle_step);
 
     for (int i = 0; i < sample_quantity; i++) {
         if (distances[i] == 0) {
