@@ -4,6 +4,12 @@
 #include <stdint.h>
 #include "circ_buffer.hpp"
 
+#if DEBUG
+#define LOG(str, ...) printf(str "\n", __VA_ARGS__)
+#else
+#define LOG(str,...) (void)0
+#endif
+
 typedef enum Parsing_Stage_s {
     IDLE,
     HEADER_START,

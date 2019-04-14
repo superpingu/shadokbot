@@ -1,4 +1,7 @@
 #include "lidar.hpp"
+#if DEBUG
+#include <stdio.h>
+#endif
 
 #define ABS(x) ((x) >= 0 ? (x) : -(x))
 
@@ -106,12 +109,11 @@ void Lidar::parseFrame() {
             ang_corr = 0;
         } else {
             ang_corr = (8 * (155.3-distances[i])/distances[i]);
+            LOG("ang_corr %d", ang_corr);
         }
         angle = start_angle + i * angle_step + ang_corr;
         (void)angle;
-#if DEBUG
-    printf("Angle %d dis: %d", angle, distances[i]);
-#endif
+        LOG("Angle %d dis: %d", angle, distances[i]);
     }
 }
 
