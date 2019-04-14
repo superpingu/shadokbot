@@ -35,7 +35,8 @@ LOCAL_INO_SRCS = $(SRCDIR)/main.ino
 # project sources
 LOCAL_CPP_SRCS = $(SRCDIR)/shell/commands.cpp $(SRCDIR)/shell/Shell.cpp \
 	$(SRCDIR)/ax12/AXcomms.cpp $(SRCDIR)/ax12/AX12.cpp $(SRCDIR)/hal/Timer.cpp \
-	$(SRCDIR)/motion/Motor.cpp $(SRCDIR)/motion/Motion.cpp
+	$(SRCDIR)/motion/Motor.cpp $(SRCDIR)/motion/Motion.cpp $(SRCDIR)/ydlidar_arduino/YDLidar.cpp \
+	$(SRCDIR)/lidar/circ_buffer.cpp $(SRCDIR)/lidar/lidar.cpp
 
 include $(ARDMK_DIR)/Sam.mk
 
