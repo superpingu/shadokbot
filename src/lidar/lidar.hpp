@@ -17,6 +17,9 @@ public:
     Lidar();
     ~Lidar();
     void pushSampleData(uint8_t data);
+#if DEBUG
+    Parsing_Stage_t getStage();
+#endif
 
 private:
     CircBuffer buffer;
