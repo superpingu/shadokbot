@@ -1,4 +1,5 @@
 #include "lidar.hpp"
+#include <string.h>
 #if DEBUG
 #include <stdio.h>
 #endif
@@ -48,11 +49,9 @@ void Lidar::pushSampleData(uint8_t data) {
 }
 
 void Lidar::parseFrame() {
-    uint8_t data, ret, sample_quantity, data2;
-    uint16_t raw_start_angle, raw_finish_angle;
-    uint32_t start_angle, finish_angle;
-    int32_t angle, angle_step;
+    uint8_t data, ret, data2;
 
+    memset(&raw_data, 0, sizeof(raw_data));
     ret = buffer.read(&data);
     while ((ret == 0) && (data != 0xAA)) {
         ret = buffer.read(&data);
@@ -66,58 +65,64 @@ void Lidar::parseFrame() {
     if (data != 0) { // Zero packet frame
         return;
     }
-    buffer.read(&sample_quantity);
+    buffer.read(&raw_data.sample_quantity);
 
     // Starting angle
     buffer.read(&data);
     buffer.read(&data2);
-    raw_start_angle = data | (data2 << 8);
+    raw_data.raw_start_angle = data | (data2 << 8);
 
     // Finishing angle
     buffer.read(&data);
     buffer.read(&data2);
-    raw_finish_angle = data | (data2 << 8);
+    raw_data.raw_finish_angle = data | (data2 << 8);
 
     // Check code
     buffer.read(&data);
     buffer.read(&data);
 
-    uint32_t distances[sample_quantity];
-    for (int i = 0; i < sample_quantity; i++) {
+    for (int i = 0; i < raw_data.sample_quantity; i++) {
         buffer.read(&data);
         buffer.read(&data2);
-        distances[i] = (data | (data2 << 8)) / 4;
+        raw_data.distances[i] = (data | (data2 << 8)) / 4;
     }
 
+    updateMap();
+}
+
+void Lidar::updateMap() {
+    uint32_t start_angle, finish_angle;
+    int32_t angle, angle_step;
+
     // Fixed point with 3 decimals
-    for (int i = 0; i < sample_quantity; i++) {
-        distances[i] *= FIXED_POINT_MULTIPLIER;
+    for (int i = 0; i < raw_data.sample_quantity; i++) {
+        raw_data.distances[i] *= FIXED_POINT_MULTIPLIER;
     }
 
     // Start angle
-    start_angle = raw_start_angle >> 7;
+    start_angle = raw_data.raw_start_angle >> 7;
     start_angle *= FIXED_POINT_MULTIPLIER;
-    start_angle += computeAngCorr(distances[0]);
+    start_angle += computeAngCorr(raw_data.distances[0]);
 
     // Finish angle
-    finish_angle = raw_finish_angle >> 7;
+    finish_angle = raw_data.raw_finish_angle >> 7;
     finish_angle *= FIXED_POINT_MULTIPLIER;
-    finish_angle += computeAngCorr(distances[sample_quantity - 1]);
+    finish_angle += computeAngCorr(raw_data.distances[raw_data.sample_quantity - 1]);
 
-    if (sample_quantity > 1)
+    if (raw_data.sample_quantity > 1)
         if (finish_angle >= start_angle)
-            angle_step = (finish_angle - start_angle) / (sample_quantity - 1);
+            angle_step = (finish_angle - start_angle) / (raw_data.sample_quantity - 1);
         else
-            angle_step = ((360 * FIXED_POINT_MULTIPLIER) + finish_angle - start_angle) / (sample_quantity - 1);
+            angle_step = ((360 * FIXED_POINT_MULTIPLIER) + finish_angle - start_angle) / (raw_data.sample_quantity - 1);
     else
         angle_step = 0;
 
-    LOG("Start %d Finish %d Quantity %d Step %d", start_angle, finish_angle, sample_quantity, angle_step);
+    LOG("Start %d Finish %d Quantity %d Step %d", start_angle, finish_angle, raw_data.sample_quantity, angle_step);
 
-    for (int i = 0; i < sample_quantity; i++) {
-        angle = start_angle + i * angle_step + computeAngCorr(distances[i]);
+    for (int i = 0; i < raw_data.sample_quantity; i++) {
+        angle = start_angle + i * angle_step + computeAngCorr(raw_data.distances[i]);
         (void)angle;
-        LOG("Angle %d dis: %d", angle, distances[i]);
+        LOG("Angle %d dis: %d", angle, raw_data.distances[i]);
     }
 }
 
