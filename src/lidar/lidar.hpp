@@ -21,7 +21,7 @@ typedef enum Parsing_Stage_s {
     IDLE,
     HEADER_START,
     HEADER_END,
-    CT,
+    CONTENT_TYPE,
     LENGTH
 } Parsing_Stage_t;
 
@@ -30,8 +30,10 @@ public:
     Lidar();
     ~Lidar();
     void pushSampleData(uint8_t data);
+    uint32_t* getMap();
 #if DEBUG
     Parsing_Stage_t getStage();
+    void printMap();
 #endif
 
 private:
@@ -39,10 +41,12 @@ private:
     int content_length;
     Parsing_Stage_t stage;
     Raw_Data_t raw_data;
+    uint32_t map[360];
 
     void parseFrame();
     void updateMap();
     int32_t computeAngCorr(uint32_t distance);
+    uint16_t convertAngle(int32_t angle);
 
 };
 

@@ -10,6 +10,7 @@
 Lidar::Lidar() :
     buffer(200) {
     stage = IDLE;
+    memset(&map, 0, sizeof(map));
 }
 
 Lidar::~Lidar() {
@@ -31,11 +32,11 @@ void Lidar::pushSampleData(uint8_t data) {
         break;
     case HEADER_END:
         if (data == 0x00 || data == 0x01)
-            stage = CT;
+            stage = CONTENT_TYPE;
         else
             stage = IDLE;
         break;
-    case CT:
+    case CONTENT_TYPE:
         content_length = 2 * data + 6; // 2 bytes per sample + 4 bytes for angles + 2 bytes for check code
         stage = LENGTH;
         break;
@@ -121,9 +122,12 @@ void Lidar::updateMap() {
 
     for (int i = 0; i < raw_data.sample_quantity; i++) {
         angle = start_angle + i * angle_step + computeAngCorr(raw_data.distances[i]);
-        (void)angle;
-        LOG("Angle %d dis: %d", angle, raw_data.distances[i]);
+        map[convertAngle(angle)] = raw_data.distances[i] / FIXED_POINT_MULTIPLIER;
     }
+
+#if DEBUG
+    printMap();
+#endif
 }
 
 int32_t Lidar::computeAngCorr(uint32_t distance) {
@@ -136,8 +140,30 @@ int32_t Lidar::computeAngCorr(uint32_t distance) {
     return ang_corr;
 }
 
+uint16_t Lidar::convertAngle(int32_t angle) {
+    angle /= FIXED_POINT_MULTIPLIER;
+    while (angle >= 360) {
+        angle -= 360;
+    }
+    while (angle < 0) {
+        angle += 360;
+    }
+
+    return angle;
+}
+
+uint32_t* Lidar::getMap() {
+    return map;
+}
+
 #if DEBUG
 Parsing_Stage_t Lidar::getStage() {
     return stage;
+}
+
+void Lidar::printMap() {
+    for (int i = 0; i < 360; i++) {
+        LOG("%i %d", i, map[i]);
+    }
 }
 #endif
