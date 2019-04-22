@@ -3,6 +3,9 @@
 #include <stdio.h>
 #endif
 
+#define FIXED_POINT_MULTIPLIER 1000
+#define ANG_CORR_CONST (155.3 * FIXED_POINT_MULTIPLIER)
+
 Lidar::Lidar() :
     buffer(200) {
     stage = IDLE;
@@ -47,8 +50,8 @@ void Lidar::pushSampleData(uint8_t data) {
 void Lidar::parseFrame() {
     uint8_t data, ret, sample_quantity, data2;
     uint16_t raw_start_angle, raw_finish_angle;
-    uint16_t start_angle, finish_angle;
-    int16_t ang_corr, angle, angle_step;
+    uint32_t start_angle, finish_angle;
+    int32_t angle, angle_step;
 
     ret = buffer.read(&data);
     while ((ret == 0) && (data != 0xAA)) {
@@ -79,50 +82,54 @@ void Lidar::parseFrame() {
     buffer.read(&data);
     buffer.read(&data);
 
-    uint16_t distances[sample_quantity];
+    uint32_t distances[sample_quantity];
     for (int i = 0; i < sample_quantity; i++) {
         buffer.read(&data);
         buffer.read(&data2);
         distances[i] = (data | (data2 << 8)) / 4;
     }
 
+    // Fixed point with 3 decimals
+    for (int i = 0; i < sample_quantity; i++) {
+        distances[i] *= FIXED_POINT_MULTIPLIER;
+    }
+
     // Start angle
     start_angle = raw_start_angle >> 7;
-    if (distances[0] != 0) {
-        ang_corr = (8 * (155.3-distances[0])/distances[0]);
-        start_angle += ang_corr;
-    }
+    start_angle *= FIXED_POINT_MULTIPLIER;
+    start_angle += computeAngCorr(distances[0]);
 
     // Finish angle
     finish_angle = raw_finish_angle >> 7;
-    if (distances[sample_quantity - 1] != 0) {
-        ang_corr = (8 * (155.3-distances[sample_quantity - 1])/distances[sample_quantity - 1]);
-        finish_angle += ang_corr;
-    }
+    finish_angle *= FIXED_POINT_MULTIPLIER;
+    finish_angle += computeAngCorr(distances[sample_quantity - 1]);
 
     if (sample_quantity > 1)
         if (finish_angle >= start_angle)
             angle_step = (finish_angle - start_angle) / (sample_quantity - 1);
         else
-            angle_step = (360 + finish_angle - start_angle) / (sample_quantity - 1);
+            angle_step = ((360 * FIXED_POINT_MULTIPLIER) + finish_angle - start_angle) / (sample_quantity - 1);
     else
         angle_step = 0;
 
     LOG("Start %d Finish %d Quantity %d Step %d", start_angle, finish_angle, sample_quantity, angle_step);
 
     for (int i = 0; i < sample_quantity; i++) {
-        if (distances[i] == 0) {
-            ang_corr = 0;
-        } else {
-            ang_corr = (8 * (155.3-distances[i])/distances[i]);
-            LOG("ang_corr %d", ang_corr);
-        }
-        angle = start_angle + i * angle_step + ang_corr;
+        angle = start_angle + i * angle_step + computeAngCorr(distances[i]);
         (void)angle;
         LOG("Angle %d dis: %d", angle, distances[i]);
     }
 }
 
+int32_t Lidar::computeAngCorr(uint32_t distance) {
+    int32_t ang_corr;
+    if (distance != 0)
+        ang_corr = (8047 * (ANG_CORR_CONST - distance)) / distance; // 8047 = 1000 * (21.8 * 180) / (155.3 * PI)
+    else
+        ang_corr = 0;
+
+    return ang_corr;
+}
 
 #if DEBUG
 Parsing_Stage_t Lidar::getStage() {

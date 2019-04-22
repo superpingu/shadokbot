@@ -33,6 +33,7 @@ private:
     Parsing_Stage_t stage;
 
     void parseFrame();
+    int32_t computeAngCorr(uint32_t distance);
 
 };
 
