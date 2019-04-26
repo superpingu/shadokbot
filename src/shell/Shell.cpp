@@ -39,12 +39,18 @@ void Shell::processCommand() {
 		onUnknownComm();
 }
 
-Shell::Shell(uint32_t baudrate, const command_t* _commands) {
+Shell::Shell(uint32_t baudrate, const command_t* _commands, void (*inviteCallback)(void)) {
 	index = 0;
 	commands = _commands;
+	onInviteCallback = inviteCallback;
+
 	onUnknownComm = NULL;
 	Serial.begin(baudrate);
-	Serial.print(SHELL_INVITE);
+
+	if(onInviteCallback == NULL)
+		Serial.print(" > ");
+	else
+		onInviteCallback();
 }
 
 void Shell::update() {
@@ -59,7 +65,11 @@ void Shell::update() {
 			processCommand();
 			index = 0;
 			argc = 0;
-			Serial.print(SHELL_INVITE);
+			
+			if(onInviteCallback == NULL)
+				Serial.print(" > ");
+			else
+				onInviteCallback();
 		} else if(newchar == ' ') {
 			buffer[index++] = 0;
 		} else if(newchar != '\r') { // ignore \r but add all other character to the buffer

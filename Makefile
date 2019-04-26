@@ -6,7 +6,7 @@ OBJDIR = $(PROJECT_DIR)/build
 SRCDIR = $(PROJECT_DIR)/src
 
 # The configuration below is platform dependent
-ifeq ($(OSTYPE), darwin17)
+ifeq ($(shell echo $$OSTYPE), darwin17)
 	ARDMK_DIR            = /usr/local/Cellar/arduino-mk/HEAD-4452f77
 	ARDUINO_DIR          = /Applications/Arduino.app/Contents/Java
 	ARDUINO_PACKAGE_DIR := $(HOME)/Library/Arduino15/packages
