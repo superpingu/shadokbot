@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include "circ_buffer.hpp"
+#include <Arduino.h>
 
 #if DEBUG
 #define LOG(str, ...) printf(str "\n", __VA_ARGS__)
@@ -30,6 +31,8 @@ public:
     Lidar();
     ~Lidar();
     void pushSampleData(uint8_t data);
+    void init(HardwareSerial& serial, int baudrate);
+    void startScan();
     uint32_t* getMap();
 #if DEBUG
     Parsing_Stage_t getStage();
@@ -42,6 +45,7 @@ private:
     Parsing_Stage_t stage;
     Raw_Data_t raw_data;
     uint32_t map[360];
+    HardwareSerial *serial;
 
     void parseFrame();
     void updateMap();

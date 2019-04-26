@@ -17,6 +17,36 @@ Lidar::~Lidar() {
 
 }
 
+void Lidar::init(HardwareSerial& serial, int baudrate) {
+    this->serial = &serial;
+    this->serial->begin(baudrate);
+}
+
+void Lidar::startScan() {
+    int byte, count = 0;
+    serial->write(0xA5);
+    serial->write(0x60);
+    while (1) {
+        byte = serial->read();
+        if (byte < 0) continue;
+        Serial.write(byte);
+        switch (count) {
+        case 0:
+            if (byte != 0xA5)
+                continue;
+            break;
+        case 1:
+            if (byte != 0x5A)
+                continue;
+            break;
+        }
+        count++;
+        if (count == 7)
+            break;
+
+    }
+}
+
 void Lidar::pushSampleData(uint8_t data) {
     buffer.write(data);
     switch (stage) {

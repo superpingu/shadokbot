@@ -2,14 +2,12 @@
 #include "ax12/AX12.hpp"
 #include "motion/Motion.hpp"
 #include "lidar/lidar.hpp"
-#include "ydlidar_arduino/YDLidar.h"
 
 #include "shell/Shell.hpp"
 #include "shell/commands.h"
 
 Shell* shell;
 Lidar* lidar;
-YDLidar* ydLidar;
 int count;
 
 void lilol() {
@@ -25,15 +23,14 @@ void lol() {
 // the setup function runs once when you press reset or power the board
 void setup() {
 	shell = new Shell(115200, getComms());
-	ydLidar = new YDLidar();
 	lidar = new Lidar();
 
 	pinMode(17, OUTPUT);
 	digitalWrite(17, HIGH);
 	AX12::init(&Serial1, 115200);
 
-	ydLidar->begin(Serial3, 128000);
-	ydLidar->startScan();
+	lidar->init(Serial3, 128000);
+	lidar->startScan();
 	count = 0;
 
 }
