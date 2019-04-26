@@ -52,4 +52,5 @@ lidar_test: $(LIDAR_TEST_SRCS)
 	g++ -DDEBUG=1 $(CXXFLAGS_STD) $(LIDAR_TEST_SRCS) -o lidar_test
 
 host_lidar: test/lidar_host.c lib/gnuplot_i/src/gnuplot_i.c
-	gcc $^ -o lidar_host -lm
+	mkdir -p build
+	gcc $^ -o build/lidar_host -lm
