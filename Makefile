@@ -11,6 +11,11 @@ ifeq ($(shell echo $$OSTYPE), darwin17)
 	ARDUINO_DIR          = /Applications/Arduino.app/Contents/Java
 	ARDUINO_PACKAGE_DIR := $(HOME)/Library/Arduino15/packages
 	MONITOR_PORT         = /dev/tty.usbmodem* # Arduino serial port
+else
+	ARDMK_DIR            = $(HOME)/Documents/TelecomRobotics/Arduino-Makefile/
+	ARDUINO_DIR          = $(HOME)/Documents/Arduino/arduino-1.8.5/java/bin/java
+	ARDUINO_PACKAGE_DIR  := $(HOME)/.arduino15/packages
+	MONITOR_PORT         = /dev/ttyACM1
 endif
 
 # end platform dependent configuration
@@ -28,9 +33,12 @@ CXXFLAGS_STD = -std=gnu++11 -Wall -Wextra -I$(SRCDIR)
 # main file
 LOCAL_INO_SRCS = $(SRCDIR)/main.ino
 # project sources
+LIDAR_CPP_SRCS = $(SRCDIR)/lidar/circ_buffer.cpp $(SRCDIR)/lidar/lidar.cpp
+
 LOCAL_CPP_SRCS = $(SRCDIR)/shell/commands.cpp $(SRCDIR)/shell/Shell.cpp \
 	$(SRCDIR)/ax12/AXcomms.cpp $(SRCDIR)/ax12/AX12.cpp $(SRCDIR)/hal/Timer.cpp \
-	$(SRCDIR)/motion/Motor.cpp $(SRCDIR)/motion/Motion.cpp
+	$(SRCDIR)/motion/Motor.cpp $(SRCDIR)/motion/Motion.cpp $(SRCDIR)/ydlidar_arduino/YDLidar.cpp \
+	$(LIDAR_CPP_SRCS)
 
 include $(ARDMK_DIR)/Sam.mk
 
@@ -39,3 +47,10 @@ AX12:
 
 AX12upload:
 	make upload LOCAL_INO_SRCS=AX12console/AX12console.ino
+
+LIDAR_TEST_SRCS = $(LIDAR_CPP_SRCS) test/lidar_test.cpp
+lidar_test: $(LIDAR_TEST_SRCS)
+	g++ -DDEBUG=1 $(CXXFLAGS_STD) $(LIDAR_TEST_SRCS) -o lidar_test
+
+host_lidar: test/lidar_host.c lib/gnuplot_i/src/gnuplot_i.c
+	gcc $^ -o lidar_host -lm
