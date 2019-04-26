@@ -23,25 +23,26 @@ void Lidar::init(HardwareSerial& serial, int baudrate) {
 }
 
 void Lidar::startScan() {
-    int byte, count = 0;
-    serial->write(0xA5);
-    serial->write(0x60);
+    int byte, offset = 0, length = 0;
+    serial->write(COMMAND_START_BYTE);
+    serial->write(COMMAND_CMD_START_SCAN);
     while (1) {
         byte = serial->read();
         if (byte < 0) continue;
-        Serial.write(byte);
-        switch (count) {
-        case 0:
-            if (byte != 0xA5)
+        switch (offset) {
+        case OFFSET_RESP_START_SIGN_1:
+            if (byte != RESPONSE_START_SIGN_BYTE1)
                 continue;
             break;
-        case 1:
-            if (byte != 0x5A)
+        case OFFSET_RESP_START_SIGN_2:
+            if (byte != RESPONSE_START_SIGN_BYTE2)
                 continue;
+            break;
+        default:
             break;
         }
-        count++;
-        if (count == 7)
+        offset++;
+        if (offset == 7 + length)
             break;
 
     }

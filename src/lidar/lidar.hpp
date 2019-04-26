@@ -11,6 +11,15 @@
 #define LOG(str,...) (void)0
 #endif
 
+#define RESPONSE_START_SIGN_BYTE1 0xA5
+#define RESPONSE_START_SIGN_BYTE2 0x5A
+
+#define COMMAND_START_BYTE 0xA5
+#define COMMAND_CMD_START_SCAN 0x60
+
+#define OFFSET_RESP_START_SIGN_1 0
+#define OFFSET_RESP_START_SIGN_2 1
+
 typedef struct Raw_Data_s {
     uint16_t raw_start_angle;
     uint16_t raw_finish_angle;
