@@ -52,5 +52,5 @@ LIDAR_TEST_SRCS = $(LIDAR_CPP_SRCS) test/lidar_test.cpp
 lidar_test: $(LIDAR_TEST_SRCS)
 	g++ -DDEBUG=1 $(CXXFLAGS_STD) $(LIDAR_TEST_SRCS) -o lidar_test
 
-host_lidar: test/lidar_host.c /home/sylvain/Documents/TelecomRobotics/X4/gnuplot_i/src/gnuplot_i.c
+host_lidar: test/lidar_host.c lib/gnuplot_i/src/gnuplot_i.c
 	gcc $^ -o lidar_host -lm
