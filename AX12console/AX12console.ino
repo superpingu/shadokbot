@@ -64,8 +64,6 @@ void dump(int argc, char** argv) {
 			Serial.write('\n');
 		}
 	}
-
-	Serial.print((int) ax12->id);
 }
 
 void scan(int argc, char** argv) {
@@ -85,7 +83,6 @@ void scan(int argc, char** argv) {
 	Serial.write('\n');
 
 	ax12->id = savedID;
-	Serial.print((int) ax12->id);
 }
 
 void setBaudrate(int argc, char** argv) {
@@ -95,8 +92,6 @@ void setBaudrate(int argc, char** argv) {
 		Serial1.flush();
 		Serial1.begin(str2int(argv[1]));
 	}
-
-	Serial.print((int) ax12->id);
 }
 
 void setid(int argc, char** argv) {
@@ -105,7 +100,6 @@ void setid(int argc, char** argv) {
 	} else {
 		ax12->id = str2int(argv[1]);
 	}
-	Serial.print((int) ax12->id);
 }
 
 void accessReg(int argc, char** argv) {
@@ -140,12 +134,28 @@ void accessReg(int argc, char** argv) {
 		} else {
 			ax12->write8(regs[i].addr, (uint8_t) str2int(argv[1]));
 		}
-		Serial.print("OK\n");
 	} else {
-		Serial.print("Syntax : COMMAND [value to write] (if value to write omitted, register is read)");
+		Serial.print("Syntax : COMMAND [value to write] (if value to write omitted, register is read)\n");
 	}
+}
 
-	Serial.print((int) ax12->id);
+void errorTest(int argc, char** argv) {
+	uint8_t value;
+	(void) argc; (void) argv;
+
+	Serial.print("Running 400 ID reads ...");
+	Serial.flush();
+
+	ax12->errorCounter = 0;
+	ax12->verbose = false;
+	for (int i = 0; i < 400; i++) {
+		ax12->read8(0x03, &value);
+	}
+	ax12->verbose = true;
+
+	Serial.print(" got ");
+	Serial.print(ax12->errorCounter);
+	Serial.print(" errors\n");
 }
 
 const command_t comms[] = {
@@ -153,6 +163,7 @@ const command_t comms[] = {
 	{"scan", scan},
 	{"id", setid},
 	{"baud", setBaudrate},
+	{"errortest", errorTest},
 	{"ID", accessReg},
 	{"BAUDRATE", accessReg},
 	{"DELAY", accessReg},
@@ -179,35 +190,45 @@ const command_t comms[] = {
 	{NULL, NULL}
 };
 
-void shellUnknownCommand() {
-	Serial.print("Unknown command\n");
-	Serial.print((int) ax12->id);
-}
-
-// the setup function runs once when you press reset or power the board
-void setup() {
-	sh = new Shell(115200, comms);
-	sh->onUnknownCommand(shellUnknownCommand);
-
-	// setup AX12 serial port
-	pinMode(17, OUTPUT); // the electronics uses a nearby IO as low current 3.3V power supply
-	digitalWrite(17, HIGH);
-	AX12::init(&Serial1, 115200);
-
-	ax12 = new AX12(0xFE);
-	pinMode(13, OUTPUT);
-
-	Serial.print("\n                    ===  AX12 interactive console ===\n");
+void printHelp() {
 	Serial.print("available commands:\n");
 	Serial.print("  id <ID> : set working ID, subsequent commands will target AX12 with given ID\n");
 	Serial.print("  baud <baudrate> : set AX12 serial port speed\n");
 	Serial.print("  scan : print all AX12 IDs responding to a ping\n");
 	Serial.print("  dump : show all AX12 registers value\n");
+	Serial.print("  errortest : test link reliability, do 200 reads and print error count\n");
 	Serial.print("  <name of a register> : return the register current value\n");
 	Serial.print("  <name of a register> <value>: write a value to an AX12 register\n");
 	Serial.print("      (available names are listed with a dump command)\n\n");
+}
+
+void shellUnknownCommand() {
+	Serial.print("Unknown command\n");
+	printHelp();
+}
+
+// print shell invite
+void onShellInvite() {
 	Serial.print((int) ax12->id);
-	Serial.print(SHELL_INVITE);
+	Serial.print(" > ");
+}
+
+// the setup function runs once when you press reset or power the board
+void setup() {
+	// on the standalone board, the electronics uses a nearby IO as low current 3.3V power supply
+	// pinMode(17, OUTPUT);
+	// digitalWrite(17, HIGH);
+
+	// setup AX12 serial port
+	AX12::init(&Serial1, 115200);
+	ax12 = new AX12(0xFE);
+
+	sh = new Shell(115200, comms, onShellInvite);
+	sh->onUnknownCommand(shellUnknownCommand);
+
+	Serial.print("\n                    ===  AX12 interactive console ===\n");
+	printHelp();
+	onShellInvite();
 }
 
 // the loop function runs over and over again forever
