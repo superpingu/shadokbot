@@ -3,7 +3,11 @@
 
 #include <stdint.h>
 #include "circ_buffer.hpp"
+#if DEBUG
+#include "../test/arduino_mockup.h"
+#else
 #include <Arduino.h>
+#endif
 
 #if DEBUG
 #define LOG(str, ...) printf(str "\n", __VA_ARGS__)

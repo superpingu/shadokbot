@@ -47,10 +47,10 @@ AX12:
 AX12upload:
 	make upload LOCAL_INO_SRCS=AX12console/AX12console.ino
 
-LIDAR_TEST_SRCS = $(LIDAR_CPP_SRCS) test/lidar_test.cpp
+LIDAR_TEST_SRCS = $(LIDAR_CPP_SRCS) test/lidar_test.cpp test/arduino_mockup.cpp
 lidar_test: $(LIDAR_TEST_SRCS)
-	g++ -DDEBUG=1 $(CXXFLAGS_STD) $(LIDAR_TEST_SRCS) -o lidar_test
+	g++ -DDEBUG=1 $(CXXFLAGS_STD) $(LIDAR_TEST_SRCS) -o $(OBJDIR)/lidar_test
 
 host_lidar: test/lidar_host.c lib/gnuplot_i/src/gnuplot_i.c
 	mkdir -p build
-	gcc $^ -o build/lidar_host -lm
+	gcc $^ -o $(OBJDIR)/lidar_host -lm
