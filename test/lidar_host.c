@@ -8,6 +8,8 @@
 #include </home/sylvain/Documents/TelecomRobotics/X4/gnuplot_i/src/gnuplot_i.h>
 #include <math.h>
 
+#define ANGLE_MAX 720
+
 // Copied from https://stackoverflow.com/questions/6947413/how-to-open-read-and-write-from-serial-port-in-c
 int
 set_interface_attribs (int fd, int speed, int parity)
@@ -77,8 +79,8 @@ typedef enum {
 char *portname = "/dev/ttyACM1";
 int main(int argc, char *argv[]) {
     gnuplot_ctrl *h = gnuplot_init();
-    double x[360];
-    double y[360];
+    double x[ANGLE_MAX];
+    double y[ANGLE_MAX];
 
     memset(x, 0, sizeof(x));
     memset(y, 0, sizeof(y));
@@ -96,7 +98,7 @@ int main(int argc, char *argv[]) {
     int ret, angle, distance;
     Status_e status = UNKNOWN;
     while (1) {
-        ret = read (fd, &data, 1);  // read up to 100 characters if ready to read
+        ret = read (fd, &data, 1);  // read 1 character if ready to read
         switch (status) {
         case UNKNOWN:
             if ((ret != 0) && (data == '\n')) {
@@ -120,8 +122,9 @@ int main(int argc, char *argv[]) {
                 if (data == '\n') {
                     status = ANGLE;
                     printf("%d\n", distance);
-                    x[angle] = distance * cos(-angle * M_PI / 180.0); // lidar handles angle clockwise
-                    y[angle] = distance * sin(-angle * M_PI / 180.0);
+
+                    x[angle] = distance * cos(-angle * M_PI / (2.0 * 180.0)); // lidar handles angle clockwise
+                    y[angle] = distance * sin(-angle * M_PI / (2.0 * 180.0));
                     angle = 0;
                 } else if ((data >= '0') && (data <= '9')){
                     distance = distance * 10 + (data - '0');
@@ -132,9 +135,9 @@ int main(int argc, char *argv[]) {
             break;
         }
 
-        if (angle == 359) {
+        if (angle == ANGLE_MAX - 1) {
             gnuplot_resetplot(h);
-            gnuplot_plot_xy(h, x, y, 360, "map");
+            gnuplot_plot_xy(h, x, y, ANGLE_MAX, "map");
         }
     }
 

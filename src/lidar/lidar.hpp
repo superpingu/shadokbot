@@ -20,6 +20,8 @@
 #define OFFSET_RESP_START_SIGN_1 0
 #define OFFSET_RESP_START_SIGN_2 1
 
+#define ANGLE_MAX 720
+
 typedef struct Raw_Data_s {
     uint16_t raw_start_angle;
     uint16_t raw_finish_angle;
@@ -53,7 +55,7 @@ private:
     int content_length;
     Parsing_Stage_t stage;
     Raw_Data_t raw_data;
-    uint32_t map[360];
+    uint32_t map[ANGLE_MAX];
     HardwareSerial *serial;
 
     void parseFrame();

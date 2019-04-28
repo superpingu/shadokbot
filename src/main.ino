@@ -46,7 +46,7 @@ void loop() {
 	count++;
 	if (count == 100) {
 		uint32_t* map = lidar->getMap();
-		for (int i = 0; i < 360; i++) {
+		for (int i = 0; i < ANGLE_MAX; i++) {
 			Serial.print(i);
 			Serial.print(" ");
 			Serial.println(map[i]);

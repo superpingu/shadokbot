@@ -133,19 +133,19 @@ void Lidar::updateMap() {
 
     // Start angle
     start_angle = raw_data.raw_start_angle >> 7;
-    start_angle *= FIXED_POINT_MULTIPLIER;
+    start_angle *= FIXED_POINT_MULTIPLIER * 2;
     start_angle += computeAngCorr(raw_data.distances[0]);
 
     // Finish angle
     finish_angle = raw_data.raw_finish_angle >> 7;
-    finish_angle *= FIXED_POINT_MULTIPLIER;
+    finish_angle *= FIXED_POINT_MULTIPLIER * 2;
     finish_angle += computeAngCorr(raw_data.distances[raw_data.sample_quantity - 1]);
 
     if (raw_data.sample_quantity > 1)
         if (finish_angle >= start_angle)
             angle_step = (finish_angle - start_angle) / (raw_data.sample_quantity - 1);
         else
-            angle_step = ((360 * FIXED_POINT_MULTIPLIER) + finish_angle - start_angle) / (raw_data.sample_quantity - 1);
+            angle_step = ((ANGLE_MAX * FIXED_POINT_MULTIPLIER) + finish_angle - start_angle) / (raw_data.sample_quantity - 1);
     else
         angle_step = 0;
 
@@ -164,7 +164,8 @@ void Lidar::updateMap() {
 int32_t Lidar::computeAngCorr(uint32_t distance) {
     int32_t ang_corr;
     if (distance != 0)
-        ang_corr = (8047 * (ANG_CORR_CONST - distance)) / distance; // 8047 = 1000 * (21.8 * 180) / (155.3 * PI)
+        // 16086 = 2 * FIXED_POINT_MULTIPLIER * (21.8 * 180) / (155.3 * PI)
+        ang_corr = (16086 * (ANG_CORR_CONST - distance)) / distance;
     else
         ang_corr = 0;
 
@@ -173,11 +174,11 @@ int32_t Lidar::computeAngCorr(uint32_t distance) {
 
 uint16_t Lidar::convertAngle(int32_t angle) {
     angle /= FIXED_POINT_MULTIPLIER;
-    while (angle >= 360) {
-        angle -= 360;
+    while (angle >= ANGLE_MAX) {
+        angle -= ANGLE_MAX;
     }
     while (angle < 0) {
-        angle += 360;
+        angle += ANGLE_MAX;
     }
 
     return angle;
@@ -193,7 +194,7 @@ Parsing_Stage_t Lidar::getStage() {
 }
 
 void Lidar::printMap() {
-    for (int i = 0; i < 360; i++) {
+    for (int i = 0; i < ANGLE_MAX; i++) {
         LOG("%i %d", i, map[i]);
     }
 }
