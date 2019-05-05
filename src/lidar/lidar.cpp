@@ -187,7 +187,8 @@ void Lidar::updateMap() {
     for (int i = 0; i < raw_data.sample_quantity; i++) {
         angle = start_angle + i * angle_step + computeAngCorr(raw_data.distances[i]);
         if ((raw_data.distances[i] >= MIN_DIST) && raw_data.distances[i] <= MAX_DIST) {
-            map[convertAngle(angle)] = raw_data.distances[i] / FIXED_POINT_MULTIPLIER;
+            map[convertAngle(angle)].distance = raw_data.distances[i] / FIXED_POINT_MULTIPLIER;
+            map[convertAngle(angle)].age = 0;
         }
     }
 
@@ -219,11 +220,17 @@ uint16_t Lidar::convertAngle(int32_t angle) {
     return angle;
 }
 
-uint32_t* Lidar::getMap() {
+Map_Data_t* Lidar::getMap() {
     return map;
 }
 
 void Lidar::update() {
+    // Increment age of data
+    for (int i = 0; i < ANGLE_MAX; i++) {
+        map[i].age++;
+    }
+
+    // Parse new data
     while (needParsing()) {
         parseFrame();
         frameToParse--;
@@ -241,7 +248,7 @@ Parsing_Stage_t Lidar::getStage() {
 
 void Lidar::printMap() {
     for (int i = 0; i < ANGLE_MAX; i++) {
-        LOG("%i %d", i, map[i]);
+        LOG("%i %d", i, map[i].distance);
     }
 }
 #endif

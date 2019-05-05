@@ -44,11 +44,14 @@ void loop() {
 
 	count++;
 	if (count == 100) {
-		uint32_t* map = lidar->getMap();
+		Map_Data_t* map = lidar->getMap();
 		for (int i = 0; i < ANGLE_MAX; i++) {
 			Serial.print(i);
 			Serial.print(" ");
-			Serial.println(map[i]);
+			if (map[i].age < 300)
+				Serial.println(map[i].distance);
+			else
+				Serial.println(0);
 		}
 		count = 0;
 	}
