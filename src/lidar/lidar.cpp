@@ -7,14 +7,33 @@
 #define FIXED_POINT_MULTIPLIER 1000
 #define ANG_CORR_CONST (155.3 * FIXED_POINT_MULTIPLIER)
 
+static void priv_readCb(void *ref);
+
 Lidar::Lidar() :
-    buffer(200) {
+    buffer(2000),
+    readTimer(2000 * US_TO_TIMER_PERIOD) {
     stage = IDLE;
+    frameToParse = 0;
     memset(&map, 0, sizeof(map));
+    readTimer.setCallback(&priv_readCb, this);
+    readTimer.start();
 }
 
 Lidar::~Lidar() {
 
+}
+static void priv_readCb(void *ref) {
+    Lidar *lidar;
+    if (ref != NULL) {
+        lidar = (Lidar*)ref;
+        lidar->readCb();
+    }
+}
+
+void Lidar::readCb() {
+    while (serial->available() != 0) {
+        pushSampleData(serial->read());
+    }
 }
 
 void Lidar::init(HardwareSerial& serial, int baudrate) {
@@ -75,7 +94,7 @@ void Lidar::pushSampleData(uint8_t data) {
         content_length--;
         if (content_length == 0) {
             stage = IDLE;
-            parseFrame();
+            frameToParse++;
         }
     }
 }
@@ -88,34 +107,48 @@ void Lidar::parseFrame() {
     while ((ret == 0) && (data != 0xAA)) {
         ret = buffer.read(&data);
     }
-    buffer.read(&data);
+    if (ret != 0) return;
+
+    ret = buffer.read(&data);
+    if (ret != 0) return;
     if (data != 0x55) {
         parseFrame();
         return;
     }
-    buffer.read(&data);
-    if (data != 0) { // Zero packet frame
+
+    ret = buffer.read(&data);
+    if ((ret != 0) || (data != 0)) { // No data or Zero packet frame
         return;
     }
-    buffer.read(&raw_data.sample_quantity);
+
+    ret = buffer.read(&raw_data.sample_quantity);
+    if (ret != 0) return;
 
     // Starting angle
-    buffer.read(&data);
-    buffer.read(&data2);
+    ret = buffer.read(&data);
+    if (ret != 0) return;
+    ret = buffer.read(&data2);
+    if (ret != 0) return;
     raw_data.raw_start_angle = data | (data2 << 8);
 
     // Finishing angle
-    buffer.read(&data);
-    buffer.read(&data2);
+    ret = buffer.read(&data);
+    if (ret != 0) return;
+    ret = buffer.read(&data2);
+    if (ret != 0) return;
     raw_data.raw_finish_angle = data | (data2 << 8);
 
     // Check code
-    buffer.read(&data);
-    buffer.read(&data);
+    ret = buffer.read(&data);
+    if (ret != 0) return;
+    ret = buffer.read(&data);
+    if (ret != 0) return;
 
     for (int i = 0; i < raw_data.sample_quantity; i++) {
-        buffer.read(&data);
-        buffer.read(&data2);
+        ret = buffer.read(&data);
+        if (ret != 0) return;
+        ret = buffer.read(&data2);
+        if (ret != 0) return;
         raw_data.distances[i] = (data | (data2 << 8)) / 4;
     }
 
@@ -153,7 +186,9 @@ void Lidar::updateMap() {
 
     for (int i = 0; i < raw_data.sample_quantity; i++) {
         angle = start_angle + i * angle_step + computeAngCorr(raw_data.distances[i]);
-        map[convertAngle(angle)] = raw_data.distances[i] / FIXED_POINT_MULTIPLIER;
+        if ((raw_data.distances[i] >= MIN_DIST) && raw_data.distances[i] <= MAX_DIST) {
+            map[convertAngle(angle)] = raw_data.distances[i] / FIXED_POINT_MULTIPLIER;
+        }
     }
 
 #if DEBUG
@@ -186,6 +221,17 @@ uint16_t Lidar::convertAngle(int32_t angle) {
 
 uint32_t* Lidar::getMap() {
     return map;
+}
+
+void Lidar::update() {
+    while (needParsing()) {
+        parseFrame();
+        frameToParse--;
+    }
+}
+
+bool Lidar::needParsing() {
+    return (frameToParse > 0);
 }
 
 #if DEBUG

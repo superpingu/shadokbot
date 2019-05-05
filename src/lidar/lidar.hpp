@@ -7,6 +7,7 @@
 #include "../test/arduino_mockup.h"
 #else
 #include <Arduino.h>
+#include "hal/Timer.hpp"
 #endif
 
 #if DEBUG
@@ -25,6 +26,9 @@
 #define OFFSET_RESP_START_SIGN_2 1
 
 #define ANGLE_MAX 720
+
+#define MIN_DIST (150 * FIXED_POINT_MULTIPLIER)// in mm
+#define MAX_DIST (5000 * FIXED_POINT_MULTIPLIER) // in mm
 
 typedef struct Raw_Data_s {
     uint16_t raw_start_angle;
@@ -49,6 +53,8 @@ public:
     void init(HardwareSerial& serial, int baudrate);
     void startScan();
     uint32_t* getMap();
+    void readCb();
+    void update();
 #if DEBUG
     Parsing_Stage_t getStage();
     void printMap();
@@ -61,12 +67,15 @@ private:
     Raw_Data_t raw_data;
     uint32_t map[ANGLE_MAX];
     HardwareSerial *serial;
+    Timer readTimer;
+    uint32_t frameToParse;
 
-    void parseFrame();
     void updateMap();
     int32_t computeAngCorr(uint32_t distance);
     uint16_t convertAngle(int32_t angle);
 
+    void parseFrame();
+    bool needParsing();
 };
 
 #endif // LIDAR_H

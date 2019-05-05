@@ -38,11 +38,10 @@ void setup() {
 // the loop function runs over and over again forever
 void loop() {
 	delay(5);
-//	motion->update();
+	motion->update();
 	shell->update();
-	while (Serial3.available() != 0) {
-		lidar->pushSampleData(Serial3.read());
-	}
+	lidar->update();
+
 	count++;
 	if (count == 100) {
 		uint32_t* map = lidar->getMap();
