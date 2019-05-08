@@ -4,6 +4,7 @@
 
 Map::Map() {
     memset(data, 0, sizeof(data));
+    robotAngle = 0;
 }
 
 int Map::setDataPoint(uint32_t index, uint32_t distance) {
@@ -17,12 +18,21 @@ int Map::setDataPoint(uint32_t index, uint32_t distance) {
     return 0;
 }
 
-uint32_t Map::getDistance(uint32_t index) {
-    if ((index >= MAP_SIZE) || (data[index].age > MAX_AGE)) {
+uint32_t Map::getDistance(uint32_t absoluteAngle) {
+    uint32_t relativeAngle;
+    if (absoluteAngle >= MAP_SIZE)
+        return 0;
+
+    relativeAngle = getIndexFromAbsoluteAngle(absoluteAngle);
+    if (data[relativeAngle].age > MAX_AGE) {
         return 0;
     }
 
-    return data[index].distance;
+    return data[relativeAngle].distance;
+}
+
+void Map::setRobotAngle(uint32_t newRobotAngle) {
+    robotAngle = newRobotAngle % MAP_SIZE;
 }
 
 void Map::incrementAge() {
@@ -36,4 +46,12 @@ void Map::print() {
         Serial.print(" ");
         Serial.println(getDistance(i));
     }
+}
+
+uint32_t Map::getIndexFromAbsoluteAngle(uint32_t angle) {
+    int32_t relativeAngle = angle - robotAngle;
+    while (relativeAngle < 0)
+        relativeAngle += MAP_SIZE;
+
+    return (relativeAngle % MAP_SIZE);
 }
