@@ -76,3 +76,11 @@ void Motion::move(int32_t distance, int32_t angle, int32_t speed, void (*callbac
 	motor_RL->move(yx_speed_sum, ABS(yx_dist_sum));
 	motor_RR->move(yx_speed_diff, ABS(yx_dist_diff));
 }
+
+int32_t Motion::getPosX() {
+	return 0; // TODO return actual value
+}
+
+int32_t Motion::getPosY() {
+	return 0; // TODO return actual value
+}

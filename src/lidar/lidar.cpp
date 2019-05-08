@@ -9,9 +9,9 @@
 
 static void priv_readCb(void *ref);
 
-Lidar::Lidar() :
+Lidar::Lidar(Map *pMap) :
     buffer(2000),
-    map(),
+    map(pMap),
     readTimer(2000 * US_TO_TIMER_PERIOD) {
     stage = IDLE;
     frameToParse = 0;
@@ -187,7 +187,7 @@ void Lidar::updateMap() {
     for (int i = 0; i < raw_data.sample_quantity; i++) {
         angle = start_angle + i * angle_step + computeAngCorr(raw_data.distances[i]);
         if ((raw_data.distances[i] >= MIN_DIST) && raw_data.distances[i] <= MAX_DIST) {
-            map.setDataPoint(convertAngle(angle), raw_data.distances[i] / FIXED_POINT_MULTIPLIER);
+            map->setDataPoint(convertAngle(angle), raw_data.distances[i] / FIXED_POINT_MULTIPLIER);
         }
     }
 
@@ -220,20 +220,10 @@ uint16_t Lidar::convertAngle(int32_t angle) {
 }
 
 void Lidar::update() {
-    static int count = 0;
-
-    map.incrementAge();
-
     // Parse new data
     while (needParsing()) {
         parseFrame();
         frameToParse--;
-    }
-
-    count++;
-    if (count == 100) {
-        map.print();
-        count = 0;
     }
 }
 
@@ -248,7 +238,7 @@ Parsing_Stage_t Lidar::getStage() {
 
 void Lidar::printMap() {
     for (int i = 0; i < ANGLE_MAX; i++) {
-        LOG("%i %d", i, map[i].distance);
+        LOG("%i %d", i, map->getDistance(i));
     }
 }
 #endif

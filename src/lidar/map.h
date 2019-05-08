@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #define MAP_SIZE 720
-#define MAX_AGE 100
+#define MAX_AGE 50
 
 typedef struct Map_Data_s {
     uint32_t distance;
@@ -25,7 +25,7 @@ public:
     /**
     * @brief Get the distance of the first obstacle, absolute angle.
     */
-    uint32_t getDistance(uint32_t absoluteAngle);
+    uint32_t getDistance(int32_t absoluteAngle);
     void setRobotAngle(uint32_t newRobotAngle);
     void incrementAge();
     void print();

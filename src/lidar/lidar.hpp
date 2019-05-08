@@ -48,7 +48,7 @@ typedef enum Parsing_Stage_s {
 
 class Lidar {
 public:
-    Lidar();
+    Lidar(Map *pMap);
     ~Lidar();
     void pushSampleData(uint8_t data);
     void init(HardwareSerial& serial, int baudrate);
@@ -65,7 +65,7 @@ private:
     int content_length;
     Parsing_Stage_t stage;
     Raw_Data_t raw_data;
-    Map map;
+    Map *map;
     HardwareSerial *serial;
     Timer readTimer;
     uint32_t frameToParse;

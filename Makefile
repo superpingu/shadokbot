@@ -34,7 +34,7 @@ CXXFLAGS_STD = -std=gnu++11 -Wall -Wextra -I$(SRCDIR)
 LOCAL_INO_SRCS = $(SRCDIR)/main.ino
 # project sources
 LIDAR_CPP_SRCS = $(SRCDIR)/lidar/circ_buffer.cpp $(SRCDIR)/lidar/lidar.cpp \
- 	$(SRCDIR)/lidar/map.cpp
+ 	$(SRCDIR)/lidar/map.cpp $(SRCDIR)/lidar/detection.cpp
 
 LOCAL_CPP_SRCS = $(SRCDIR)/shell/commands.cpp $(SRCDIR)/shell/Shell.cpp \
 	$(SRCDIR)/ax12/AXcomms.cpp $(SRCDIR)/ax12/AX12.cpp $(SRCDIR)/hal/Timer.cpp \

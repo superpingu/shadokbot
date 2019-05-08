@@ -34,6 +34,9 @@ public:
 	//   speed: translation cruise speed (ramp-up and ramp-down excluded), in mm/s (must be > 0)
 	//   callback: function to call when the move ends
 	void move(int32_t distance, int32_t angle, int32_t speed, void (*callback)()=NULL);
+
+	int32_t getPosX();
+	int32_t getPosY();
 };
 
 extern Motion* motion; // pointer to motion instance

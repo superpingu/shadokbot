@@ -18,12 +18,12 @@ int Map::setDataPoint(uint32_t index, uint32_t distance) {
     return 0;
 }
 
-uint32_t Map::getDistance(uint32_t absoluteAngle) {
+uint32_t Map::getDistance(int32_t absoluteAngle) {
     uint32_t relativeAngle;
-    if (absoluteAngle >= MAP_SIZE)
-        return 0;
+    while (absoluteAngle < 0)
+        absoluteAngle += MAP_SIZE;
 
-    relativeAngle = getIndexFromAbsoluteAngle(absoluteAngle);
+    relativeAngle = getIndexFromAbsoluteAngle(absoluteAngle % MAP_SIZE);
     if (data[relativeAngle].age > MAX_AGE) {
         return 0;
     }
