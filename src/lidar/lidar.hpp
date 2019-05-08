@@ -8,6 +8,7 @@
 #else
 #include <Arduino.h>
 #include "hal/Timer.hpp"
+#include "map.h"
 #endif
 
 #if DEBUG
@@ -45,11 +46,6 @@ typedef enum Parsing_Stage_s {
     LENGTH
 } Parsing_Stage_t;
 
-typedef struct Map_Data_s {
-    uint32_t distance;
-    uint32_t age;
-} Map_Data_t;
-
 class Lidar {
 public:
     Lidar();
@@ -57,7 +53,6 @@ public:
     void pushSampleData(uint8_t data);
     void init(HardwareSerial& serial, int baudrate);
     void startScan();
-    Map_Data_t* getMap();
     void readCb();
     void update();
 #if DEBUG
@@ -70,7 +65,7 @@ private:
     int content_length;
     Parsing_Stage_t stage;
     Raw_Data_t raw_data;
-    Map_Data_t map[ANGLE_MAX];
+    Map map;
     HardwareSerial *serial;
     Timer readTimer;
     uint32_t frameToParse;

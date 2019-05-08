@@ -8,7 +8,6 @@
 
 Shell* shell;
 Lidar* lidar;
-int count;
 
 void lilol() {
 	delay(200);
@@ -31,7 +30,6 @@ void setup() {
 
 	lidar->init(Serial3, 128000);
 	lidar->startScan();
-	count = 0;
 
 }
 
@@ -41,18 +39,4 @@ void loop() {
 	motion->update();
 	shell->update();
 	lidar->update();
-
-	count++;
-	if (count == 100) {
-		Map_Data_t* map = lidar->getMap();
-		for (int i = 0; i < ANGLE_MAX; i++) {
-			Serial.print(i);
-			Serial.print(" ");
-			if (map[i].age < 300)
-				Serial.println(map[i].distance);
-			else
-				Serial.println(0);
-		}
-		count = 0;
-	}
 }
