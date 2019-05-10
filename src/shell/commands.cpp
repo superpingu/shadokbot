@@ -4,7 +4,7 @@
 
 static void moveCallback() {
 	delay(200);
-	motion->enable(false);
+	//motion->enable(false);
 	Serial.print("\nMove done.\n > ");
 }
 
@@ -14,7 +14,7 @@ static void moveCommand(int argc, char** argv) {
 		return;
 	}
 	motion->enable(true);
-	motion->move(str2int(argv[1]), str2int(argv[2]), str2int(argv[3]), moveCallback);
+	motion->move(str2int(argv[1]), str2int(argv[2]), str2int(argv[3]), moveCallback, true);
 }
 
 const command_t comms[] = {
