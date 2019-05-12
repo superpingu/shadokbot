@@ -1,6 +1,6 @@
 #include "hal/Timer.hpp"
 #include "ax12/AX12.hpp"
-#include "motion/Motion.hpp"
+#include "motion/AbsoluteMotion.hpp"
 
 #include "board.h"
 #include "lidar/lidar.hpp"
@@ -12,7 +12,8 @@
 Shell* shell;
 Lidar* lidar;
 YDLidar* ydLidar;
-int count;
+
+int count = 0;
 
 #define BATT_PROBE_COEFF (3270*(11+33)/11)
 // returns battery voltage in millivolts
@@ -40,30 +41,38 @@ void setup() {
 	ydLidar = new YDLidar();
 	lidar = new Lidar();
 
-	motion = new Motion();
+	motion = new AbsoluteMotion();
 	motion->enable(true);
 
-	ydLidar->begin(Serial3, 128000);
+	ydLidar->begin(LIDAR_SERIALPORT, 128000);
 	ydLidar->startScan();
 	count = 0;
+
+	pinMode(LIDAR_M_SCTP, OUTPUT);
+	analogWrite(LIDAR_M_SCTP, 38);
 }
 
+#define LOOP_PERIOD_US 5000 // duration of each loop iteration
 // the loop function runs over and over again forever
 void loop() {
-	delay(5);
-//	motion->update();
+	unsigned long loopStart = micros();
+	motion->update();
 	shell->update();
-	while (Serial3.available() != 0) {
-		lidar->pushSampleData(Serial3.read());
-	}
-	count++;
-	if (count == 100) {
-		uint32_t* map = lidar->getMap();
-		for (int i = 0; i < 360; i++) {
-			Serial.print(i);
-			Serial.print(" ");
-			Serial.println(map[i]);
-		}
-		count = 0;
-	}
+
+	// while (LIDAR_SERIALPORT.available() != 0) {
+	// 	lidar->pushSampleData(LIDAR_SERIALPORT.read());
+	// }
+	// count++;
+	// if (count == 100) {
+	// 	uint32_t* map = lidar->getMap();
+	// 	for (int i = 0; i < 360; i++) {
+	// 		Serial.print(i);
+	// 		Serial.print(" ");
+	// 		Serial.println(map[i]);
+	// 	}
+	// 	count = 0;
+	// }
+
+	unsigned long loopTime = micros() - loopStart;
+	delayMicroseconds(loopTime > LOOP_PERIOD_US ? 0 : LOOP_PERIOD_US - loopTime);
 }

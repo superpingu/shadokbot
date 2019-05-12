@@ -39,8 +39,14 @@ public:
 	//   callback: function to call when the move ends
 	//   recal: slow down at the end and stop when hitting a wall
 	void move(int32_t distance, int32_t angle, int32_t speed, void (*callback)()=NULL, bool recal=false);
-};
 
-extern Motion* motion; // pointer to motion instance
+	// move the robot with a linear translation
+	//   deltaX : translation along X axis (in mm, relative)
+	//   deltaY : translation along Y axis (in mm, relative)
+	//   speed: translation cruise speed (ramp-up and ramp-down excluded), in mm/s (must be > 0)
+	//   callback: function to call when the move ends
+	//   recal: slow down at the end and stop when hitting a wall
+	void moveXY(int32_t deltaX, int32_t deltaY, int32_t speed, void (*callback)()=NULL, bool recal=false);
+};
 
 #endif

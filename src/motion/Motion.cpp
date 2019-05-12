@@ -1,4 +1,4 @@
-#include "Arduino.h"
+#include <Arduino.h>
 #include "Motor.hpp"
 #include "Motion.hpp"
 #include "../board.h"
@@ -6,8 +6,6 @@
 
 #define SIGN(a) (a > 0 ? 1 : -1)
 #define ABS(a) ((a) > 0 ? (a) : -(a))
-
-Motion* motion; // pointer to motion instance
 
 Motion::Motion() {
 	moveCallback = NULL;
@@ -101,4 +99,21 @@ void Motion::move(int32_t distance, int32_t angle, int32_t speed, void (*callbac
 	motor_FR->move(yx_speed_sum, ABS(yx_dist_sum), recal);
 	motor_RL->move(yx_speed_sum, ABS(yx_dist_sum), recal);
 	motor_RR->move(yx_speed_diff, ABS(yx_dist_diff), recal);
+}
+
+void Motion::moveXY(int32_t deltaX, int32_t deltaY, int32_t speed, void (*callback)(), bool recal) {
+	int32_t dist = deltaX == 0 ? deltaY : deltaY == 0 ? deltaX : sqrt(deltaX*deltaX + deltaY*deltaY);
+	int32_t speedX = dist > 0 ? speed*deltaX/dist : 0; // extract X component of speed
+	int32_t speedY = dist > 0 ? speed*deltaY/dist : 0; // extract Y component of speed
+	moveCallback = callback;
+
+	int32_t yxSpeedSum = MM_PER_S_TO_HALFTICK_PER_SPEEDTU*(speedY + speedX);
+	int32_t yxSpeedDiff = MM_PER_S_TO_HALFTICK_PER_SPEEDTU*(speedY - speedX);
+	int32_t yxDistSum = MM_TO_HALFTICK*ABS(deltaY + deltaX);
+	int32_t yxDistDiff = MM_TO_HALFTICK*ABS(deltaY - deltaX);
+
+	motor_FL->move(yxSpeedDiff, ABS(yxDistDiff), recal);
+	motor_FR->move(yxSpeedSum, ABS(yxDistSum), recal);
+	motor_RL->move(yxSpeedSum, ABS(yxDistSum), recal);
+	motor_RR->move(yxSpeedDiff, ABS(yxDistDiff), recal);
 }
