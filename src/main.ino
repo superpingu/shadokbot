@@ -1,4 +1,3 @@
-#include "hal/Timer.hpp"
 #include "ax12/AX12.hpp"
 #include "motion/AbsoluteMotion.hpp"
 #include "lidar/detection.hpp"

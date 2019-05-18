@@ -7,7 +7,7 @@
 #include "../test/arduino_mockup.h"
 #else
 #include <Arduino.h>
-#include "hal/Timer.hpp"
+#include "utils/Timer.hpp"
 #include "map.h"
 #endif
 
