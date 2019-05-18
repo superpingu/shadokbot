@@ -43,15 +43,20 @@ void setup() {
 	motion->enable(true);
 
 	pinMode(LED_BUILTIN, OUTPUT);
-	pinMode(LIDAR_M_SCTP, OUTPUT);
-	analogWrite(LIDAR_M_SCTP, 250);
+
+	// pinMode(LIDAR_M_SCTP, OUTPUT);
+	// pinMode(LIDAR_DEV_EN, OUTPUT);
+	// pinMode(LIDAR_M_EN, OUTPUT);
+	// digitalWrite(LIDAR_M_EN, HIGH);
+	// digitalWrite(LIDAR_DEV_EN, HIGH);
+	// analogWrite(LIDAR_M_SCTP, 250);
 }
 
 #define LOOP_PERIOD_US 5000 // duration of each loop iteration
 // the loop function runs over and over again forever
 void loop() {
 	unsigned long loopStart = micros();
-	motion->update();
+	//motion->update();
 	shell->update();
 	detection->update(0, 0, 0);
 

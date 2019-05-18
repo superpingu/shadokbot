@@ -1,7 +1,7 @@
 #ifndef MOTOR_HPP
 #define MOTOR_HPP
 
-#include "../hal/Timer.hpp"
+#include "../utils/Timer.hpp"
 
 class Motor {
  	const uint8_t enablePin, clockPin, dirPin;
