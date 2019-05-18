@@ -39,4 +39,7 @@
 // battery probe analog input
 #define BATT_PROBE 1
 
+// IMU I2C port
+#define IMU_I2C Wire
+
 #endif
