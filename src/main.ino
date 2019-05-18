@@ -36,5 +36,5 @@ void loop() {
 	delay(5);
 	motion->update();
 	shell->update();
-	detection->update(motion->getPosX(), motion->getPosY());
+	detection->update(motion->getPosX(), motion->getPosY(), motion->getMovementOrientation());
 }

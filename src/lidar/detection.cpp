@@ -5,7 +5,7 @@
 #define DETECTION_THRESHOLD 600 // in mm
 #define COHERENCY_WINDOW_SIZE 3
 #define COHERENCY_THRESHOLD 10
-#define OBSTACLE_MIN_SIZE 3
+#define OBSTACLE_MIN_SIZE 4
 
 #define TABLE_MAX_X 3000
 #define TABLE_MAX_Y 2000
@@ -25,24 +25,26 @@ void Detection::init() {
     lidar.startScan();
 }
 
-void Detection::update(int32_t newRobotX, int32_t newRobotY) {
+void Detection::update(int32_t newRobotX, int32_t newRobotY, int32_t movementOrientation) {
     static int count = 0;
     lidar.update();
     map.incrementAge();
 
     count++;
     if (count == 100) {
-    //    map.print();
+       // map.print();
         count = 0;
     }
 
     robotPosition.x = newRobotX;
     robotPosition.y = newRobotY;
     bool detected = false;
-    for (int i = 0; i < MAP_SIZE; i++) {
+    for (int i = movementOrientation - MAP_SIZE/4; i < movementOrientation + MAP_SIZE/4; i++) {
         uint32_t curDistance = map.getDistance(i);
         if ((curDistance != 0) && (curDistance <= DETECTION_THRESHOLD)) {
-            if (!isNoise(i) && isOnTable(i, curDistance)) {
+            if (isNoise(i)) {
+                i += COHERENCY_WINDOW_SIZE;
+            } else if (isOnTable(i, curDistance)) {
                 detected = true;
                 break;
             }
@@ -58,8 +60,8 @@ void Detection::update(int32_t newRobotX, int32_t newRobotY) {
 bool Detection::isNoise(int32_t angle) {
     int closePointsCounter = 0;
     int32_t baseDistance = map.getDistance(angle);
-    for (int i = -COHERENCY_WINDOW_SIZE; i < COHERENCY_WINDOW_SIZE; i++) {
-        if (ABS(baseDistance - (int32_t)map.getDistance(angle + i)) < COHERENCY_THRESHOLD) {
+    for (int i = angle - COHERENCY_WINDOW_SIZE; i <= angle + COHERENCY_WINDOW_SIZE; i++) {
+        if (ABS(baseDistance - (int32_t)map.getDistance(i)) < COHERENCY_THRESHOLD) {
             closePointsCounter++;
             if (closePointsCounter >= OBSTACLE_MIN_SIZE)
                 return false;

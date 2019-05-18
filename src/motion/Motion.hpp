@@ -37,6 +37,7 @@ public:
 
 	int32_t getPosX();
 	int32_t getPosY();
+	int32_t getMovementOrientation();
 };
 
 extern Motion* motion; // pointer to motion instance

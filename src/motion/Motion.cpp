@@ -78,9 +78,13 @@ void Motion::move(int32_t distance, int32_t angle, int32_t speed, void (*callbac
 }
 
 int32_t Motion::getPosX() {
-	return 0; // TODO return actual value
+	return 1000; // TODO return actual value
 }
 
 int32_t Motion::getPosY() {
-	return 0; // TODO return actual value
+	return 1000; // TODO return actual value
+}
+
+int32_t Motion::getMovementOrientation() {
+	return 360;  // TODO return actual value
 }

@@ -24,6 +24,9 @@ public:
 
     /**
     * @brief Get the distance of the first obstacle, absolute angle.
+    * @ param absoluteAngle The angle for which to get the distance. It can be
+    *                       outside the range [0,MAP_SIZE], in which case the angle
+    *                       will be automatically brought back to this range.
     */
     uint32_t getDistance(int32_t absoluteAngle);
     void setRobotAngle(uint32_t newRobotAngle);
