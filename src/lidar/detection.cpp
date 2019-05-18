@@ -7,8 +7,9 @@
 #define COHERENCY_THRESHOLD 10
 #define OBSTACLE_MIN_SIZE 4
 
-#define TABLE_MAX_X 3000
-#define TABLE_MAX_Y 2000
+#define TABLE_MAX_X 3000 // in mm
+#define TABLE_MAX_Y 2000 // in mm
+#define TABLE_MARGIN 50 // in mm
 
 #define ABS(x) (((x) < 0) ? (-(x)) : (x))
 
@@ -77,12 +78,17 @@ bool Detection::isOnTable(int32_t angle, uint32_t distance) {
     obstacle.x += distance * cos(-angle * 0.00873); // -angle/2 * PI/180
     obstacle.y += distance * sin(-angle * 0.00873);
 
-    if ((obstacle.x > 0)
-        && (obstacle.x < TABLE_MAX_X)
-        && (obstacle.y > 0)
-        && (obstacle.y < TABLE_MAX_Y))
+    if ((obstacle.x > TABLE_MARGIN)
+        && (obstacle.x < TABLE_MAX_X - TABLE_MARGIN)
+        && (obstacle.y > 400 + TABLE_MARGIN)
+        && (obstacle.y < TABLE_MAX_Y - TABLE_MARGIN))
     {
-        return true;
+        return true; // Main "free" space
+    } else if ((obstacle.y > TABLE_MARGIN)
+               && (obstacle.y < 400 + TABLE_MARGIN)
+               && ((obstacle.x > TABLE_MARGIN) && (obstacle.x < 450)
+                  || (obstacle.x > 2550) && (obstacle.x < TABLE_MAX_X - TABLE_MARGIN))) {
+        return true; // Base of the slopes
     } else {
         return false;
     }
