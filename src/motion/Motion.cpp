@@ -117,3 +117,12 @@ void Motion::moveXY(int32_t deltaX, int32_t deltaY, int32_t speed, void (*callba
 	motor_RL->move(yxSpeedSum, ABS(yxDistSum), recal);
 	motor_RR->move(yxSpeedDiff, ABS(yxDistDiff), recal);
 }
+
+// stop the robot as fast as possible (with deceleration). It has no effect on rotations
+void Motion::emergencyStop() {
+
+}
+// resume the move stopped by emergency stop
+void Motion::emergencyResume() {
+
+}

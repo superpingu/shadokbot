@@ -47,6 +47,11 @@ public:
 	//   callback: function to call when the move ends
 	//   recal: slow down at the end and stop when hitting a wall
 	void moveXY(int32_t deltaX, int32_t deltaY, int32_t speed, void (*callback)()=NULL, bool recal=false);
+
+	// stop the robot as fast as possible (with deceleration). It has no effect on rotations
+	void emergencyStop();
+	// resume the move stopped by emergency stop
+	void emergencyResume();
 };
 
 #endif
