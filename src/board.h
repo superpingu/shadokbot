@@ -27,4 +27,19 @@
 #define RR_CK 52
 #define RR_INVDIR true // inverse direction
 
+// AX12 serial port
+#define AX12_SERIALPORT Serial1
+
+// LIDAR connections
+#define LIDAR_SERIALPORT Serial2
+#define LIDAR_DEV_EN 15
+#define LIDAR_M_EN 14
+#define LIDAR_M_SCTP 3
+
+// battery probe analog input
+#define BATT_PROBE 1
+
+// IMU I2C port
+#define IMU_I2C Wire
+
 #endif

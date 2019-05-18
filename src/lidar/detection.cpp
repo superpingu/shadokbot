@@ -1,6 +1,7 @@
 #include "detection.hpp"
 #include "Arduino.h"
 #include <math.h>
+#include "board.h"
 
 #define DETECTION_THRESHOLD 600 // in mm
 #define COHERENCY_WINDOW_SIZE 3
@@ -22,7 +23,7 @@ Detection::Detection() :
 }
 
 void Detection::init() {
-    lidar.init(Serial3, 128000);
+    lidar.init(LIDAR_SERIALPORT, 128000);
     lidar.startScan();
 }
 
@@ -33,7 +34,7 @@ void Detection::update(int32_t newRobotX, int32_t newRobotY, int32_t movementOri
 
     count++;
     if (count == 100) {
-       // map.print();
+        map.print();
         count = 0;
     }
 
@@ -86,8 +87,8 @@ bool Detection::isOnTable(int32_t angle, uint32_t distance) {
         return true; // Main "free" space
     } else if ((obstacle.y > TABLE_MARGIN)
                && (obstacle.y < 400 + TABLE_MARGIN)
-               && ((obstacle.x > TABLE_MARGIN) && (obstacle.x < 450)
-                  || (obstacle.x > 2550) && (obstacle.x < TABLE_MAX_X - TABLE_MARGIN))) {
+               && (((obstacle.x > TABLE_MARGIN) && (obstacle.x < 450))
+                  || ((obstacle.x > 2550) && (obstacle.x < TABLE_MAX_X - TABLE_MARGIN)))) {
         return true; // Base of the slopes
     } else {
         return false;

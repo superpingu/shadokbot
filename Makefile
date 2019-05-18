@@ -6,7 +6,7 @@ OBJDIR = $(PROJECT_DIR)/build
 SRCDIR = $(PROJECT_DIR)/src
 
 # The configuration below is platform dependent
-ifeq ($(OSTYPE), darwin17)
+ifeq ($(shell echo $$OSTYPE), darwin17)
 	ARDMK_DIR            = /usr/local/Cellar/arduino-mk/HEAD-4452f77
 	ARDUINO_DIR          = /Applications/Arduino.app/Contents/Java
 	ARDUINO_PACKAGE_DIR := $(HOME)/Library/Arduino15/packages
@@ -28,17 +28,19 @@ ARDUINO_QUIET = 1
 MONITOR_BAUDRATE = 115200
 
 CFLAGS_STD = -std=gnu11
-CXXFLAGS_STD = -std=gnu++11 -Wall -Wextra -I$(SRCDIR)
+CXXFLAGS_STD = -std=gnu++11 -Wall -Wextra -I$(SRCDIR) -I$(ARDUINO_PLATFORM_LIB_PATH)/Wire/src
 
 # main file
 LOCAL_INO_SRCS = $(SRCDIR)/main.ino
 # project sources
 LIDAR_CPP_SRCS = $(SRCDIR)/lidar/circ_buffer.cpp $(SRCDIR)/lidar/lidar.cpp \
- 	$(SRCDIR)/lidar/map.cpp $(SRCDIR)/lidar/detection.cpp
+$(SRCDIR)/lidar/map.cpp $(SRCDIR)/lidar/detection.cpp
+IMU_CPP_SRCS = $(SRCDIR)/imu/IMU.cpp $(ARDUINO_PLATFORM_LIB_PATH)/Wire/src/Wire.cpp
+MOTION_CPP_SRCS = $(SRCDIR)/motion/Motor.cpp $(SRCDIR)/motion/Motion.cpp $(SRCDIR)/motion/AbsoluteMotion.cpp
 
 LOCAL_CPP_SRCS = $(SRCDIR)/shell/commands.cpp $(SRCDIR)/shell/Shell.cpp \
 	$(SRCDIR)/ax12/AXcomms.cpp $(SRCDIR)/ax12/AX12.cpp $(SRCDIR)/hal/Timer.cpp \
-	$(SRCDIR)/motion/Motor.cpp $(SRCDIR)/motion/Motion.cpp $(LIDAR_CPP_SRCS)
+	$(LIDAR_CPP_SRCS) $(IMU_CPP_SRCS) $(MOTION_CPP_SRCS)
 
 include $(ARDMK_DIR)/Sam.mk
 

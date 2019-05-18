@@ -16,6 +16,7 @@ void AXcomms::init(HardwareSerial* serialport, int baudrate) {
 // constructor checks the serial port is initialized at instantiation
 AXcomms::AXcomms(uint8_t axid) {
 	id = axid;
+	errorCounter = 0;
 	if(!initialized)
 		Serial.print("ERROR : serial port not initialized\n");
 }
@@ -39,6 +40,7 @@ int AXcomms::sendPacket(uint8_t instruction, uint8_t command, uint8_t arg1, uint
 		axserial->write(arg2);
 	axserial->write(checksum);
 	axserial->flush();
+	axserial->read();
 
 	return 0;
 }
@@ -102,6 +104,7 @@ int AXcomms::transaction(uint8_t instruction, uint8_t command, uint16_t arg, int
 
 		code = receiveAnswer(result, error);
 		if(!code) break; // if everything went well, return, otherwise retry
+		errorCounter++; // otherwise increment error counter
 	}
 
 	if(verbose && code != 0) {

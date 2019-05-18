@@ -33,6 +33,7 @@ class AXcomms {
 public:
 	bool verbose = true; // if true, error message are printed to the console when there is a communication error
 	uint8_t id; // ID of the AX12 (between 0 and 254, 254 is broadcast)
+	int errorCounter; // counter of the number of errors on read or reply
 
 	/* initialize serial port. Calling this is MANDATORY before any other operation */
 	static void init(HardwareSerial* serialport, int baudrate);
