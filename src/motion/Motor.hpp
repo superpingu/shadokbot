@@ -13,6 +13,10 @@ class Motor {
 
 	bool recalibration; // true when current move ends with a recalibration
 	bool recalPhase; // true when we are the slow constant speed phase before hitting the wall
+
+	bool emergency; // true when robot has something in its way and should stop until path is cleared
+	bool resumeFromEmergency; // true when robot has stopped and should restart
+	int32_t lastSpeed, lastPosition;
 public:
 	Timer* motorTimer; // timer allowing to send step pulses periodically to the stepper motor controller
 	int32_t position; // current position in the move (in half ticks)
@@ -32,6 +36,9 @@ public:
 	void move(int32_t speed, uint32_t distance, bool recal=false);
 	void enable(bool enabled); // enable stepper motor drive or not
 	void stopRecal(); // stop the motor when recalibration is done
+
+	void emergencyStop(); // slow down as fast as possible (within max acceleration limits)
+	void emergencyResume(); // resume the move interrupted by emergencyStop
 
 	bool finished(); // true when the motor is not moving
 	bool recalibrating(); // true when the motor is in the recalibration phase

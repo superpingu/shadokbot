@@ -18,16 +18,32 @@ static void moveCommand(int argc, char** argv) {
 
 static void gotoCommand(int argc, char** argv) {
 	if(argc != 6) {
-		Serial.print("Oops ! Syntax: m <x mm> <y mm> <heading deg> <speed mm/s> <strategy>\n");
+		Serial.print("Oops ! Syntax: g <x mm> <y mm> <heading deg> <speed mm/s> <strategy>\n");
 		return;
 	}
 	motion->enable(true);
-	motion->goTo(str2int(argv[1]), str2int(argv[2]), str2int(argv[3]), str2int(argv[4]), str2int(argv[5]), moveCallback);
+	motion->goTo(str2int(argv[1]), str2int(argv[2]), str2int(argv[3]), str2int(argv[4]),
+		(MotionStrategy) str2int(argv[5]), moveCallback);
+}
+
+static const MotionElement diamondPath[] = {
+	{.x = 0, .y = 0, .heading = 0, .speed = 200, .strategy = MOVE_TURN},
+	{.x = 100, .y = 100, .heading = 0, .speed = 200, .strategy = MOVE_TURN},
+	{.x = 0, .y = 200, .heading = 0, .speed = 200, .strategy = MOVE_TURN},
+	{.x = -100, .y = 100, .heading = 0, .speed = 200, .strategy = MOVE_TURN},
+	{.x = 0, .y = 0, .heading = 0, .speed = 200, .strategy = MOVE_TURN},
+	END_PATH
+};
+
+static void diamondCommand(int argc, char** argv) {
+	(void) argc; (void) argv;
+	motion->followPath(diamondPath, moveCallback);
 }
 
 const command_t comms[] = {
 	{"m", moveCommand},
 	{"g", gotoCommand},
+	{"diamond", diamondCommand},
 	{NULL, NULL}
 };
 

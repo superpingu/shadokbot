@@ -6,8 +6,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define SHELL_BUFFER_SIZE 50 // maximum number of characters for a single command
-#define MAX_ARG_NUMBER 5 // maximum number of arguments + 1
+#define SHELL_BUFFER_SIZE 70 // maximum number of characters for a single command
+#define MAX_ARG_NUMBER 8 // maximum number of arguments + 1
 
 // type for describing commands : when the user enters <command> <arg1> <arg2> ...
 // if the command matches name, callback is called.

@@ -36,6 +36,20 @@ float mcos(float x) {
 	return (_sin(val) + (x - val)*(_sin(val+1)-_sin(val)))/32767.0;
 }
 
+float msin_deg(int x) {
+	while(x < 0) x += 360;
+	while(x >= 360) x -= 360;
+
+	float y = x << 7;
+	y = y/180.0;
+
+	uint8_t val = y;
+	return (_sin(val) + (y - val)*(_sin(val+1)-_sin(val)))/32767.0;
+}
+float mcos_deg(int x) {
+	return msin_deg(x + 90);
+}
+
 // this constant defines the required precision of the macos function
 // (i.e. when the dichotomy can stop if it doesn't find the exact value)
 #define MACOS_PRECISION 0.001

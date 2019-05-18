@@ -28,6 +28,7 @@ Motor::Motor(uint8_t _enablePin, uint8_t _dirPin, uint8_t _clockPin, bool _invDi
 	recalSpeed = DEFAULT_RECAL_SPEED;
 	recalDistance = DEFAULT_RECAL_DISTANCE;
 	recalPhase = false;
+	lastSpeed = lastPosition = 0;
 
 	motorTimer = new Timer();
 	motorTimer->setCallback(motorTimerCallback, this);
@@ -63,6 +64,32 @@ void Motor::update() {
 		recalPhase = false;
 	}
 
+	// emergency stop/resume management
+	if(emergency && !recalPhase) {
+		int32_t emergencySpeed;
+		if(position < lastPosition) // can happen only if a move has just been started, delay slow down to next iteration
+			emergencySpeed = lastSpeed;
+		else
+			emergencySpeed = lastSpeed + (resumeFromEmergency ? 1 : -1)
+				*((accelerationCoeff*(position - lastPosition) & 0xFFFFFC00) >> MOTOR_ACC_COEFF_FP);
+
+		if(emergencySpeed < minSpeed)
+			emergencySpeed = resumeFromEmergency ? minSpeed : 0;
+
+		// speed fully resumed : we are no more in emergency
+		if(resumeFromEmergency && emergencySpeed >= speed) {
+			resumeFromEmergency = emergency = false;
+		}
+
+		if(emergencySpeed < speed)
+			speed = emergencySpeed;
+	} else { // no emergency stop during recalibration
+		emergency = false;
+	}
+
+	lastSpeed = speed;
+	lastPosition = position;
+
 	// update motor timer to adjust tick frequency to speed
 	if(speed != 0)
 		period = SPEEDTU_TO_S*1000000*US_TO_TIMER_PERIOD/speed;
@@ -78,7 +105,7 @@ void Motor::move(int32_t speed, uint32_t distance, bool recal) {
 		distance -= recalDistance;
 
 	position = 0;
-	cruiseSpeed = ABS(speed) < minSpeed ? minSpeed*SIGN(speed) : speed;
+	cruiseSpeed = ABS(speed) < minSpeed ? minSpeed : ABS(speed);
 	// goalPosition is in half ticks (as position is incremented twice/tick when motor timer toggles output)
 	goalPosition = distance & 0xFFFFFFFE;
 
@@ -88,14 +115,14 @@ void Motor::move(int32_t speed, uint32_t distance, bool recal) {
 		accelerationDistance = goalPosition/2;
 	// pre-compute coeff used to compute speed from position during the move
 	accelerationCoeff = accelerationDistance == 0 ? 0 :
-		((ABS(cruiseSpeed) - minSpeed) << MOTOR_ACC_COEFF_FP)/accelerationDistance;
+		((cruiseSpeed - minSpeed) << MOTOR_ACC_COEFF_FP)/accelerationDistance;
 
 	// set initial motor timer period
 	update();
 	// start generating pulses to the stepper motor controller
 	motorTimer->start();
 	// set rotation direction
-	digitalWrite(dirPin, (cruiseSpeed < 0) ^ invDir ? MOTOR_ACTIVE_LEVEL : MOTOR_IDLE_LEVEL);
+	digitalWrite(dirPin, (speed < 0) ^ invDir ? MOTOR_ACTIVE_LEVEL : MOTOR_IDLE_LEVEL);
 }
 
 void Motor::enable(bool enabled) {
@@ -104,6 +131,13 @@ void Motor::enable(bool enabled) {
 void Motor::stopRecal() {
 	recalPhase = false;
 	position = goalPosition;
+}
+void Motor::emergencyStop() {
+	emergency = true;
+	resumeFromEmergency = false;
+}
+void Motor::emergencyResume() {
+	resumeFromEmergency = true;
 }
 
 bool Motor::finished() { return position >= goalPosition; }

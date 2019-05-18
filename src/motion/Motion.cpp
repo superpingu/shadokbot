@@ -3,6 +3,7 @@
 #include "Motion.hpp"
 #include "../board.h"
 #include "motionconf.h"
+#include "utils/trigo.hpp"
 
 #define SIGN(a) (a > 0 ? 1 : -1)
 #define ABS(a) ((a) > 0 ? (a) : -(a))
@@ -86,8 +87,8 @@ void Motion::turn(int32_t angle, int32_t angular_speed, void (*callback)()) {
 }
 
 void Motion::move(int32_t distance, int32_t angle, int32_t speed, void (*callback)(), bool recal) {
-	float y_coeff = cos(angle*M_PI/180);
-	float x_coeff = sin(angle*M_PI/180);
+	float y_coeff = mcos(angle*M_PI/180);
+	float x_coeff = msin(angle*M_PI/180);
 	moveCallback = callback;
 
 	int32_t yx_speed_sum = speed*MM_PER_S_TO_HALFTICK_PER_SPEEDTU*(y_coeff + x_coeff);
@@ -102,27 +103,25 @@ void Motion::move(int32_t distance, int32_t angle, int32_t speed, void (*callbac
 }
 
 void Motion::moveXY(int32_t deltaX, int32_t deltaY, int32_t speed, void (*callback)(), bool recal) {
-	int32_t dist = deltaX == 0 ? deltaY : deltaY == 0 ? deltaX : sqrt(deltaX*deltaX + deltaY*deltaY);
-	int32_t speedX = dist > 0 ? speed*deltaX/dist : 0; // extract X component of speed
-	int32_t speedY = dist > 0 ? speed*deltaY/dist : 0; // extract Y component of speed
 	moveCallback = callback;
+	int32_t dist;
+	if(deltaX == 0)
+	 	dist = ABS(deltaY);
+	else if(deltaY == 0)
+		dist = ABS(deltaX);
+	else
+		dist = sqrt(deltaX*deltaX + deltaY*deltaY);
+
+	int32_t speedX = dist != 0 ? (speed*deltaX)/dist : 0; // extract X component of speed
+	int32_t speedY = dist != 0 ? (speed*deltaY)/dist : 0; // extract Y component of speed
 
 	int32_t yxSpeedSum = MM_PER_S_TO_HALFTICK_PER_SPEEDTU*(speedY + speedX);
 	int32_t yxSpeedDiff = MM_PER_S_TO_HALFTICK_PER_SPEEDTU*(speedY - speedX);
 	int32_t yxDistSum = MM_TO_HALFTICK*ABS(deltaY + deltaX);
 	int32_t yxDistDiff = MM_TO_HALFTICK*ABS(deltaY - deltaX);
 
-	motor_FL->move(yxSpeedDiff, ABS(yxDistDiff), recal);
-	motor_FR->move(yxSpeedSum, ABS(yxDistSum), recal);
-	motor_RL->move(yxSpeedSum, ABS(yxDistSum), recal);
-	motor_RR->move(yxSpeedDiff, ABS(yxDistDiff), recal);
-}
-
-// stop the robot as fast as possible (with deceleration). It has no effect on rotations
-void Motion::emergencyStop() {
-
-}
-// resume the move stopped by emergency stop
-void Motion::emergencyResume() {
-
+	motor_FL->move(yxSpeedSum, yxDistSum, recal);
+	motor_FR->move(yxSpeedDiff, yxDistDiff, recal);
+	motor_RL->move(yxSpeedDiff, yxDistDiff, recal);
+	motor_RR->move(yxSpeedSum, yxDistSum, recal);
 }

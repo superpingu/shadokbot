@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "AbsoluteMotion.hpp"
 #include "motionconf.h"
+#include "utils/trigo.hpp"
 
 AbsoluteMotion* motion; // pointer to absolute motion instance
 
@@ -10,11 +11,10 @@ void absmOnEndOfFirstTurn() {
 
 	motion->currentMotionType = MOVE;
 
-	// TODO optimize
-	int32_t deltaX = (motion->currentMove.x - motion->currentX)*cos(motion->currentHeading*2*M_PI/360)
-	               - (motion->currentMove.y - motion->currentY)*sin(motion->currentHeading*2*M_PI/360);
-	int32_t deltaY = (motion->currentMove.x - motion->currentX)*sin(motion->currentHeading*2*M_PI/360)
-	               + (motion->currentMove.y - motion->currentY)*cos(motion->currentHeading*2*M_PI/360);
+	int32_t deltaX = (motion->currentMove.x - motion->currentX)*mcos_deg(motion->currentHeading)
+	               - (motion->currentMove.y - motion->currentY)*msin_deg(motion->currentHeading);
+	int32_t deltaY = (motion->currentMove.x - motion->currentX)*msin_deg(motion->currentHeading)
+	               + (motion->currentMove.y - motion->currentY)*mcos_deg(motion->currentHeading);
 	motion->moveXY(deltaX, deltaY, motion->currentMove.speed, absmOnEndOfMove, motion->currentMove.strategy == TURN_RECAL);
 }
 void absmOnEndOfMove() {
@@ -44,6 +44,17 @@ void absmOnEndOfGoTo() {
 	}
 }
 
+void absmOnPathPointReached() {
+	motion->currentPathPoint++;
+	if(motion->currentPath[motion->currentPathPoint].speed != 0) { // check next point is not the terminating element
+		motion->goTo(motion->currentPath[motion->currentPathPoint], absmOnPathPointReached);
+	} else { // path finished
+		void (*cb)() = motion->followPathCallback;
+		motion->followPathCallback = NULL;
+		if(cb != NULL) cb();
+	}
+}
+
 AbsoluteMotion::AbsoluteMotion() : Motion() {
 	gotoCallback = NULL;
 	currentX = 0;
@@ -67,6 +78,17 @@ void AbsoluteMotion::update() {
 	}
 }
 
+void AbsoluteMotion::followPath(const MotionElement* path, void (*callback)()) {
+	setX(path[0].x);
+	setY(path[0].y);
+	setHeading(path[0].heading);
+	currentPath = path;
+	currentPathPoint = 0;
+	followPathCallback = callback;
+
+	absmOnPathPointReached();
+}
+
 void AbsoluteMotion::goTo(int32_t x, int32_t y, int heading, int32_t speed, MotionStrategy strategy, void (*callback)()) {
 	MotionElement me = {.x = x, .y = y, .heading = heading, .speed = speed, .strategy = strategy};
 	goTo(me, callback);
@@ -77,7 +99,6 @@ void AbsoluteMotion::goTo(MotionElement me, void (*callback)()) {
 
 	if((me.strategy == TURN_MOVE || me.strategy == TURN_RECAL) && me.heading != currentHeading) {
 		currentMotionType = TURN;
-
 		int deltaHeading = me.heading - currentHeading;
 		while(deltaHeading > 180) deltaHeading -= 360;
 		while(deltaHeading <= -180) deltaHeading += 360;
@@ -143,4 +164,21 @@ void AbsoluteMotion::setY(int32_t y) {
 }
 void AbsoluteMotion::setHeading(int heading) {
 	currentHeading = heading;
+}
+
+// stop the robot as fast as possible (with deceleration). It has no effect on rotations
+void AbsoluteMotion::emergencyStop() {
+	if(currentMotionType == MOVE) {
+		motor_FL->emergencyStop();
+		motor_FR->emergencyStop();
+		motor_RL->emergencyStop();
+		motor_RR->emergencyStop();
+	}
+}
+// resume the move stopped by emergency stop
+void AbsoluteMotion::emergencyResume() {
+	motor_FL->emergencyResume();
+	motor_FR->emergencyResume();
+	motor_RL->emergencyResume();
+	motor_RR->emergencyResume();
 }
