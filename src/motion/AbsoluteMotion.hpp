@@ -33,6 +33,7 @@ class AbsoluteMotion : public Motion {
 	int32_t currentX;
 	int32_t currentY;
 	int currentHeading;
+	int currentMotionDirection;
 
 	MotionType currentMotionType; // current robot activity : no motion, turning or moving
 	MotionElement currentMove; // current (or last) move being executed
@@ -65,6 +66,7 @@ public:
 	int32_t getX(); // current absolute x in mm
 	int32_t getY(); // current absolute y in mm
 	int getHeading(); // current absolute heading in deg, 0-360 counter-clockwise
+	int getMotionDirection(); // current direction of the robot motion, absolute angle in deg, 0-360 counter-clockwise
 
 	// DO NOT MODIFY POSITION DURING A MOVE
 	void setX(int32_t x); // set x position in mm

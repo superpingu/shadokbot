@@ -15,10 +15,7 @@ void absmOnEndOfFirstTurn() {
 	               + (motion->currentMove.y - motion->currentY)*msin_deg(motion->currentHeading);
 	int32_t deltaY = (motion->currentMove.y - motion->currentY)*mcos_deg(motion->currentHeading)
 	               - (motion->currentMove.x - motion->currentX)*msin_deg(motion->currentHeading);
-	Serial.print("Dx = ");
-	Serial.print(deltaX);
-	Serial.print(", Dy = ");
-	Serial.print(deltaY);
+
 	motion->moveXY(deltaX, deltaY, motion->currentMove.speed, absmOnEndOfMove, motion->currentMove.strategy == TURN_RECAL);
 }
 void absmOnEndOfMove() {
@@ -79,6 +76,8 @@ void AbsoluteMotion::update() {
 		Serial.print(getY());
 		Serial.print(", heading = ");
 		Serial.print(getHeading());
+		Serial.print(", direction = ");
+		Serial.print(getMotionDirection());
 		Serial.print("\n");
 	}
 }
@@ -113,6 +112,18 @@ void AbsoluteMotion::goTo(MotionElement me, void (*callback)()) {
 		absmOnEndOfFirstTurn();
 	} else {
 		absmOnEndOfMove();
+	}
+
+	// compute absolute motion direction for Lidar
+	float deltaX = me.x - currentX;
+	float deltaY = me.y - currentY;
+	if(deltaX == 0) {
+		currentMotionDirection = deltaY > 0 ? 0 : 180;
+	} else {
+		currentMotionDirection = matan(deltaY/deltaX)*180.0/M_PI;
+		if(deltaX < 0)
+			currentMotionDirection += 180;
+		currentMotionDirection = (currentMotionDirection + 270) % 360;
 	}
 }
 
@@ -159,6 +170,9 @@ int AbsoluteMotion::getHeading() {
 	} else {
 		return currentHeading;
 	}
+}
+int AbsoluteMotion::getMotionDirection() {
+	return currentMotionDirection;
 }
 
 void AbsoluteMotion::setX(int32_t x) {
