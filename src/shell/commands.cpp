@@ -1,6 +1,7 @@
 #include "Shell.hpp"
 #include <Arduino.h>
 #include "motion/AbsoluteMotion.hpp"
+#include "actions/paths.hpp"
 
 static void moveCallback() {
 	//motion->enable(false);
@@ -25,15 +26,6 @@ static void gotoCommand(int argc, char** argv) {
 	motion->goTo(str2int(argv[1]), str2int(argv[2]), str2int(argv[3]), str2int(argv[4]),
 		(MotionStrategy) str2int(argv[5]), moveCallback);
 }
-
-static const MotionElement diamondPath[] = {
-	{.x = 0, .y = 0, .heading = 0, .speed = 200, .strategy = MOVE_TURN},
-	{.x = 100, .y = 100, .heading = 0, .speed = 200, .strategy = MOVE_TURN},
-	{.x = 0, .y = 200, .heading = 0, .speed = 200, .strategy = MOVE_TURN},
-	{.x = -100, .y = 100, .heading = 0, .speed = 200, .strategy = MOVE_TURN},
-	{.x = 0, .y = 0, .heading = 0, .speed = 200, .strategy = MOVE_TURN},
-	END_PATH
-};
 
 static void diamondCommand(int argc, char** argv) {
 	(void) argc; (void) argv;

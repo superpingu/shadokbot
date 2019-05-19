@@ -12,9 +12,13 @@ void absmOnEndOfFirstTurn() {
 	motion->currentMotionType = MOVE;
 
 	int32_t deltaX = (motion->currentMove.x - motion->currentX)*mcos_deg(motion->currentHeading)
-	               - (motion->currentMove.y - motion->currentY)*msin_deg(motion->currentHeading);
-	int32_t deltaY = (motion->currentMove.x - motion->currentX)*msin_deg(motion->currentHeading)
-	               + (motion->currentMove.y - motion->currentY)*mcos_deg(motion->currentHeading);
+	               + (motion->currentMove.y - motion->currentY)*msin_deg(motion->currentHeading);
+	int32_t deltaY = (motion->currentMove.y - motion->currentY)*mcos_deg(motion->currentHeading)
+	               - (motion->currentMove.x - motion->currentX)*msin_deg(motion->currentHeading);
+	Serial.print("Dx = ");
+	Serial.print(deltaX);
+	Serial.print(", Dy = ");
+	Serial.print(deltaY);
 	motion->moveXY(deltaX, deltaY, motion->currentMove.speed, absmOnEndOfMove, motion->currentMove.strategy == TURN_RECAL);
 }
 void absmOnEndOfMove() {
@@ -65,9 +69,10 @@ AbsoluteMotion::AbsoluteMotion() : Motion() {
 }
 
 void AbsoluteMotion::update() {
+	static int i = 0;
 	Motion::update();
 
-	if(currentMotionType != NONE) {
+	if(currentMotionType != NONE && (i++ % 50) == 0) {
 		Serial.print("x = ");
 		Serial.print(getX());
 		Serial.print(", y = ");

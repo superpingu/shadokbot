@@ -16,7 +16,7 @@ Lidar::Lidar(Map *pMap) :
     stage = IDLE;
     frameToParse = 0;
     readTimer.setCallback(&priv_readCb, this);
-    readTimer.start();
+    // readTimer.start();
 }
 
 Lidar::~Lidar() {

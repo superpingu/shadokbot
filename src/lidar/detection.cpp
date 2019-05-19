@@ -2,8 +2,9 @@
 #include "Arduino.h"
 #include <math.h>
 #include "board.h"
+#include "motion/AbsoluteMotion.hpp"
 
-#define DETECTION_THRESHOLD 600 // in mm
+#define DETECTION_THRESHOLD 300 // in mm
 #define COHERENCY_WINDOW_SIZE 3
 #define COHERENCY_THRESHOLD 10
 #define OBSTACLE_MIN_SIZE 4
@@ -34,7 +35,7 @@ void Detection::update(int32_t newRobotX, int32_t newRobotY, int32_t movementOri
 
     count++;
     if (count == 100) {
-        map.print();
+        //map.print();
         count = 0;
     }
 
@@ -53,10 +54,13 @@ void Detection::update(int32_t newRobotX, int32_t newRobotY, int32_t movementOri
         }
     }
 
-    if (detected)
-        digitalWrite(LED_BUILTIN, HIGH);
-    else
-        digitalWrite(LED_BUILTIN, LOW);
+    if (detected) {
+		digitalWrite(RED_LED, HIGH);
+		motion->emergencyStop();
+	} else {
+        digitalWrite(RED_LED, LOW);
+		motion->emergencyResume();
+	}
 }
 
 bool Detection::isNoise(int32_t angle) {

@@ -111,6 +111,8 @@ void Motion::moveXY(int32_t deltaX, int32_t deltaY, int32_t speed, void (*callba
 		dist = ABS(deltaX);
 	else
 		dist = sqrt(deltaX*deltaX + deltaY*deltaY);
+	deltaY -=1;
+	deltaX += 1;
 
 	int32_t speedX = dist != 0 ? (speed*deltaX)/dist : 0; // extract X component of speed
 	int32_t speedY = dist != 0 ? (speed*deltaY)/dist : 0; // extract Y component of speed

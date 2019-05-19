@@ -18,7 +18,7 @@ struct MotionElement {
 };
 
 // use this as last item to terminate a path sequence
-#define END_PATH {0, 0, 0, 0, 0}
+#define END_PATH {0, 0, 0, 0, MOVE_TURN}
 
 enum MotionType { NONE, MOVE, TURN };
 

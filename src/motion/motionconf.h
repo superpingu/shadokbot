@@ -7,7 +7,7 @@
 #define STEP_PER_TURN 400
 #define WHEEL_DIAMETER_MM 100
 #define WHEEL_TO_CENTER_MM 138.5f // distance between a wheel contact point and center of all 4 contact points
-#define MAGIC_TURN_COEFF 1.395 // not clear why but DEG_TO_SUBSTEP needs an additionnal coeff ~~black magic~~
+#define MAGIC_TURN_COEFF 1.4 // not clear why but DEG_TO_SUBSTEP needs an additionnal coeff ~~black magic~~
 
 // mm to halfticks conversion factor
 #define MM_TO_HALFTICK (STEP_PER_TURN*2/(WHEEL_DIAMETER_MM*3.1416f))
@@ -23,12 +23,12 @@
 // acceleration conversion factor
 #define MM_PER_S2_TO_HALFTICK_PER_SPEEDTU2 (MM_TO_HALFTICK*SPEEDTU_TO_S*SPEEDTU_TO_S)
 
-#define DEFAULT_MAX_ACCELERATION (300*MM_PER_S2_TO_HALFTICK_PER_SPEEDTU2)
-#define DEFAULT_MIN_SPEED (50*MM_PER_S_TO_HALFTICK_PER_SPEEDTU)
-#define DEFAULT_RECAL_SPEED (150*MM_PER_S_TO_HALFTICK_PER_SPEEDTU)
+#define DEFAULT_MAX_ACCELERATION (220*MM_PER_S2_TO_HALFTICK_PER_SPEEDTU2)
+#define DEFAULT_MIN_SPEED (70*MM_PER_S_TO_HALFTICK_PER_SPEEDTU)
+#define DEFAULT_RECAL_SPEED (170*MM_PER_S_TO_HALFTICK_PER_SPEEDTU)
 #define DEFAULT_RECAL_DISTANCE (50*MM_TO_HALFTICK)
 
-#define RECAL_COLLISION_THRESHOLD 100000
+#define RECAL_COLLISION_THRESHOLD 200000
 #define DEFAULT_TURN_SPEED 90
 
 #endif

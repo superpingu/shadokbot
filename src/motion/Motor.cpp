@@ -87,12 +87,18 @@ void Motor::update() {
 		emergency = false;
 	}
 
+	// update motor timer to adjust tick frequency to speed
+	if(speed != 0) {
+		period = SPEEDTU_TO_S*1000000*US_TO_TIMER_PERIOD/speed;
+		// start generating pulses to the stepper motor controller
+		if(lastSpeed == 0)
+			motorTimer->start();
+	} else {
+		motorTimer->stop();
+	}
+
 	lastSpeed = speed;
 	lastPosition = position;
-
-	// update motor timer to adjust tick frequency to speed
-	if(speed != 0)
-		period = SPEEDTU_TO_S*1000000*US_TO_TIMER_PERIOD/speed;
 }
 
 void Motor::setPulse(bool active) {
@@ -117,12 +123,12 @@ void Motor::move(int32_t speed, uint32_t distance, bool recal) {
 	accelerationCoeff = accelerationDistance == 0 ? 0 :
 		((cruiseSpeed - minSpeed) << MOTOR_ACC_COEFF_FP)/accelerationDistance;
 
+	// set rotation direction
+	digitalWrite(dirPin, (speed < 0) ^ invDir ? MOTOR_ACTIVE_LEVEL : MOTOR_IDLE_LEVEL);
 	// set initial motor timer period
 	update();
 	// start generating pulses to the stepper motor controller
 	motorTimer->start();
-	// set rotation direction
-	digitalWrite(dirPin, (speed < 0) ^ invDir ? MOTOR_ACTIVE_LEVEL : MOTOR_IDLE_LEVEL);
 }
 
 void Motor::enable(bool enabled) {

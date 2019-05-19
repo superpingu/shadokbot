@@ -1,7 +1,7 @@
 #include "ax12/AX12.hpp"
 #include "motion/AbsoluteMotion.hpp"
 #include "lidar/detection.hpp"
-
+#include "actions/sequence.hpp"
 #include "board.h"
 
 #include "shell/Shell.hpp"
@@ -41,23 +41,27 @@ void setup() {
 	motion = new AbsoluteMotion();
 	motion->enable(true);
 
-	pinMode(LED_BUILTIN, OUTPUT);
+	pinMode(GREEN_LED, OUTPUT);
+	pinMode(YELLOW_LED, OUTPUT);
+	pinMode(RED_LED, OUTPUT);
+	pinMode(TEAM_SWITCH, INPUT_PULLUP);
+	pinMode(MATCH_SWITCH, INPUT_PULLUP);
+	pinMode(MODE_SWITCH, INPUT_PULLUP);
+	pinMode(START_JACK, INPUT_PULLUP);
 
-	// pinMode(LIDAR_M_SCTP, OUTPUT);
-	// pinMode(LIDAR_DEV_EN, OUTPUT);
-	// pinMode(LIDAR_M_EN, OUTPUT);
-	// digitalWrite(LIDAR_M_EN, HIGH);
-	// digitalWrite(LIDAR_DEV_EN, HIGH);
-	// analogWrite(LIDAR_M_SCTP, 250);
+	detection->map.setRobotAngle(270*2);
 }
 
 #define LOOP_PERIOD_US 5000 // duration of each loop iteration
 // the loop function runs over and over again forever
 void loop() {
 	unsigned long loopStart = micros();
-	//motion->update();
+	motion->update();
 	shell->update();
-	detection->update(0, 0, 0);
+	while (Serial2.available())
+		detection->lidar.pushSampleData(Serial2.read());
+	detection->update(motion->getX(), motion->getY(), 0);
+	sequenceUpdate();
 
 	unsigned long loopTime = micros() - loopStart;
 	delayMicroseconds(loopTime > LOOP_PERIOD_US ? 0 : LOOP_PERIOD_US - loopTime);

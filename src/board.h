@@ -42,4 +42,13 @@
 // IMU I2C port
 #define IMU_I2C Wire
 
+// roof connections
+#define GREEN_LED 10
+#define YELLOW_LED 9
+#define RED_LED 8
+#define TEAM_SWITCH 13
+#define MATCH_SWITCH 12
+#define MODE_SWITCH 11
+#define START_JACK 7
+
 #endif

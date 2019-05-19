@@ -14,9 +14,10 @@ public:
     Detection();
     void init();
     void update(int32_t newRobotX, int32_t newRobotY, int32_t movementOrientation);
+	Map map;
+	Lidar lidar;
 private:
-    Map map;
-    Lidar lidar;
+
     Position_t robotPosition;
 
     bool isNoise(int32_t angle);
