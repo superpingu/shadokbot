@@ -6,6 +6,7 @@
 
 #define FIXED_POINT_MULTIPLIER 1000
 #define ANG_CORR_CONST (155.3 * FIXED_POINT_MULTIPLIER)
+#define LIDAR_TIMEOUT 1000
 
 static void priv_readCb(void *ref);
 
@@ -43,9 +44,10 @@ void Lidar::init(HardwareSerial& serial, int baudrate) {
 
 void Lidar::startScan() {
     int byte, offset = 0, length = 0;
+    unsigned long startTime = millis();
     serial->write(COMMAND_START_BYTE);
     serial->write(COMMAND_CMD_START_SCAN);
-    while (1) {
+    while (millis() - startTime < LIDAR_TIMEOUT) {
         byte = serial->read();
         if (byte < 0) continue;
         switch (offset) {
