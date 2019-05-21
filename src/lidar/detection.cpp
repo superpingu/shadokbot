@@ -1,6 +1,6 @@
 #include "detection.hpp"
 #include "Arduino.h"
-#include <math.h>
+#include "utils/trigo.hpp"
 #include "board.h"
 #include "motion/AbsoluteMotion.hpp"
 
@@ -91,8 +91,8 @@ bool Detection::isNoise(int32_t angle) {
 bool Detection::isOnTable(int32_t angle, uint32_t distance) {
     Position_t obstacle = {robotPosition.x, robotPosition.y};
 
-    obstacle.x += distance * cos((angle + MAP_SIZE / 4) * 0.00873); // ((angle + MAP_SIZE / 4)/2 * PI/180
-    obstacle.y += distance * sin((angle + MAP_SIZE / 4) * 0.00873);
+    obstacle.x += distance * mcos((angle + MAP_SIZE / 4) * 0.00873); // ((angle + MAP_SIZE / 4)/2 * PI/180
+    obstacle.y += distance * msin((angle + MAP_SIZE / 4) * 0.00873);
 
     if ((obstacle.x > TABLE_MARGIN)
         && (obstacle.x < TABLE_MAX_X - TABLE_MARGIN)
