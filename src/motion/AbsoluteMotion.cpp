@@ -62,6 +62,7 @@ AbsoluteMotion::AbsoluteMotion() : Motion() {
 	currentY = 0;
 	currentHeading = 0;
 	currentMotionType = NONE;
+	currentMotionDirection = 0;
 	turnSpeed = DEFAULT_TURN_SPEED;
 }
 

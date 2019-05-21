@@ -49,7 +49,7 @@ void setup() {
 	pinMode(MODE_SWITCH, INPUT_PULLUP);
 	pinMode(START_JACK, INPUT_PULLUP);
 
-	detection->map.setRobotAngle(270*2);
+	detection->map.setRobotAngle(-90);
 }
 
 #define LOOP_PERIOD_US 5000 // duration of each loop iteration
@@ -60,7 +60,7 @@ void loop() {
 	shell->update();
 	while (Serial2.available())
 		detection->lidar.pushSampleData(Serial2.read());
-	detection->update(motion->getX(), motion->getY(), 0);
+	detection->update();
 	sequenceUpdate();
 
 	unsigned long loopTime = micros() - loopStart;
