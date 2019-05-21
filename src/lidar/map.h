@@ -28,15 +28,22 @@ public:
     *                       outside the range [0,MAP_SIZE], in which case the angle
     *                       will be automatically brought back to this range.
     *                       It increases counterclockwise.
+    *                       Unit is half-degrees.
     */
     uint32_t getDistance(int32_t absoluteAngle);
-    void setRobotAngle(uint32_t newRobotAngle);
+
+    /**
+    * @brief Set the orientation of the robot (required to convert absolute angles
+    *        into relative ones and the other way round).
+    * @param[in] newRobotAngle Absolute angle of the robot, in degrees.
+    */
+    void setRobotAngle(int32_t newRobotAngle);
     void incrementAge();
     void print();
 private:
     /**
     * Indexes correspond to the angles as seen by the lidar. These angles are
-    * thus relative to the robot.
+    * thus relative to the robot. They are positive clockwise.
     */
     Map_Data_t data[MAP_SIZE];
 

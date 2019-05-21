@@ -27,7 +27,10 @@ uint32_t Map::getDistance(int32_t absoluteAngle) {
     return data[relativeAngle].distance;
 }
 
-void Map::setRobotAngle(uint32_t newRobotAngle) {
+void Map::setRobotAngle(int32_t newRobotAngle) {
+    newRobotAngle *= 2;
+    while (newRobotAngle < 0)
+        newRobotAngle += MAP_SIZE;
     robotAngle = newRobotAngle % MAP_SIZE;
 }
 
