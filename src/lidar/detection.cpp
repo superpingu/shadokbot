@@ -1,6 +1,6 @@
 #include "detection.hpp"
 #include "Arduino.h"
-#include <math.h>
+#include "utils/trigo.hpp"
 #include "board.h"
 #include "motion/AbsoluteMotion.hpp"
 
@@ -28,8 +28,21 @@ void Detection::init() {
     lidar.startScan();
 }
 
-void Detection::update(int32_t newRobotX, int32_t newRobotY, int32_t movementOrientation) {
+void Detection::update() {
     static int count = 0;
+    int motionDirection;
+
+    robotPosition.x = motion->getX();
+    robotPosition.y = motion->getY();
+    motionDirection = motion->getMotionDirection();
+    map.setRobotAngle(motion->getHeading());
+
+    motionDirection *= 2;
+    while (motionDirection < 0)
+        motionDirection += MAP_SIZE;
+
+    motionDirection = motionDirection % MAP_SIZE;
+
     lidar.update();
     map.incrementAge();
 
@@ -39,10 +52,8 @@ void Detection::update(int32_t newRobotX, int32_t newRobotY, int32_t movementOri
         count = 0;
     }
 
-    robotPosition.x = newRobotX;
-    robotPosition.y = newRobotY;
     bool detected = false;
-    for (int i = movementOrientation - MAP_SIZE/4; i < movementOrientation + MAP_SIZE/4; i++) {
+    for (int i = motionDirection - MAP_SIZE/4; i < motionDirection + MAP_SIZE/4; i++) {
         uint32_t curDistance = map.getDistance(i);
         if ((curDistance != 0) && (curDistance <= DETECTION_THRESHOLD)) {
             if (isNoise(i)) {
@@ -80,8 +91,8 @@ bool Detection::isNoise(int32_t angle) {
 bool Detection::isOnTable(int32_t angle, uint32_t distance) {
     Position_t obstacle = {robotPosition.x, robotPosition.y};
 
-    obstacle.x += distance * cos(-angle * 0.00873); // -angle/2 * PI/180
-    obstacle.y += distance * sin(-angle * 0.00873);
+    obstacle.x += distance * mcos((angle + MAP_SIZE / 4) * 0.00873); // ((angle + MAP_SIZE / 4)/2 * PI/180
+    obstacle.y += distance * msin((angle + MAP_SIZE / 4) * 0.00873);
 
     if ((obstacle.x > TABLE_MARGIN)
         && (obstacle.x < TABLE_MAX_X - TABLE_MARGIN)

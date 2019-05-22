@@ -13,7 +13,7 @@ class Detection {
 public:
     Detection();
     void init();
-    void update(int32_t newRobotX, int32_t newRobotY, int32_t movementOrientation);
+    void update();
 	Map map;
 	Lidar lidar;
 private:

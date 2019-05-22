@@ -19,11 +19,7 @@ int Map::setDataPoint(uint32_t index, uint32_t distance) {
 }
 
 uint32_t Map::getDistance(int32_t absoluteAngle) {
-    uint32_t relativeAngle;
-    while (absoluteAngle < 0)
-        absoluteAngle += MAP_SIZE;
-
-    relativeAngle = getIndexFromAbsoluteAngle(absoluteAngle % MAP_SIZE);
+    uint32_t relativeAngle = getIndexFromAbsoluteAngle(absoluteAngle);
     if (data[relativeAngle].age > MAX_AGE) {
         return 0;
     }
@@ -31,7 +27,10 @@ uint32_t Map::getDistance(int32_t absoluteAngle) {
     return data[relativeAngle].distance;
 }
 
-void Map::setRobotAngle(uint32_t newRobotAngle) {
+void Map::setRobotAngle(int32_t newRobotAngle) {
+    newRobotAngle *= 2;
+    while (newRobotAngle < 0)
+        newRobotAngle += MAP_SIZE;
     robotAngle = newRobotAngle % MAP_SIZE;
 }
 
@@ -53,5 +52,8 @@ uint32_t Map::getIndexFromAbsoluteAngle(uint32_t angle) {
     while (relativeAngle < 0)
         relativeAngle += MAP_SIZE;
 
-    return (relativeAngle % MAP_SIZE);
+    relativeAngle = relativeAngle % MAP_SIZE;
+    // absolute angles are counterclockwise positive while internal (relative) angles
+    // are clockwise positive
+    return (MAP_SIZE - relativeAngle);
 }
