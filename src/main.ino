@@ -2,6 +2,7 @@
 #include "motion/AbsoluteMotion.hpp"
 #include "lidar/detection.hpp"
 #include "actions/sequence.hpp"
+#include "actions/robot.hpp"
 #include "board.h"
 
 #include "shell/Shell.hpp"
@@ -35,11 +36,13 @@ void setup() {
 	shell = new Shell(115200, getComms(), onShellInvite);
 	AX12::init(&AX12_SERIALPORT, 115200);
 
+	motion = new AbsoluteMotion();
+	motion->enable(false);
+
+	delay(1000);
+
 	detection = new Detection();
 	detection->init();
-
-	motion = new AbsoluteMotion();
-	motion->enable(true);
 
 	pinMode(GREEN_LED, OUTPUT);
 	pinMode(YELLOW_LED, OUTPUT);
@@ -48,8 +51,6 @@ void setup() {
 	pinMode(MATCH_SWITCH, INPUT_PULLUP);
 	pinMode(MODE_SWITCH, INPUT_PULLUP);
 	pinMode(START_JACK, INPUT_PULLUP);
-
-	detection->map.setRobotAngle(-90);
 }
 
 #define LOOP_PERIOD_US 5000 // duration of each loop iteration
@@ -58,9 +59,11 @@ void loop() {
 	unsigned long loopStart = micros();
 	motion->update();
 	shell->update();
+
 	while (Serial2.available())
 		detection->lidar.pushSampleData(Serial2.read());
 	detection->update();
+	
 	sequenceUpdate();
 
 	unsigned long loopTime = micros() - loopStart;

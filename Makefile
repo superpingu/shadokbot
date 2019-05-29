@@ -38,10 +38,11 @@ LIDAR_CPP_SRCS = $(SRCDIR)/lidar/circ_buffer.cpp $(SRCDIR)/lidar/lidar.cpp \
 IMU_CPP_SRCS = $(SRCDIR)/imu/IMU.cpp $(ARDUINO_PLATFORM_LIB_PATH)/Wire/src/Wire.cpp
 MOTION_CPP_SRCS = $(SRCDIR)/motion/Motor.cpp $(SRCDIR)/motion/Motion.cpp $(SRCDIR)/motion/AbsoluteMotion.cpp
 UTILS_CPP_SRCS = $(SRCDIR)/utils/Timer.cpp $(SRCDIR)/utils/trigo.cpp
+ACTIONS_CPP_SRCS = $(SRCDIR)/actions/sequence.cpp $(SRCDIR)/actions/robot.cpp
 
 LOCAL_CPP_SRCS = $(SRCDIR)/shell/commands.cpp $(SRCDIR)/shell/Shell.cpp \
-	$(SRCDIR)/ax12/AXcomms.cpp $(SRCDIR)/ax12/AX12.cpp $(SRCDIR)/actions/sequence.cpp \
-	$(LIDAR_CPP_SRCS) $(IMU_CPP_SRCS) $(MOTION_CPP_SRCS) $(UTILS_CPP_SRCS)
+	$(SRCDIR)/ax12/AXcomms.cpp $(SRCDIR)/ax12/AX12.cpp \
+	$(LIDAR_CPP_SRCS) $(IMU_CPP_SRCS) $(MOTION_CPP_SRCS) $(UTILS_CPP_SRCS) $(ACTIONS_CPP_SRCS)
 
 include $(ARDMK_DIR)/Sam.mk
 

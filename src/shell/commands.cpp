@@ -27,15 +27,9 @@ static void gotoCommand(int argc, char** argv) {
 		(MotionStrategy) str2int(argv[5]), moveCallback);
 }
 
-static void diamondCommand(int argc, char** argv) {
-	(void) argc; (void) argv;
-	motion->followPath(diamondPath, moveCallback);
-}
-
 const command_t comms[] = {
 	{"m", moveCommand},
 	{"g", gotoCommand},
-	{"diamond", diamondCommand},
 	{NULL, NULL}
 };
 

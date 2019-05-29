@@ -2,6 +2,7 @@
 // function periodically. (C++ class methods should not be used as callback).
 
 #include <stdint.h>
+#include <stdlib.h>
 
 #ifndef TIMER_HPP
 #define TIMER_HPP
