@@ -77,6 +77,8 @@ public:
 	void emergencyStop();
 	// resume the move stopped by emergency stop
 	void emergencyResume();
+
+	bool isOnSlopes();
 };
 
 extern AbsoluteMotion* motion; // pointer to absolute motion instance
