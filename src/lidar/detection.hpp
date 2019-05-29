@@ -22,6 +22,9 @@ private:
 
     bool isNoise(int32_t angle);
     bool isOnTable(int32_t angle, uint32_t distance);
+
+    void emergencyStop();
+    void emergencyResume();
 };
 
 #endif // DETECTION_HPP

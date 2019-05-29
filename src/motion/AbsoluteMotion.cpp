@@ -2,6 +2,7 @@
 #include "AbsoluteMotion.hpp"
 #include "motionconf.h"
 #include "utils/trigo.hpp"
+#include "utils/table.hpp"
 
 AbsoluteMotion* motion; // pointer to absolute motion instance
 
@@ -201,4 +202,16 @@ void AbsoluteMotion::emergencyResume() {
 	motor_FR->emergencyResume();
 	motor_RL->emergencyResume();
 	motor_RR->emergencyResume();
+}
+
+bool AbsoluteMotion::isOnSlopes() {
+	int x = getX();
+	int y = getY();
+
+	if ((y > 0) && (y < SLOPES_END_Y)
+	&& (x > SLOPES_START_X) && (x < SLOPES_END_X)) {
+		return true; // Base of the slopes
+	} else {
+		return false;
+	}
 }

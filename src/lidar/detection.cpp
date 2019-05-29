@@ -3,15 +3,14 @@
 #include "utils/trigo.hpp"
 #include "board.h"
 #include "motion/AbsoluteMotion.hpp"
+#include "utils/table.hpp"
 
 #define DETECTION_THRESHOLD 300 // in mm
 #define COHERENCY_WINDOW_SIZE 3
 #define COHERENCY_THRESHOLD 10
 #define OBSTACLE_MIN_SIZE 4
 
-#define TABLE_MAX_X 3000 // in mm
-#define TABLE_MAX_Y 2000 // in mm
-#define TABLE_MARGIN 50 // in mm
+#define DETECTION_MARGIN 50 // in mm
 
 #define ABS(x) (((x) < 0) ? (-(x)) : (x))
 
@@ -53,6 +52,13 @@ void Detection::update() {
     }
 
     bool detected = false;
+
+    // Deactivate detection when on slopes
+    if (motion->isOnSlopes()) {
+        emergencyResume();
+        return;
+    }
+
     for (int i = motionDirection - MAP_SIZE/4; i < motionDirection + MAP_SIZE/4; i++) {
         uint32_t curDistance = map.getDistance(i);
         if ((curDistance != 0) && (curDistance <= DETECTION_THRESHOLD)) {
@@ -66,11 +72,9 @@ void Detection::update() {
     }
 
     if (detected) {
-		digitalWrite(RED_LED, HIGH);
-		motion->emergencyStop();
+        emergencyStop();
 	} else {
-        digitalWrite(RED_LED, LOW);
-		motion->emergencyResume();
+        emergencyResume();
 	}
 }
 
@@ -94,18 +98,28 @@ bool Detection::isOnTable(int32_t angle, uint32_t distance) {
     obstacle.x += distance * mcos((angle + MAP_SIZE / 4) * 0.00873); // ((angle + MAP_SIZE / 4)/2 * PI/180
     obstacle.y += distance * msin((angle + MAP_SIZE / 4) * 0.00873);
 
-    if ((obstacle.x > TABLE_MARGIN)
-        && (obstacle.x < TABLE_MAX_X - TABLE_MARGIN)
-        && (obstacle.y > 400 + TABLE_MARGIN)
-        && (obstacle.y < TABLE_MAX_Y - TABLE_MARGIN))
+    if ((obstacle.x > DETECTION_MARGIN)
+        && (obstacle.x < TABLE_MAX_X - DETECTION_MARGIN)
+        && (obstacle.y > SLOPES_END_Y + DETECTION_MARGIN)
+        && (obstacle.y < TABLE_MAX_Y - DETECTION_MARGIN))
     {
         return true; // Main "free" space
-    } else if ((obstacle.y > TABLE_MARGIN)
-               && (obstacle.y < 400 + TABLE_MARGIN)
-               && (((obstacle.x > TABLE_MARGIN) && (obstacle.x < 450))
-                  || ((obstacle.x > 2550) && (obstacle.x < TABLE_MAX_X - TABLE_MARGIN)))) {
+    } else if ((obstacle.y > DETECTION_MARGIN)
+               && (obstacle.y < SLOPES_END_Y + DETECTION_MARGIN)
+               && (((obstacle.x > DETECTION_MARGIN) && (obstacle.x < SLOPES_START_X))
+                  || ((obstacle.x > SLOPES_END_X) && (obstacle.x < TABLE_MAX_X - DETECTION_MARGIN)))) {
         return true; // Base of the slopes
     } else {
         return false;
     }
+}
+
+void Detection::emergencyStop() {
+    digitalWrite(RED_LED, HIGH);
+    motion->emergencyStop();
+}
+
+void Detection::emergencyResume() {
+    digitalWrite(RED_LED, LOW);
+    motion->emergencyResume();
 }
