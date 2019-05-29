@@ -6,7 +6,8 @@
 
 #define FIXED_POINT_MULTIPLIER 1000
 #define ANG_CORR_CONST (155.3 * FIXED_POINT_MULTIPLIER)
-#define LIDAR_TIMEOUT 1000
+#define LIDAR_TIMEOUT 200
+#define LIDAR_RETRY_START_MAX 5
 
 static void priv_readCb(void *ref);
 
@@ -44,28 +45,31 @@ void Lidar::init(HardwareSerial& serial, int baudrate) {
 
 void Lidar::startScan() {
     int byte, offset = 0, length = 0;
-    unsigned long startTime = millis();
-    serial->write(COMMAND_START_BYTE);
-    serial->write(COMMAND_CMD_START_SCAN);
-    while (millis() - startTime < LIDAR_TIMEOUT) {
-        byte = serial->read();
-        if (byte < 0) continue;
-        switch (offset) {
-        case OFFSET_RESP_START_SIGN_1:
-            if (byte != RESPONSE_START_SIGN_BYTE1)
-                continue;
-            break;
-        case OFFSET_RESP_START_SIGN_2:
-            if (byte != RESPONSE_START_SIGN_BYTE2)
-                continue;
-            break;
-        default:
-            break;
+    unsigned long startTime;
+    for (int retryCount = 0; retryCount < LIDAR_RETRY_START_MAX; retryCount++) {
+        serial->write(COMMAND_START_BYTE);
+        serial->write(COMMAND_CMD_START_SCAN);
+        startTime = millis();
+        while (millis() - startTime < LIDAR_TIMEOUT) {
+            byte = serial->read();
+            if (byte < 0) continue;
+            switch (offset) {
+            case OFFSET_RESP_START_SIGN_1:
+                if (byte != RESPONSE_START_SIGN_BYTE1)
+                    continue;
+                break;
+            case OFFSET_RESP_START_SIGN_2:
+                if (byte != RESPONSE_START_SIGN_BYTE2)
+                    continue;
+                break;
+            default:
+                break;
+            }
+            offset++;
+            if (offset == 7 + length) {
+                return;
+            }
         }
-        offset++;
-        if (offset == 7 + length)
-            break;
-
     }
 }
 
