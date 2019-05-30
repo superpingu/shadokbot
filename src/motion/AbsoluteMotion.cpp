@@ -71,15 +71,13 @@ void AbsoluteMotion::update() {
 	static int i = 0;
 	Motion::update();
 
-	if(currentMotionType != NONE && (i++ % 50) == 0) {
-		Serial.print("x = ");
+	if(currentMotionType != NONE && (i++ % 25) == 0) {
+		Serial.print("pos ");
 		Serial.print(getX());
-		Serial.print(", y = ");
+		Serial.print(" ");
 		Serial.print(getY());
-		Serial.print(", heading = ");
+		Serial.print(" ");
 		Serial.print(getHeading());
-		Serial.print(", direction = ");
-		Serial.print(getMotionDirection());
 		Serial.print("\n");
 	}
 }

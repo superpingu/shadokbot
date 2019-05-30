@@ -5,7 +5,7 @@
 #include "motion/AbsoluteMotion.hpp"
 #include "utils/table.hpp"
 
-#define DETECTION_THRESHOLD 500 // in mm
+#define DETECTION_THRESHOLD 400 // in mm
 #define COHERENCY_WINDOW_SIZE 3
 #define COHERENCY_THRESHOLD 10
 #define OBSTACLE_MIN_SIZE 4
@@ -59,7 +59,7 @@ void Detection::update() {
         return;
     }
 
-    for (int i = motionDirection - MAP_SIZE/6; i < motionDirection + MAP_SIZE/6; i++) {
+    for (int i = motionDirection - MAP_SIZE/8; i < motionDirection + MAP_SIZE/8; i++) {
         uint32_t curDistance = map.getDistance(i);
         if ((curDistance != 0) && (curDistance <= DETECTION_THRESHOLD)) {
             if (isNoise(i)) {
