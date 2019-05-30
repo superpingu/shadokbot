@@ -51,4 +51,8 @@
 #define MODE_SWITCH 11
 #define START_JACK 7
 
+// AX12 IDs
+#define ARM_LEFT_ID 198
+#define ARM_RIGHT_ID 199
+
 #endif

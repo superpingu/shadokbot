@@ -3,6 +3,7 @@
 #include "lidar/detection.hpp"
 #include "actions/sequence.hpp"
 #include "actions/robot.hpp"
+#include "display/SevenSegDisplay.h"
 #include "board.h"
 
 #include "shell/Shell.hpp"
@@ -10,15 +11,6 @@
 
 Shell* shell;
 Detection *detection;
-
-int count = 0;
-
-#define BATT_PROBE_COEFF (3270*(11+33)/11)
-// returns battery voltage in millivolts
-uint getBatteryVoltage() {
-	uint value = analogRead(BATT_PROBE)*BATT_PROBE_COEFF;
-	return (value >> 10);
-}
 
 // print shell invite, with battery voltage display
 void onShellInvite() {
@@ -39,31 +31,27 @@ void setup() {
 	motion = new AbsoluteMotion();
 	motion->enable(false);
 
-	delay(1000);
-
 	detection = new Detection();
 	detection->init();
 
-	pinMode(GREEN_LED, OUTPUT);
-	pinMode(YELLOW_LED, OUTPUT);
-	pinMode(RED_LED, OUTPUT);
-	pinMode(TEAM_SWITCH, INPUT_PULLUP);
-	pinMode(MATCH_SWITCH, INPUT_PULLUP);
-	pinMode(MODE_SWITCH, INPUT_PULLUP);
-	pinMode(START_JACK, INPUT_PULLUP);
+	display.begin();
+
+	initRobot();
 }
 
 #define LOOP_PERIOD_US 5000 // duration of each loop iteration
 // the loop function runs over and over again forever
 void loop() {
 	unsigned long loopStart = micros();
+
 	motion->update();
 	shell->update();
+	AX12::update();
 
 	while (Serial2.available())
 		detection->lidar.pushSampleData(Serial2.read());
 	detection->update();
-	
+
 	sequenceUpdate();
 
 	unsigned long loopTime = micros() - loopStart;

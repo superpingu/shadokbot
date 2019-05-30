@@ -4,6 +4,9 @@
 
 static RobotTeam team = NOTEAM;
 
+static AX12* armLeft;
+static AX12* armRight;
+
 // sample buttons values
 void sampleInputs() {
     team = NOTEAM;
@@ -29,4 +32,39 @@ void initPosition(const MotionElement** path) {
     motion->setX(selectedPath[0].x);
     motion->setY(selectedPath[0].y);
     motion->setHeading(selectedPath[0].heading);
+}
+
+void initRobot() {
+    pinMode(GREEN_LED, OUTPUT);
+    pinMode(YELLOW_LED, OUTPUT);
+    pinMode(RED_LED, OUTPUT);
+    pinMode(TEAM_SWITCH, INPUT_PULLUP);
+    pinMode(MATCH_SWITCH, INPUT_PULLUP);
+    pinMode(MODE_SWITCH, INPUT_PULLUP);
+    pinMode(START_JACK, INPUT_PULLUP);
+
+    armLeft = new AX12(ARM_LEFT_ID);
+    armRight = new AX12(ARM_RIGHT_ID);
+}
+
+void deployArm(void (*callback)()) {
+    if(getTeam() == PURPLE) {
+        armRight->setTorque(100);
+        armRight->move(512);
+    } else {
+        armLeft->setTorque(100);
+        armLeft->move(512);
+    }
+}
+
+void increaseArmTorque() {
+    armRight->setTorque(500);
+    armLeft->setTorque(500);
+}
+
+#define BATT_PROBE_COEFF (3270*(11+33)/11)
+// returns battery voltage in millivolts
+uint getBatteryVoltage() {
+	uint value = analogRead(BATT_PROBE)*BATT_PROBE_COEFF;
+	return (value >> 10);
 }
