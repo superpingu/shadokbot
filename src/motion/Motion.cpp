@@ -22,6 +22,7 @@ Motion::Motion() {
 }
 
 void Motion::update() {
+	static int stopRecal = -1;
 	motor_FL->update();
 	motor_FR->update();
 	motor_RL->update();
@@ -29,17 +30,24 @@ void Motion::update() {
 
 	// all motors have entered the recalibration constant speed phase : detect collision with the wall
 	if(motor_FL->recalibrating() && motor_FR->recalibrating() && motor_RL->recalibrating() && motor_RR->recalibrating()) {
-		uint32_t accX = imu->getLinearAccelerationX();
-		uint32_t accY = imu->getLinearAccelerationY();
+
+		uint32_t accX = imu->getAccelerationX();
+		uint32_t accY = imu->getAccelerationY();
 
 		if(accX*accX + accY*accY > RECAL_COLLISION_THRESHOLD) {
+			stopRecal = 50;
+		}
+	}
+
+	if(stopRecal > -1) {
+		if(stopRecal == 0) {
 			motor_FL->stopRecal();
 			motor_FR->stopRecal();
 			motor_RL->stopRecal();
 			motor_RR->stopRecal();
 		}
+		stopRecal--;
 	}
-
 	if(motor_FL->finished() && motor_FR->finished() && motor_RL->finished() && motor_RR->finished() && moveCallback != NULL) {
 		// save and set moveCallback to NULL before calling it (a new value might be given during call)
 		void (*callback)() = moveCallback;

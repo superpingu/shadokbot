@@ -54,10 +54,6 @@ void sequenceUpdate() {
 		deployArm(NULL);
 		followPath(acceleratorPath, nextStepCallback);
 		sequenceStep++;
-	} STEP {} STEP { // accelerator finished
-		deployArm(NULL);
-		followPath(goldPath, nextStepCallback);
-		sequenceStep++;
 	} STEP {} STEP { // first move finished
 		digitalWrite(GREEN_LED, LOW);
 		sequenceStep = 0;

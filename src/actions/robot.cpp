@@ -48,13 +48,12 @@ void initRobot() {
 }
 
 void deployArm(void (*callback)()) {
-    if(getTeam() == PURPLE) {
-        armRight->setTorque(100);
-        armRight->move(512);
-    } else {
-        armLeft->setTorque(100);
+    armRight->setTorque(300);
+    armLeft->setTorque(300);
+    if(getTeam() == PURPLE)
         armLeft->move(512);
-    }
+    else
+        armRight->move(512);
 }
 
 void increaseArmTorque() {
