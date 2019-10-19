@@ -12,7 +12,7 @@ void nextStepCallback() {
 	if(sequenceStep > 0)
 		sequenceStep++;
 }
-
+#include "stdio.h"
 #define FIRSTSTEP if((step = 0) == sequenceStep)
 #define STEP else if(++step == sequenceStep)
 void sequenceUpdate() {
@@ -35,6 +35,7 @@ void sequenceUpdate() {
 			digitalWrite(YELLOW_LED, HIGH);
 
 			initPosition(paletsPath);
+			printf("initPosition\n");
 			motion->enable(true);
 
 			sequenceStep++;
@@ -47,12 +48,17 @@ void sequenceUpdate() {
 			sampleInputs();
 
 			startTime = micros();
+			printf("Start moving\n");
 			followPath(paletsPath, nextStepCallback);
+			printf("Next step\n");
 			sequenceStep++;
 		}
-	} STEP {} STEP { // palet finished
+	} STEP {printf("intermediary step\n");} STEP { // palet finished
+		printf("pre deploy\n");
 		deployArm(NULL);
+		printf("post deploy\n");
 		followPath(acceleratorPath, nextStepCallback);
+		printf("post move\n");
 		sequenceStep++;
 	} STEP {} STEP { // first move finished
 		digitalWrite(GREEN_LED, LOW);

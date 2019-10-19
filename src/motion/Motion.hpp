@@ -2,7 +2,7 @@
 #define MOTION_HPP
 
 #include "Motor.hpp"
-#include "../imu/IMU.hpp"
+#include "imu/IMU.hpp"
 
 class Motion {
 	void (*moveCallback)(); // called when a move is finished

@@ -32,6 +32,7 @@ CXXFLAGS_STD = -std=gnu++11 -Wall -Wextra -I$(SRCDIR) -I$(ARDUINO_PLATFORM_LIB_P
 
 # main file
 LOCAL_INO_SRCS = $(SRCDIR)/main.ino
+INO_FILE_AS_CPP=$(patsubst %.ino,%.cpp,$(LOCAL_INO_SRCS))
 # project sources
 LIDAR_CPP_SRCS = $(SRCDIR)/lidar/circ_buffer.cpp $(SRCDIR)/lidar/lidar.cpp \
 	$(SRCDIR)/lidar/map.cpp $(SRCDIR)/lidar/detection.cpp
@@ -39,10 +40,23 @@ IMU_CPP_SRCS = $(SRCDIR)/imu/IMU.cpp $(ARDUINO_PLATFORM_LIB_PATH)/Wire/src/Wire.
 MOTION_CPP_SRCS = $(SRCDIR)/motion/Motor.cpp $(SRCDIR)/motion/Motion.cpp $(SRCDIR)/motion/AbsoluteMotion.cpp
 UTILS_CPP_SRCS = $(SRCDIR)/utils/Timer.cpp $(SRCDIR)/utils/trigo.cpp
 ACTIONS_CPP_SRCS = $(SRCDIR)/actions/sequence.cpp $(SRCDIR)/actions/robot.cpp
+SHELL_CPP_SRCS = $(SRCDIR)/shell/commands.cpp $(SRCDIR)/shell/Shell.cpp
+AX12_CPP_SRCS = $(SRCDIR)/ax12/AXcomms.cpp $(SRCDIR)/ax12/AX12.cpp
+DISPLAY_CPP_SRCS = $(SRCDIR)/display/SevenSegDisplay.cpp
 
-LOCAL_CPP_SRCS = $(SRCDIR)/shell/commands.cpp $(SRCDIR)/shell/Shell.cpp \
-	$(SRCDIR)/ax12/AXcomms.cpp $(SRCDIR)/ax12/AX12.cpp $(SRCDIR)/display/SevenSegDisplay.cpp \
+LOCAL_CPP_SRCS = $(SHELL_CPP_SRCS) $(AX12_CPP_SRCS) $(DISPLAY_CPP_SRCS) \
 	$(LIDAR_CPP_SRCS) $(IMU_CPP_SRCS) $(MOTION_CPP_SRCS) $(UTILS_CPP_SRCS) $(ACTIONS_CPP_SRCS)
+
+# Simulation source
+SIMU_SRC=$(SRCDIR)/simu/serial.cpp $(SRCDIR)/simu/arduino_time.cpp \
+	$(SRCDIR)/simu/dummy_ax12.cpp \
+	$(SRCDIR)/utils/trigo.cpp $(SRCDIR)/simu/dummy_abs_motion.cpp \
+	$(SRCDIR)/simu/dummy_motion.cpp $(SRCDIR)/simu/dummy_motor.cpp $(SRCDIR)/simu/dummy_imu.cpp $(SRCDIR)/simu/Wire.cpp \
+	$(SRCDIR)/simu/main.cpp $(SRCDIR)/simu/dummy_lidar.cpp \
+	$(SRCDIR)/lidar/circ_buffer.cpp $(SRCDIR)/lidar/map.cpp $(SRCDIR)/lidar/detection.cpp \
+	$(SRCDIR)/simu/arduino_pin.cpp $(SRCDIR)/simu/dummy_timer.cpp $(ACTIONS_CPP_SRCS) \
+	$(SRCDIR)/simu/dummy_display.cpp $(SHELL_CPP_SRCS) $(SRCDIR)/simu/simu_table.cpp \
+	$(SRCDIR)/simu/simu_robot.cpp $(SRCDIR)/simu/simu_time.cpp
 
 include $(ARDMK_DIR)/Sam.mk
 
@@ -59,3 +73,8 @@ lidar_test: $(LIDAR_TEST_SRCS)
 host_lidar: test/lidar_host.c lib/gnuplot_i/src/gnuplot_i.c
 	mkdir -p build
 	gcc $^ -o $(OBJDIR)/lidar_host -lm
+
+host: $(LOCAL_INO_SRCS) $(SIMU_SRC)
+	mkdir -p build
+	cp $< $(INO_FILE_AS_CPP)
+	g++ $(INO_FILE_AS_CPP) $(SIMU_SRC) -g -DSIMU=1 -I$(SRCDIR)/simu -I$(SRCDIR) -lm -lsfml-graphics -lsfml-window -lsfml-system -o $(OBJDIR)/shadokbot
