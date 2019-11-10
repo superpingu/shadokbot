@@ -10,6 +10,7 @@ public:
 private:
 	sf::RenderWindow *mWindow;
 	sf::RectangleShape* mShape;
+	sf::CircleShape* mFront;
 	sf::Vector2f mDimensions;
 };
 

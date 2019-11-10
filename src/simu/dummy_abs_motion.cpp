@@ -4,8 +4,11 @@
 #include <stdio.h>
 AbsoluteMotion* motion;
 #define SIGN(x) ((x) < 0 ? -1 : 1)
+#define ABS(x) ((x) < 0 ? (-(x)) : (x))
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
 #define DEG_TO_RAD(x) (((x) * M_PI) / 180)
 #define RAD_TO_DEG(x) (((x) * 180) / M_PI)
+#define ANGULAR_SPEED 1
 
 static bool onGoingMove = false;
 
@@ -13,35 +16,49 @@ AbsoluteMotion::AbsoluteMotion() {
 	memset(&currentMove, 0, sizeof(MotionElement));
 }
 
+static int computeNewHeading(int currentHeading, int targetHeading)
+{
+	int deltaHeading = targetHeading - currentHeading;
+	while(deltaHeading > 180) deltaHeading -= 360;
+	while(deltaHeading <= -180) deltaHeading += 360;
+	currentHeading += SIGN(deltaHeading) * MIN(ANGULAR_SPEED,ABS(currentHeading-targetHeading)%360) * (Time::getCurTime() - Time::getPrevTime());
+	while (currentHeading > 180)
+		currentHeading -= 360;
+	while (currentHeading <= -180)
+		currentHeading += 360;
+	return currentHeading;
+}
+
 void AbsoluteMotion::update()
 {
 	int newX, newY;
-	if (currentMove.speed != 0) {
-		printf("curX %d curY %d targetX %d targetY %d\n", currentX, currentY, currentMove.x, currentMove.y);
-		if (currentX == currentMove.x && currentY == currentMove.y) {
-			if (gotoCallback) {
-				gotoCallback();
-				return;
-			}
-		}
-		// Compute heading
-		if (currentMove.x != currentX) {
-			currentHeading = RAD_TO_DEG(atan2(currentMove.y-currentY,currentMove.x - currentX));
-		} else if (currentMove.y > currentY) {
-			currentHeading = 90;
-		} else {
-			currentHeading = 270;
-		}
+	if (currentMove.speed == 0)
+		return;
 
-		printf("x: %d y: %d speed %d heading %d\n", currentX, currentY, currentMove.speed, currentHeading);
-		newX = currentX + (Time::getCurTime() - Time::getPrevTime()) * currentMove.speed/100 * cos(DEG_TO_RAD(currentHeading));
-		newY = currentY + (Time::getCurTime() - Time::getPrevTime()) * currentMove.speed/100 * sin(DEG_TO_RAD(currentHeading));
-		if (SIGN(newX - currentMove.x) != SIGN(currentX - currentMove.x) || SIGN(newY - currentMove.y) != SIGN(currentY - currentMove.y)) {
-			newX = currentMove.x;
-			newY = currentMove.y;
+	printf("curX %d curY %d targetX %d targetY %d\n", currentX, currentY, currentMove.x, currentMove.y);
+	if (currentX != currentMove.x || currentY != currentMove.y) {
+		// Compute motion direction
+		currentMotionDirection = RAD_TO_DEG(atan2(currentMove.y-currentY,currentMove.x - currentX));
+
+		if (currentHeading != currentMotionDirection) {
+			currentHeading = computeNewHeading(currentHeading, currentMotionDirection);
+		} else {
+			newX = currentX + (Time::getCurTime() - Time::getPrevTime()) * currentMove.speed/100 * cos(DEG_TO_RAD(currentHeading));
+			newY = currentY + (Time::getCurTime() - Time::getPrevTime()) * currentMove.speed/100 * sin(DEG_TO_RAD(currentHeading));
+			if (SIGN(newX - currentMove.x) != SIGN(currentX - currentMove.x) || SIGN(newY - currentMove.y) != SIGN(currentY - currentMove.y)) {
+				newX = currentMove.x;
+				newY = currentMove.y;
+			}
+			currentX = newX;
+			currentY = newY;
 		}
-		currentX = newX;
-		currentY = newY;
+	} else if (currentHeading != currentMove.heading) {
+		currentHeading = computeNewHeading(currentHeading, currentMove.heading);
+	} else { // Current move finished
+		if (gotoCallback) {
+			gotoCallback();
+			return;
+		}
 	}
 }
 

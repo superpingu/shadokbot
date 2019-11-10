@@ -23,8 +23,6 @@ int main()
 	Time::reset();
 	initPin();
     setup();
-	printf("foo %f\n", atan2(650 - 1440,2500 - 1710));
-	printf("foo %f\n", RAD_TO_DEG(atan2(650 - 1440,2500 - 1710)));
     while (window.isOpen()) {
 		Time::increaseTime(LOOP_DURATION);
         loop();
