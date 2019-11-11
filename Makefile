@@ -77,4 +77,4 @@ host_lidar: test/lidar_host.c lib/gnuplot_i/src/gnuplot_i.c
 host: $(LOCAL_INO_SRCS) $(SIMU_SRC)
 	mkdir -p build
 	cp $< $(INO_FILE_AS_CPP)
-	g++ $(INO_FILE_AS_CPP) $(SIMU_SRC) -g -DSIMU=1 -I$(SRCDIR)/simu -I$(SRCDIR) -lm -lsfml-graphics -lsfml-window -lsfml-system -o $(OBJDIR)/shadokbot
+	g++ $(INO_FILE_AS_CPP) $(SIMU_SRC) -g -std=c++11 -DSIMU=1 -I$(SRCDIR)/simu -I$(SRCDIR) -lm -lsfml-graphics -lsfml-window -lsfml-system -o $(OBJDIR)/shadokbot

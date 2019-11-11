@@ -22,6 +22,6 @@ void increaseArmTorque();
 
 void initRobot();
 
-uint getBatteryVoltage();
+unsigned int getBatteryVoltage();
 
 #endif

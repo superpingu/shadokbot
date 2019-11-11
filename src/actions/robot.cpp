@@ -63,7 +63,7 @@ void increaseArmTorque() {
 
 #define BATT_PROBE_COEFF (3270*(11+33)/11)
 // returns battery voltage in millivolts
-uint getBatteryVoltage() {
-	uint value = analogRead(BATT_PROBE)*BATT_PROBE_COEFF;
+unsigned int getBatteryVoltage() {
+	unsigned int value = analogRead(BATT_PROBE)*BATT_PROBE_COEFF;
 	return (value >> 10);
 }
