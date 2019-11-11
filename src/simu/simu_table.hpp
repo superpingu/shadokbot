@@ -13,7 +13,8 @@ private:
 	float mLength;
 	float mWidth;
 	sf::RenderWindow* mWindow;
-	sf::RectangleShape* mTable;
+	sf::Sprite mTable;
+	sf::Texture mTexture;
 };
 
 #endif /* SIMU_TABLE_HPP */
