@@ -49,7 +49,7 @@ void AbsoluteMotion::update()
 	if (currentX != currentMove.x || currentY != currentMove.y) {
 		// Compute motion direction
 		currentMotionDirection = RAD_TO_DEG(atan2(currentMove.y-currentY,currentMove.x - currentX));
-		printf("x %d/%d y %d/%d heading %d/%d\n", currentX, currentMove.x, currentY, currentMove.y, currentHeading, currentMotionDirection);
+		printf("x %d/%d y %d/%d heading %d/%d speed %d\n", currentX, currentMove.x, currentY, currentMove.y, currentHeading, currentMotionDirection, currentMove.speed);
 
 		if ((currentHeading != currentMotionDirection) && (currentHeading != currentMotionDirection + 180) && (currentHeading != currentMotionDirection - 180)) {
 			currentHeading = computeNewHeading(currentHeading, currentMotionDirection, true);
@@ -75,7 +75,9 @@ void AbsoluteMotion::update()
 		printf("heading %d/%d\n", currentHeading, currentMove.heading);
 	} else { // Current move finished
 		if (gotoCallback) {
-			gotoCallback();
+			void (*cb)() = gotoCallback;
+			gotoCallback = NULL;
+			cb();
 			return;
 		}
 	}
