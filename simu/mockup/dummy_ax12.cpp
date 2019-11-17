@@ -1,5 +1,5 @@
 #include "ax12/AX12.hpp"
-#include "simu/AXcomms.hpp"
+#include "AXcomms.hpp"
 
 AXcomms::AXcomms(uint8_t axid) {}
 void AXcomms::init(HardwareSerial* serialport, int baudrate) {}

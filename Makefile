@@ -4,6 +4,7 @@
 PROJECT_DIR = $(abspath .)
 OBJDIR = $(PROJECT_DIR)/build
 SRCDIR = $(PROJECT_DIR)/src
+SIMUDIR = $(PROJECT_DIR)/simu
 
 # The configuration below is platform dependent
 ifeq ($(shell echo $$OSTYPE), darwin17)
@@ -48,15 +49,15 @@ LOCAL_CPP_SRCS = $(SHELL_CPP_SRCS) $(AX12_CPP_SRCS) $(DISPLAY_CPP_SRCS) \
 	$(LIDAR_CPP_SRCS) $(IMU_CPP_SRCS) $(MOTION_CPP_SRCS) $(UTILS_CPP_SRCS) $(ACTIONS_CPP_SRCS)
 
 # Simulation source
-SIMU_SRC=$(SRCDIR)/simu/serial.cpp $(SRCDIR)/simu/arduino_time.cpp \
-	$(SRCDIR)/simu/dummy_ax12.cpp \
-	$(SRCDIR)/utils/trigo.cpp $(SRCDIR)/simu/dummy_abs_motion.cpp \
-	$(SRCDIR)/simu/dummy_motion.cpp $(SRCDIR)/simu/dummy_motor.cpp $(SRCDIR)/simu/dummy_imu.cpp $(SRCDIR)/simu/Wire.cpp \
-	$(SRCDIR)/simu/main.cpp $(SRCDIR)/simu/dummy_lidar.cpp \
+SIMU_SRC=$(SIMUDIR)/mockup/serial.cpp $(SIMUDIR)/mockup/arduino_time.cpp \
+	$(SIMUDIR)/mockup/dummy_ax12.cpp $(SIMUDIR)/mockup/Wire.cpp \
+	$(SRCDIR)/utils/trigo.cpp $(SIMUDIR)/mockup/dummy_abs_motion.cpp \
+	$(SIMUDIR)/mockup/dummy_motion.cpp $(SIMUDIR)/mockup/dummy_motor.cpp $(SIMUDIR)/mockup/dummy_imu.cpp \
+	$(SIMUDIR)/main.cpp $(SIMUDIR)/mockup/dummy_lidar.cpp \
 	$(SRCDIR)/lidar/circ_buffer.cpp $(SRCDIR)/lidar/map.cpp $(SRCDIR)/lidar/detection.cpp \
-	$(SRCDIR)/simu/arduino_pin.cpp $(SRCDIR)/simu/dummy_timer.cpp $(ACTIONS_CPP_SRCS) \
-	$(SRCDIR)/simu/dummy_display.cpp $(SHELL_CPP_SRCS) $(SRCDIR)/simu/simu_table.cpp \
-	$(SRCDIR)/simu/simu_robot.cpp $(SRCDIR)/simu/simu_time.cpp
+	$(SIMUDIR)/mockup/arduino_pin.cpp $(SIMUDIR)/mockup/dummy_timer.cpp $(ACTIONS_CPP_SRCS) \
+	$(SIMUDIR)/mockup/dummy_display.cpp $(SHELL_CPP_SRCS) $(SIMUDIR)/simu_table.cpp \
+	$(SIMUDIR)/simu_robot.cpp $(SIMUDIR)/simu_time.cpp
 
 include $(ARDMK_DIR)/Sam.mk
 
@@ -77,4 +78,4 @@ host_lidar: test/lidar_host.c lib/gnuplot_i/src/gnuplot_i.c
 host: $(LOCAL_INO_SRCS) $(SIMU_SRC)
 	mkdir -p build
 	cp $< $(INO_FILE_AS_CPP)
-	g++ $(INO_FILE_AS_CPP) $(SIMU_SRC) -g -std=c++11 -DSIMU=1 -I$(SRCDIR)/simu -I$(SRCDIR) -lm -lsfml-graphics -lsfml-window -lsfml-system -o $(OBJDIR)/shadokbot
+	g++ $(INO_FILE_AS_CPP) $(SIMU_SRC) -g -std=c++11 -DSIMU=1 -I$(SIMUDIR)/mockup -I$(SIMUDIR) -I$(SRCDIR) -lm -lsfml-graphics -lsfml-window -lsfml-system -o $(OBJDIR)/shadokbot
