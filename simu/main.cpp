@@ -12,14 +12,15 @@ void initPin()
 {
 	digitalWrite(START_JACK, LOW);
 }
+
 #define DEG_TO_RAD(x) (((x) * M_PI) / 180)
 #define RAD_TO_DEG(x) (((x) * 180) / M_PI)
 int main()
 {
-    printf("Setup\n");
-    sf::RenderWindow window(sf::VideoMode(MM_TO_PX(3000), MM_TO_PX(2000)), "Match");
+    sf::RenderWindow window(sf::VideoMode(MM_TO_PX(3000), MM_TO_PX(2000)), "Table");
+    sf::RenderWindow roof(sf::VideoMode(MM_TO_PX(600), MM_TO_PX(300)), "Toit");
     Table table(MM_TO_PX(3000.f), MM_TO_PX(2000.f), &window);
-    Robot robot(MM_TO_PX(250), MM_TO_PX(250), &window);
+    Robot robot(MM_TO_PX(250), MM_TO_PX(250), &window, &roof);
 	Time::reset();
 	initPin();
     setup();
@@ -37,9 +38,11 @@ int main()
         }
 
         window.clear(sf::Color::White);
+		roof.clear(sf::Color::Black);
         table.draw();
 		robot.draw();
         window.display();
+		roof.display();
     }
     return 0;
 }
