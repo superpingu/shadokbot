@@ -22,12 +22,12 @@ RobotTeam getTeam() {
 }
 
 // follow the path of the selected team
-void followPath(const MotionElement** path, void (*callback)()) {
+void followPath(const MotionElement* const* path, void (*callback)()) {
     motion->followPath(path[getTeam() == YELLOW ? 0 : 1], callback);
 }
 
 // set the position of the robot to the first point of the path (according to the team)
-void initPosition(const MotionElement** path) {
+void initPosition(const MotionElement* const* path) {
     const MotionElement* selectedPath = path[getTeam() == YELLOW ? 0 : 1];
     motion->setX(selectedPath[0].x);
     motion->setY(selectedPath[0].y);
@@ -63,7 +63,7 @@ void increaseArmTorque() {
 
 #define BATT_PROBE_COEFF (3270*(11+33)/11)
 // returns battery voltage in millivolts
-uint getBatteryVoltage() {
-	uint value = analogRead(BATT_PROBE)*BATT_PROBE_COEFF;
+unsigned int getBatteryVoltage() {
+	unsigned int value = analogRead(BATT_PROBE)*BATT_PROBE_COEFF;
 	return (value >> 10);
 }

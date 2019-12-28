@@ -4,6 +4,7 @@
 PROJECT_DIR = $(abspath .)
 OBJDIR = $(PROJECT_DIR)/build
 SRCDIR = $(PROJECT_DIR)/src
+SIMUDIR = $(PROJECT_DIR)/simu
 
 # The configuration below is platform dependent
 ifeq ($(shell echo $$OSTYPE), darwin17)
@@ -32,6 +33,7 @@ CXXFLAGS_STD = -std=gnu++11 -Wall -Wextra -I$(SRCDIR) -I$(ARDUINO_PLATFORM_LIB_P
 
 # main file
 LOCAL_INO_SRCS = $(SRCDIR)/main.ino
+INO_FILE_AS_CPP=$(patsubst %.ino,%.cpp,$(LOCAL_INO_SRCS))
 # project sources
 LIDAR_CPP_SRCS = $(SRCDIR)/lidar/circ_buffer.cpp $(SRCDIR)/lidar/lidar.cpp \
 	$(SRCDIR)/lidar/map.cpp $(SRCDIR)/lidar/detection.cpp
@@ -39,10 +41,23 @@ IMU_CPP_SRCS = $(SRCDIR)/imu/IMU.cpp $(ARDUINO_PLATFORM_LIB_PATH)/Wire/src/Wire.
 MOTION_CPP_SRCS = $(SRCDIR)/motion/Motor.cpp $(SRCDIR)/motion/Motion.cpp $(SRCDIR)/motion/AbsoluteMotion.cpp
 UTILS_CPP_SRCS = $(SRCDIR)/utils/Timer.cpp $(SRCDIR)/utils/trigo.cpp
 ACTIONS_CPP_SRCS = $(SRCDIR)/actions/sequence.cpp $(SRCDIR)/actions/robot.cpp
+SHELL_CPP_SRCS = $(SRCDIR)/shell/commands.cpp $(SRCDIR)/shell/Shell.cpp
+AX12_CPP_SRCS = $(SRCDIR)/ax12/AXcomms.cpp $(SRCDIR)/ax12/AX12.cpp
+DISPLAY_CPP_SRCS = $(SRCDIR)/display/SevenSegDisplay.cpp
 
-LOCAL_CPP_SRCS = $(SRCDIR)/shell/commands.cpp $(SRCDIR)/shell/Shell.cpp \
-	$(SRCDIR)/ax12/AXcomms.cpp $(SRCDIR)/ax12/AX12.cpp $(SRCDIR)/display/SevenSegDisplay.cpp \
+LOCAL_CPP_SRCS = $(SHELL_CPP_SRCS) $(AX12_CPP_SRCS) $(DISPLAY_CPP_SRCS) \
 	$(LIDAR_CPP_SRCS) $(IMU_CPP_SRCS) $(MOTION_CPP_SRCS) $(UTILS_CPP_SRCS) $(ACTIONS_CPP_SRCS)
+
+# Simulation source
+SIMU_SRC=$(SIMUDIR)/mockup/serial.cpp $(SIMUDIR)/mockup/arduino_time.cpp \
+	$(SIMUDIR)/mockup/dummy_ax12.cpp $(SIMUDIR)/mockup/Wire.cpp \
+	$(SRCDIR)/utils/trigo.cpp $(SIMUDIR)/mockup/dummy_abs_motion.cpp \
+	$(SIMUDIR)/mockup/dummy_motion.cpp $(SIMUDIR)/mockup/dummy_motor.cpp $(SIMUDIR)/mockup/dummy_imu.cpp \
+	$(SIMUDIR)/main.cpp $(SIMUDIR)/mockup/dummy_lidar.cpp \
+	$(SRCDIR)/lidar/circ_buffer.cpp $(SRCDIR)/lidar/map.cpp $(SRCDIR)/lidar/detection.cpp \
+	$(SIMUDIR)/mockup/arduino_pin.cpp $(SIMUDIR)/mockup/dummy_timer.cpp $(ACTIONS_CPP_SRCS) \
+	$(SIMUDIR)/mockup/dummy_display.cpp $(SHELL_CPP_SRCS) $(SIMUDIR)/simu_table.cpp \
+	$(SIMUDIR)/simu_robot.cpp $(SIMUDIR)/simu_time.cpp
 
 include $(ARDMK_DIR)/Sam.mk
 
@@ -59,3 +74,7 @@ lidar_test: $(LIDAR_TEST_SRCS)
 host_lidar: test/lidar_host.c lib/gnuplot_i/src/gnuplot_i.c
 	mkdir -p build
 	gcc $^ -o $(OBJDIR)/lidar_host -lm
+
+host: $(LOCAL_INO_SRCS) $(SIMU_SRC)
+	mkdir -p build
+	g++ -x c++ $(LOCAL_INO_SRCS) $(SIMU_SRC) -g -std=c++11 -DSIMU=1 -I$(SIMUDIR)/mockup -I$(SIMUDIR) -I$(SRCDIR) -lm -lsfml-graphics -lsfml-window -lsfml-system -o $(OBJDIR)/shadokbot

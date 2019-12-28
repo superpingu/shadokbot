@@ -12,7 +12,6 @@ void nextStepCallback() {
 	if(sequenceStep > 0)
 		sequenceStep++;
 }
-
 #define FIRSTSTEP if((step = 0) == sequenceStep)
 #define STEP else if(++step == sequenceStep)
 void sequenceUpdate() {

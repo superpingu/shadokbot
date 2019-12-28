@@ -12,16 +12,16 @@ void sampleInputs();
 RobotTeam getTeam();
 
 // follow the path of the selected team
-void followPath(const MotionElement** path, void (*callback)()=NULL);
+void followPath(const MotionElement* const* path, void (*callback)()=NULL);
 
 // set the position of the robot to the first point of the path (according to the team)
-void initPosition(const MotionElement** path);
+void initPosition(const MotionElement* const* path);
 
 void deployArm(void (*callback)());
 void increaseArmTorque();
 
 void initRobot();
 
-uint getBatteryVoltage();
+unsigned int getBatteryVoltage();
 
 #endif
