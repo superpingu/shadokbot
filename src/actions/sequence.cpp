@@ -29,7 +29,7 @@ void sequenceUpdate() {
 			display.show(getBatteryVoltage()/10);
 		}
 
-		if(digitalRead(START_JACK) == LOW) {
+		if(digitalRead(START_JACK) == LOW) { // Jack inserted
 			digitalWrite(GREEN_LED, LOW);
 			digitalWrite(YELLOW_LED, HIGH);
 

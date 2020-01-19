@@ -55,9 +55,10 @@ SIMU_SRC=$(SIMUDIR)/mockup/serial.cpp $(SIMUDIR)/mockup/arduino_time.cpp \
 	$(SIMUDIR)/mockup/dummy_motion.cpp $(SIMUDIR)/mockup/dummy_motor.cpp $(SIMUDIR)/mockup/dummy_imu.cpp \
 	$(SIMUDIR)/main.cpp $(SIMUDIR)/mockup/dummy_lidar.cpp \
 	$(SRCDIR)/lidar/circ_buffer.cpp $(SRCDIR)/lidar/map.cpp $(SRCDIR)/lidar/detection.cpp \
-	$(SIMUDIR)/mockup/arduino_pin.cpp $(SIMUDIR)/mockup/dummy_timer.cpp $(ACTIONS_CPP_SRCS) \
+	$(SIMUDIR)/mockup/arduino_pin.cpp $(SIMUDIR)/mockup/dummy_timer.cpp  \
 	$(SIMUDIR)/mockup/dummy_display.cpp $(SHELL_CPP_SRCS) $(SIMUDIR)/simu_table.cpp \
-	$(SIMUDIR)/simu_robot.cpp $(SIMUDIR)/simu_time.cpp
+	$(SIMUDIR)/simu_robot.cpp $(SIMUDIR)/simu_time.cpp \
+	$(SRCDIR)/actions/robot.cpp $(SIMUDIR)/simu_sequence.cpp
 
 include $(ARDMK_DIR)/Sam.mk
 

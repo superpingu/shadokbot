@@ -5,6 +5,7 @@
 #include "SFML/Graphics.hpp"
 #include "simu_time.hpp"
 #include "board.h"
+#include "simu_sequence.hpp"
 
 #define LOOP_DURATION 1 // in ms
 
@@ -23,6 +24,7 @@ int main()
     Robot robot(MM_TO_PX(250), MM_TO_PX(250), &window, &roof);
 	Time::reset();
 	initPin();
+	initSequence(&window);
     setup();
     while (window.isOpen()) {
 		Time::increaseTime(LOOP_DURATION);
@@ -30,11 +32,17 @@ int main()
         sf::Event event;
 
         while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed) {
-                window.close();
-			} else if (event.type == sf::Event::MouseButtonPressed) {
+            switch (event.type) {
+			case sf::Event::Closed:
+				window.close();
+				break;
+			case sf::Event::KeyPressed:
 				digitalWrite(START_JACK, HIGH);
+				break;
+			default:
+				break;
 			}
+			onEventSequence(&event);
         }
 
         window.clear(sf::Color::White);

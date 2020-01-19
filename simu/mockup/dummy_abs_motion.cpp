@@ -52,7 +52,7 @@ void AbsoluteMotion::update()
 		printf("x %d/%d y %d/%d heading %d/%d speed %d\n", currentX, currentMove.x, currentY, currentMove.y, currentHeading, currentMotionDirection, currentMove.speed);
 
 		if ((currentHeading != currentMotionDirection) && (currentHeading != currentMotionDirection + 180) && (currentHeading != currentMotionDirection - 180)) {
-			currentHeading = computeNewHeading(currentHeading, currentMotionDirection, true);
+			setHeading(computeNewHeading(currentHeading, currentMotionDirection, true));
 		} else {
 			direction = currentHeading == currentMotionDirection ? FORWARD : BACKWARD;
 			uint32_t deltaTime = Time::getCurTime() - Time::getPrevTime();
@@ -71,7 +71,7 @@ void AbsoluteMotion::update()
 			currentY = newY;
 		}
 	} else if (currentHeading != currentMove.heading) {
-		currentHeading = computeNewHeading(currentHeading, currentMove.heading, false);
+		setHeading(computeNewHeading(currentHeading, currentMove.heading, false));
 		printf("heading %d/%d\n", currentHeading, currentMove.heading);
 	} else { // Current move finished
 		if (gotoCallback) {
