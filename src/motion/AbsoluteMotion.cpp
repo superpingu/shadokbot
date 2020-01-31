@@ -131,7 +131,8 @@ int32_t AbsoluteMotion::getX() {
 	if(currentMotionType == MOVE) {
 		// use the motor with the largest goal position.
 		// During a move, FL and RR have the same goal position, as well as FR and RL
-		Motor* largestGoalMotor = motor_FL->goalPosition > motor_FR->goalPosition ? motor_FL : motor_FR;
+		//TODO update
+		Motor* largestGoalMotor = motor_RL->goalPosition > motor_RR->goalPosition ? motor_RL : motor_RR;
 		int32_t goalPosition = largestGoalMotor->goalPosition;
 
 		// apply correction to goalPosition when recalibrating to compensate Motor internal changes
@@ -148,7 +149,8 @@ int32_t AbsoluteMotion::getY() {
 	if(currentMotionType == MOVE) {
 		// use the motor with the largest goal position.
 		// During a move, FL and RR have the same goal position, as well as FR and RL
-		Motor* largestGoalMotor = motor_FL->goalPosition > motor_FR->goalPosition ? motor_FL : motor_FR;
+		//TODO update
+		Motor* largestGoalMotor = motor_RL->goalPosition > motor_RR->goalPosition ? motor_RL : motor_RR;
 		int32_t goalPosition = largestGoalMotor->goalPosition;
 
 		// apply correction to goalPosition when recalibrating to compensate Motor internal changes
@@ -163,7 +165,7 @@ int32_t AbsoluteMotion::getY() {
 }
 int AbsoluteMotion::getHeading() {
 	if(currentMotionType == TURN) {
-		int newHeading = currentHeading + motor_FL->position*(currentMove.heading - currentHeading)/motor_FL->goalPosition;
+		int newHeading = currentHeading + motor_F->position*(currentMove.heading - currentHeading)/motor_F->goalPosition;
 		newHeading = newHeading < 0 ? newHeading + 360 : newHeading;
 		newHeading = newHeading > 360 ? newHeading - 360 : newHeading;
 		return newHeading;
@@ -188,16 +190,14 @@ void AbsoluteMotion::setHeading(int heading) {
 // stop the robot as fast as possible (with deceleration). It has no effect on rotations
 void AbsoluteMotion::emergencyStop() {
 	if(currentMotionType == MOVE) {
-		motor_FL->emergencyStop();
-		motor_FR->emergencyStop();
+		motor_F->emergencyStop();
 		motor_RL->emergencyStop();
 		motor_RR->emergencyStop();
 	}
 }
 // resume the move stopped by emergency stop
 void AbsoluteMotion::emergencyResume() {
-	motor_FL->emergencyResume();
-	motor_FR->emergencyResume();
+	motor_F->emergencyResume();
 	motor_RL->emergencyResume();
 	motor_RR->emergencyResume();
 }

@@ -5,9 +5,9 @@
 #define MOTOR_IDLE_LEVEL (MOTOR_ACTIVE_LEVEL == LOW ? HIGH : LOW)
 
 #define STEP_PER_TURN 400
-#define WHEEL_DIAMETER_MM 100
-#define WHEEL_TO_CENTER_MM 138.5f // distance between a wheel contact point and center of all 4 contact points
-#define MAGIC_TURN_COEFF 1.4 // not clear why but DEG_TO_SUBSTEP needs an additionnal coeff ~~black magic~~
+#define WHEEL_DIAMETER_MM 60
+#define WHEEL_TO_CENTER_MM 110.0f // distance between a wheel contact point and center of all 4 contact points
+#define MAGIC_TURN_COEFF 1 // not clear why but DEG_TO_SUBSTEP needs an additionnal coeff ~~black magic~~
 
 // mm to halfticks conversion factor
 #define MM_TO_HALFTICK (STEP_PER_TURN*2/(WHEEL_DIAMETER_MM*3.1416f))

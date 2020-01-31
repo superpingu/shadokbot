@@ -8,7 +8,7 @@ class Motion {
 	void (*moveCallback)(); // called when a move is finished
 	IMU* imu;
 public:
-	Motor *motor_FL, *motor_FR, *motor_RL, *motor_RR;
+	Motor *motor_F, *motor_RL, *motor_RR;
 
 	Motion();
 

@@ -31,12 +31,12 @@ void setup() {
 	motion = new AbsoluteMotion();
 	motion->enable(false);
 
-	detection = new Detection();
-	detection->init();
+	// detection = new Detection();
+	// detection->init();
+	//
+	// display.begin();
 
-	display.begin();
-
-	initRobot();
+	// initRobot();
 }
 
 #define LOOP_PERIOD_US 5000 // duration of each loop iteration
@@ -48,11 +48,11 @@ void loop() {
 	shell->update();
 	AX12::update();
 
-	while (Serial2.available())
-		detection->lidar.pushSampleData(Serial2.read());
-	detection->update();
+	// while (Serial2.available())
+	// 	detection->lidar.pushSampleData(Serial2.read());
+	// detection->update();
 
-	sequenceUpdate();
+	// sequenceUpdate();
 
 	unsigned long loopTime = micros() - loopStart;
 	delayMicroseconds(loopTime > LOOP_PERIOD_US ? 0 : LOOP_PERIOD_US - loopTime);
