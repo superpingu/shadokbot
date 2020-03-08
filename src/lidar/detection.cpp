@@ -54,10 +54,10 @@ void Detection::update() {
     bool detected = false;
 
     // Deactivate detection when on slopes
-    if (motion->isOnSlopes()) {
-        emergencyResume();
-        return;
-    }
+    // if (motion->isOnSlopes()) {
+    //     emergencyResume();
+    //     return;
+    // }
 
     for (int i = motionDirection - MAP_SIZE/8; i < motionDirection + MAP_SIZE/8; i++) {
         uint32_t curDistance = map.getDistance(i);

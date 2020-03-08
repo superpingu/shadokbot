@@ -3,29 +3,17 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-// front motor
-#define F_EN 44
-#define F_DIR 48
-#define F_CK 52
+#define TMC_ENABLEN 52 // motor driver enable (active low)
+#define TMC_INTN 48 // motor driver interrupt (active low)
+
+// inverse rotation direction of motors
 #define F_INVDIR false
-
-// front right motor
-#define FR_EN 33
-#define FR_DIR 37
-#define FR_CK 41
-#define FR_INVDIR true // inverse direction
-
-// rear left motor
-#define RL_EN 33
-#define RL_DIR 37
-#define RL_CK 41
-#define RL_INVDIR false
-
-// rear right motor
-#define RR_EN 53
-#define RR_DIR 49
-#define RR_CK 45
 #define RR_INVDIR false
+#define RL_INVDIR false
+// SPI chipselect pin of the motor drivers (active low)
+#define F_CHIPSELECT 42
+#define RL_CHIPSELECT 46
+#define RR_CHIPSELECT 44
 
 // AX12 serial port
 #define AX12_SERIALPORT Serial1

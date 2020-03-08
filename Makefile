@@ -18,7 +18,6 @@ else
 	ARDUINO_PACKAGE_DIR  := $(HOME)/.arduino15/packages
 	MONITOR_PORT         = /dev/ttyACM1
 endif
-
 # end platform dependent configuration
 
 BOARD_TAG    = arduino_due_x
@@ -27,37 +26,15 @@ ARCHITECTURE = sam
 ARDUINO_QUIET = 1
 # arduino monitor serial port baudrate
 MONITOR_BAUDRATE = 115200
-
+# compilation flags (force include of SPI.h: on non-case sensitive system it gets confused with SAM HAL file spi.h)
 CFLAGS_STD = -std=gnu11
-CXXFLAGS_STD = -std=gnu++11 -Wall -Wextra -I$(SRCDIR) -I$(ARDUINO_PLATFORM_LIB_PATH)/Wire/src
+CXXFLAGS_STD = -std=gnu++11 -Wall -Wextra -I$(SRCDIR) -I$(ARDUINO_PLATFORM_LIB_PATH)/Wire/src \
+	-include $(ARDUINO_PLATFORM_LIB_PATH)/SPI/src/SPI.h
 
 # main file
 LOCAL_INO_SRCS = $(SRCDIR)/main.ino
-INO_FILE_AS_CPP=$(patsubst %.ino,%.cpp,$(LOCAL_INO_SRCS))
-# project sources
-LIDAR_CPP_SRCS = $(SRCDIR)/lidar/circ_buffer.cpp $(SRCDIR)/lidar/lidar.cpp \
-	$(SRCDIR)/lidar/map.cpp $(SRCDIR)/lidar/detection.cpp
-IMU_CPP_SRCS = $(SRCDIR)/imu/IMU.cpp $(ARDUINO_PLATFORM_LIB_PATH)/Wire/src/Wire.cpp
-MOTION_CPP_SRCS = $(SRCDIR)/motion/Motor.cpp $(SRCDIR)/motion/Motion.cpp $(SRCDIR)/motion/AbsoluteMotion.cpp
-UTILS_CPP_SRCS = $(SRCDIR)/utils/Timer.cpp $(SRCDIR)/utils/trigo.cpp
-ACTIONS_CPP_SRCS = $(SRCDIR)/actions/sequence.cpp $(SRCDIR)/actions/robot.cpp
-SHELL_CPP_SRCS = $(SRCDIR)/shell/commands.cpp $(SRCDIR)/shell/Shell.cpp
-AX12_CPP_SRCS = $(SRCDIR)/ax12/AXcomms.cpp $(SRCDIR)/ax12/AX12.cpp
-DISPLAY_CPP_SRCS = $(SRCDIR)/display/SevenSegDisplay.cpp
-
-LOCAL_CPP_SRCS = $(SHELL_CPP_SRCS) $(AX12_CPP_SRCS) $(DISPLAY_CPP_SRCS) \
-	$(LIDAR_CPP_SRCS) $(IMU_CPP_SRCS) $(MOTION_CPP_SRCS) $(UTILS_CPP_SRCS) $(ACTIONS_CPP_SRCS)
-
-# Simulation source
-SIMU_SRC=$(SIMUDIR)/mockup/serial.cpp $(SIMUDIR)/mockup/arduino_time.cpp \
-	$(SIMUDIR)/mockup/dummy_ax12.cpp $(SIMUDIR)/mockup/Wire.cpp \
-	$(SRCDIR)/utils/trigo.cpp $(SIMUDIR)/mockup/dummy_abs_motion.cpp \
-	$(SIMUDIR)/mockup/dummy_motion.cpp $(SIMUDIR)/mockup/dummy_motor.cpp $(SIMUDIR)/mockup/dummy_imu.cpp \
-	$(SIMUDIR)/main.cpp $(SIMUDIR)/mockup/dummy_lidar.cpp \
-	$(SRCDIR)/lidar/circ_buffer.cpp $(SRCDIR)/lidar/map.cpp $(SRCDIR)/lidar/detection.cpp \
-	$(SIMUDIR)/mockup/arduino_pin.cpp $(SIMUDIR)/mockup/dummy_timer.cpp $(ACTIONS_CPP_SRCS) \
-	$(SIMUDIR)/mockup/dummy_display.cpp $(SHELL_CPP_SRCS) $(SIMUDIR)/simu_table.cpp \
-	$(SIMUDIR)/simu_robot.cpp $(SIMUDIR)/simu_time.cpp
+# project sources (+ arduino SPI, for some reason not compiled by arduino-mk)
+LOCAL_CPP_SRCS = $(wildcard $(SRCDIR)/*/*.cpp) $(ARDUINO_PLATFORM_LIB_PATH)/SPI/src/SPI.cpp
 
 include $(ARDMK_DIR)/Sam.mk
 
@@ -74,6 +51,23 @@ lidar_test: $(LIDAR_TEST_SRCS)
 host_lidar: test/lidar_host.c lib/gnuplot_i/src/gnuplot_i.c
 	mkdir -p build
 	gcc $^ -o $(OBJDIR)/lidar_host -lm
+
+###################################################### simulator ######################################################
+
+# Simulation source
+INO_FILE_AS_CPP=$(patsubst %.ino,%.cpp,$(LOCAL_INO_SRCS))
+ACTIONS_CPP_SRCS = $(SRCDIR)/actions/sequence.cpp $(SRCDIR)/actions/robot.cpp
+SHELL_CPP_SRCS = $(SRCDIR)/shell/commands.cpp $(SRCDIR)/shell/Shell.cpp
+
+SIMU_SRC=$(SIMUDIR)/mockup/serial.cpp $(SIMUDIR)/mockup/arduino_time.cpp \
+	$(SIMUDIR)/mockup/dummy_ax12.cpp $(SIMUDIR)/mockup/Wire.cpp \
+	$(SRCDIR)/utils/trigo.cpp $(SIMUDIR)/mockup/dummy_abs_motion.cpp \
+	$(SIMUDIR)/mockup/dummy_motion.cpp $(SIMUDIR)/mockup/dummy_motor.cpp $(SIMUDIR)/mockup/dummy_imu.cpp \
+	$(SIMUDIR)/main.cpp $(SIMUDIR)/mockup/dummy_lidar.cpp \
+	$(SRCDIR)/lidar/circ_buffer.cpp $(SRCDIR)/lidar/map.cpp $(SRCDIR)/lidar/detection.cpp \
+	$(SIMUDIR)/mockup/arduino_pin.cpp $(SIMUDIR)/mockup/dummy_timer.cpp $(wildcard $(SRCDIR)/actions/*.cpp) \
+	$(SIMUDIR)/mockup/dummy_display.cpp $(wildcard $(SRCDIR)/shell/*.cpp) $(SIMUDIR)/simu_table.cpp \
+	$(SIMUDIR)/simu_robot.cpp $(SIMUDIR)/simu_time.cpp
 
 host: $(LOCAL_INO_SRCS) $(SIMU_SRC)
 	mkdir -p build

@@ -2,8 +2,7 @@
 #include "AbsoluteMotion.hpp"
 #include "motionconf.h"
 #include "utils/trigo.hpp"
-#include "utils/table.hpp"
-
+#include "board.h"
 AbsoluteMotion* motion; // pointer to absolute motion instance
 
 void absmOnEndOfFirstTurn() {
@@ -65,6 +64,8 @@ AbsoluteMotion::AbsoluteMotion() : Motion() {
 	currentMotionType = NONE;
 	currentMotionDirection = 0;
 	turnSpeed = DEFAULT_TURN_SPEED;
+
+	imu = new IMU(&IMU_I2C);
 }
 
 void AbsoluteMotion::update() {
@@ -129,46 +130,24 @@ void AbsoluteMotion::goTo(MotionElement me, void (*callback)()) {
 
 int32_t AbsoluteMotion::getX() {
 	if(currentMotionType == MOVE) {
-		// use the motor with the largest goal position.
-		// During a move, FL and RR have the same goal position, as well as FR and RL
-		//TODO update
-		Motor* largestGoalMotor = motor_RL->goalPosition > motor_RR->goalPosition ? motor_RL : motor_RR;
-		int32_t goalPosition = largestGoalMotor->goalPosition;
-
-		// apply correction to goalPosition when recalibrating to compensate Motor internal changes
-		if(currentMove.strategy == TURN_RECAL) {
-			goalPosition += (largestGoalMotor->recalibrating() ? -1 : 1)*largestGoalMotor->recalDistance;
-		}
-
-		return currentX + largestGoalMotor->position*(currentMove.x - currentX)/goalPosition;
+		return currentX + getMotionProgress()*(currentMove.x - currentX);
 	} else {
 		return currentX;
 	}
 }
 int32_t AbsoluteMotion::getY() {
 	if(currentMotionType == MOVE) {
-		// use the motor with the largest goal position.
-		// During a move, FL and RR have the same goal position, as well as FR and RL
-		//TODO update
-		Motor* largestGoalMotor = motor_RL->goalPosition > motor_RR->goalPosition ? motor_RL : motor_RR;
-		int32_t goalPosition = largestGoalMotor->goalPosition;
-
-		// apply correction to goalPosition when recalibrating to compensate Motor internal changes
-		if(currentMove.strategy == TURN_RECAL) {
-			goalPosition += (largestGoalMotor->recalibrating() ? -1 : 1)*largestGoalMotor->recalDistance;
-		}
-
-		return currentY + largestGoalMotor->position*(currentMove.y - currentY)/goalPosition;
+		return currentY + getMotionProgress()*(currentMove.y - currentY);
 	} else {
 		return currentY;
 	}
 }
 int AbsoluteMotion::getHeading() {
+	// return imu->getHeading()/16;
 	if(currentMotionType == TURN) {
-		int newHeading = currentHeading + motor_F->position*(currentMove.heading - currentHeading)/motor_F->goalPosition;
+		int newHeading = currentHeading + getMotionProgress()*(currentMove.heading - currentHeading);
 		newHeading = newHeading < 0 ? newHeading + 360 : newHeading;
 		newHeading = newHeading > 360 ? newHeading - 360 : newHeading;
-		return newHeading;
 	} else {
 		return currentHeading;
 	}
@@ -200,16 +179,4 @@ void AbsoluteMotion::emergencyResume() {
 	motor_F->emergencyResume();
 	motor_RL->emergencyResume();
 	motor_RR->emergencyResume();
-}
-
-bool AbsoluteMotion::isOnSlopes() {
-	int x = getX();
-	int y = getY();
-
-	if ((y > 0) && (y < SLOPES_END_Y)
-	&& (x > SLOPES_START_X) && (x < SLOPES_END_X)) {
-		return true; // Base of the slopes
-	} else {
-		return false;
-	}
 }
