@@ -18,7 +18,7 @@ TMC5130::TMC5130(bool _inv_direction, int _cs_pin, int _int_pin) {
   xtarget = xmovestart = 0;
   write_data(TMC_XACTUAL, 0);
   write_data(TMC_XTARGET, 0);
-  // Tzerowait = 300ms
+  // Tzerowait = 200ms
   write_data(TMC_TZEROWAIT, 200*(TMC5130_CLKFREQ/1000)/512);
   // position mode
   write_data(TMC_RAMPMODE, TMC_MODE_POSITION);
@@ -107,10 +107,11 @@ bool TMC5130::isMoving() {
 }
 
 void TMC5130::emergencyStop() {
-
+  write_data(TMC_SWMODE, 0x803);
+  write_data(TMC_SWMODE, 0x80F);
 }
 void TMC5130::emergencyResume() {
-
+  write_data(TMC_SWMODE, 0x803);
 }
 
 void TMC5130::write_data(uint8_t address, uint32_t data) {

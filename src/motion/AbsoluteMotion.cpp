@@ -72,15 +72,15 @@ void AbsoluteMotion::update() {
 	static int i = 0;
 	Motion::update();
 
-	if(currentMotionType != NONE && (i++ % 25) == 0) {
-		Serial.print("pos ");
-		Serial.print(getX());
-		Serial.print(" ");
-		Serial.print(getY());
-		Serial.print(" ");
-		Serial.print(getHeading());
-		Serial.print("\n");
-	}
+	// if(currentMotionType != NONE && (i++ % 25) == 0) {
+	// 	Serial.print("pos ");
+	// 	Serial.print(getX());
+	// 	Serial.print(" ");
+	// 	Serial.print(getY());
+	// 	Serial.print(" ");
+	// 	Serial.print(getHeading());
+	// 	Serial.print("\n");
+	// }
 }
 
 void AbsoluteMotion::followPath(const MotionElement* path, void (*callback)()) {

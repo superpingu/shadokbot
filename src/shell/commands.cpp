@@ -77,9 +77,18 @@ static void gotoCommand(int argc, char** argv) {
 		(MotionStrategy) str2int(argv[5]), moveCallback);
 }
 
+static void stopCommand(int argc, char** argv) {
+	motion->emergencyStop();
+}
+static void resumeCommand(int argc, char** argv) {
+	motion->emergencyResume();
+}
+
 const command_t comms[] = {
 	{"m", moveCommand},
 	{"g", gotoCommand},
+	{"s", stopCommand},
+	{"r", resumeCommand},
 	{"addpoint", addPointCommand},
 	{"execpath", execPathCommand},
 	{NULL, NULL}

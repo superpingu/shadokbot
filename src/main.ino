@@ -57,7 +57,7 @@ void loop() {
 	unsigned long loopStart = micros();
 
 	motion->update();
-	// shell->update();
+	shell->update();
 	// AX12::update();
 
 	// while (Serial2.available())
