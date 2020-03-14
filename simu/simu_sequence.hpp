@@ -3,7 +3,19 @@
 #define SIMU_SEQUENCE_H
 
 #include "SFML/Graphics.hpp"
-void initSequence(sf::RenderWindow* window);
-void onEventSequence(sf::Event* event);
+#include "eventHandler.hpp"
+#include <iostream>
+#include <fstream>
+
+class Sequence : public EventHandler
+{
+public:
+	Sequence(const char *fileName);
+	void onEvent(sf::Event* event);
+	void onNewTarget(int x, int y, int angle);
+	void update();
+private:
+	std::ifstream file;
+};
 
 #endif // SIMU_SEQUENCE_H

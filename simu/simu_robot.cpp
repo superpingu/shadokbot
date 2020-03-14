@@ -3,6 +3,7 @@
 #include "simu_table.hpp"
 #include "mockup/arduino_pin.hpp"
 #include "board.h"
+extern sf::Font font;
 
 #define LED_SIZE MM_TO_PX(50)
 
@@ -23,6 +24,10 @@ Robot::Robot(float length, float width, sf::RenderWindow *table, sf::RenderWindo
 	mFront = new sf::CircleShape(length/2,3);
 	mFront->setOrigin(length/2,width/2);
 	mFront->setFillColor(sf::Color::Black);
+
+	mText.setFont(font);
+	mText.setPosition(0, 0);
+	mText.setFillColor(sf::Color::Magenta);
 }
 
 void Robot::draw() {
@@ -31,9 +36,12 @@ void Robot::draw() {
 		mShape->setRotation(motion->getHeading());
 		mFront->setPosition(MM_TO_PX(motion->getX()), MM_TO_PX(motion->getY()));
 		mFront->setRotation(motion->getHeading()+90);
+		sprintf(mTextContent, "ROBOT X=%d Y=%d heading=%d", (int)MM_TO_PX(motion->getX()), (int)MM_TO_PX(motion->getY()), motion->getHeading());
+		mText.setString(mTextContent);
 	}
 	mWindow->draw(*mShape);
 	mWindow->draw(*mFront);
+	mWindow->draw(mText);
 
 	mRedLed.update();
 	mGreenLed.update();

@@ -2,6 +2,7 @@
 #include "simu_time.hpp"
 #include <string.h>
 #include <stdio.h>
+#define EPSILON 0.2f
 AbsoluteMotion* motion;
 #define SIGN(x) ((x) < 0 ? -1 : 1)
 #define ABS(x) ((x) < 0 ? (-(x)) : (x))
@@ -13,6 +14,7 @@ typedef enum Direction {
 	FORWARD,
 	BACKWARD
 } Direction_t;
+double curX, curY, curHeading, curMotionDirection;
 
 static bool onGoingMove = false;
 
@@ -20,59 +22,66 @@ AbsoluteMotion::AbsoluteMotion() {
 	memset(&currentMove, 0, sizeof(MotionElement));
 }
 
-static int computeNewHeading(int currentHeading, int targetHeading, bool allowReverse)
+static double computeNewHeading(double current, double target, bool allowReverse)
 {
-	int deltaHeading = targetHeading - currentHeading;
+	double deltaHeading = target - current;
 	while(deltaHeading > 180) deltaHeading -= 360;
 	while(deltaHeading <= -180) deltaHeading += 360;
+	printf("Delta %f\n", deltaHeading);
 	if (allowReverse && ABS(deltaHeading) > 90) {
-		targetHeading += 180;
-		while (targetHeading > 180) targetHeading -= 360;
-		return computeNewHeading(currentHeading, targetHeading, false);
+		target += 180;
+		while (target > 180) target -= 360;
+		return computeNewHeading(current, target, false);
 	} else {
-	currentHeading += SIGN(deltaHeading) * MIN(ANGULAR_SPEED,ABS(currentHeading-targetHeading)%360) * (Time::getCurTime() - Time::getPrevTime());
-		while (currentHeading > 180)
-			currentHeading -= 360;
-		while (currentHeading <= -180)
-			currentHeading += 360;
-		return currentHeading;
+		curHeading += ((double)SIGN(deltaHeading)) * MIN(ANGULAR_SPEED * (Time::getCurTime() - Time::getPrevTime()), ABS(deltaHeading));
+		while (curHeading > 180)
+			curHeading -= 360;
+		while (curHeading <= -180)
+			curHeading += 360;
+		return curHeading;
 	}
 }
 
 void AbsoluteMotion::update()
 {
-	int newX, newY;
+	double newX, newY, speed, targetHeading;
 	Direction_t direction;
-	if (currentMove.speed == 0)
+	if (currentMove.speed == 0) // No move requested
 		return;
 
-	if (currentX != currentMove.x || currentY != currentMove.y) {
-		// Compute motion direction
-		currentMotionDirection = RAD_TO_DEG(atan2(currentMove.y-currentY,currentMove.x - currentX));
-		printf("x %d/%d y %d/%d heading %d/%d speed %d\n", currentX, currentMove.x, currentY, currentMove.y, currentHeading, currentMotionDirection, currentMove.speed);
+	speed = (double)currentMove.speed;
+	targetHeading = (double)currentMove.heading;
+	while (targetHeading > 180)
+		targetHeading -= 360.f;
+	while (targetHeading <= -180)
+		targetHeading += 360.f;
+	if ((ABS(curX - currentMove.x) > EPSILON) || (ABS(curY - currentMove.y)  > EPSILON)) { // Target position not reached yet
+		// Compute motion direction as straight line from current position to target position
+		curMotionDirection = RAD_TO_DEG(atan2(currentMove.y-curY,currentMove.x - curX));
+		printf("x %f/%d y %f/%d heading %f/%f speed %f\n", curX, currentMove.x, curY, currentMove.y, curHeading, curMotionDirection, speed);
 
-		if ((currentHeading != currentMotionDirection) && (currentHeading != currentMotionDirection + 180) && (currentHeading != currentMotionDirection - 180)) {
-			setHeading(computeNewHeading(currentHeading, currentMotionDirection, true));
+		if ((ABS(curHeading - curMotionDirection) > EPSILON) && (ABS(curHeading - curMotionDirection + 180) > EPSILON) && (ABS(curHeading - curMotionDirection - 180) > EPSILON)) {
+			curHeading = computeNewHeading(curHeading, curMotionDirection, true);
 		} else {
-			direction = currentHeading == currentMotionDirection ? FORWARD : BACKWARD;
+			direction = ABS(curHeading - curMotionDirection) < EPSILON ? FORWARD : BACKWARD;
 			uint32_t deltaTime = Time::getCurTime() - Time::getPrevTime();
 			if (direction == FORWARD) {
-				newX = currentX + (deltaTime * currentMove.speed * cos(DEG_TO_RAD(currentHeading))) / 100;
-				newY = currentY + (deltaTime * currentMove.speed * sin(DEG_TO_RAD(currentHeading))) / 100;
+				newX = curX + (deltaTime * speed * cos(DEG_TO_RAD(curHeading))) / 100;
+				newY = curY + (deltaTime * speed * sin(DEG_TO_RAD(curHeading))) / 100;
 			} else {
-				newX = currentX + (deltaTime * currentMove.speed * cos(DEG_TO_RAD(currentHeading + 180))) / 100;
-				newY = currentY + (deltaTime * currentMove.speed * sin(DEG_TO_RAD(currentHeading + 180))) / 100;
+				newX = curX + (deltaTime * speed * cos(DEG_TO_RAD(curHeading + 180))) / 100;
+				newY = curY + (deltaTime * speed * sin(DEG_TO_RAD(curHeading + 180))) / 100;
 			}
-			if (SIGN(newX - currentMove.x) != SIGN(currentX - currentMove.x) || SIGN(newY - currentMove.y) != SIGN(currentY - currentMove.y)) {
+			if (SIGN(newX - currentMove.x) != SIGN(curX - currentMove.x) || SIGN(newY - currentMove.y) != SIGN(curY - currentMove.y)) {
 				newX = currentMove.x;
 				newY = currentMove.y;
 			}
-			currentX = newX;
-			currentY = newY;
+			curX = newX;
+			curY = newY;
 		}
-	} else if (currentHeading != currentMove.heading) {
-		setHeading(computeNewHeading(currentHeading, currentMove.heading, false));
-		printf("heading %d/%d\n", currentHeading, currentMove.heading);
+	} else if (ABS(curHeading - targetHeading) > EPSILON) {
+		curHeading = computeNewHeading(curHeading, targetHeading, false);
+		printf("heading %f/%f\n", curHeading, targetHeading);
 	} else { // Current move finished
 		if (gotoCallback) {
 			void (*cb)() = gotoCallback;
@@ -108,6 +117,7 @@ void AbsoluteMotion::followPath(const MotionElement* path, void (*callback)())
 }
 void AbsoluteMotion::goTo(int32_t x, int32_t y, int heading, int32_t speed, MotionStrategy strategy, void (*callback)())
 {
+	printf("Goto %d°\n", heading);
 	MotionElement me;
 	me.x = x;
 	me.y = y;
@@ -124,13 +134,13 @@ void AbsoluteMotion::goTo(MotionElement me, void (*callback)())
 	gotoCallback = callback;
 	printf("goto\n");
 }
-int32_t AbsoluteMotion::getX() {return currentX;}
-int32_t AbsoluteMotion::getY() {return currentY;}
-int AbsoluteMotion::getHeading() {return currentHeading;}
-int AbsoluteMotion::getMotionDirection() {return currentMotionDirection;}
-void AbsoluteMotion::setX(int32_t x) {currentX = x;}
-void AbsoluteMotion::setY(int32_t y) {currentY = y;}
-void AbsoluteMotion::setHeading(int heading) {currentHeading = heading;}
+int32_t AbsoluteMotion::getX() {return (int32_t)curX;}
+int32_t AbsoluteMotion::getY() {return (int32_t)curY;}
+int AbsoluteMotion::getHeading() {return (int)curHeading;}
+int AbsoluteMotion::getMotionDirection() {return (int)curMotionDirection;}
+void AbsoluteMotion::setX(int32_t x) {curX = (double)x;}
+void AbsoluteMotion::setY(int32_t y) {curY = (double)y;}
+void AbsoluteMotion::setHeading(int heading) {curHeading = (double)heading;}
 void AbsoluteMotion::emergencyStop() {}
 void AbsoluteMotion::emergencyResume() {}
 bool AbsoluteMotion::isOnSlopes() {return false;}

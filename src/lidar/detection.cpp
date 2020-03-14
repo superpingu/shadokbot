@@ -36,6 +36,8 @@ void Detection::update() {
     motionDirection = motion->getMotionDirection();
     map.setRobotAngle(motion->getHeading());
 
+    // Convert motionDirection to half-degree for use with Map
+    // and set it inside [0;MAP_SIZE] range
     motionDirection *= 2;
     while (motionDirection < 0)
         motionDirection += MAP_SIZE;
@@ -52,12 +54,6 @@ void Detection::update() {
     }
 
     bool detected = false;
-
-    // Deactivate detection when on slopes
-    if (motion->isOnSlopes()) {
-        emergencyResume();
-        return;
-    }
 
     for (int i = motionDirection - MAP_SIZE/8; i < motionDirection + MAP_SIZE/8; i++) {
         uint32_t curDistance = map.getDistance(i);
@@ -100,15 +96,10 @@ bool Detection::isOnTable(int32_t angle, uint32_t distance) {
 
     if ((obstacle.x > DETECTION_MARGIN)
         && (obstacle.x < TABLE_MAX_X - DETECTION_MARGIN)
-        && (obstacle.y > SLOPES_END_Y + DETECTION_MARGIN)
+        && (obstacle.y > DETECTION_MARGIN)
         && (obstacle.y < TABLE_MAX_Y - DETECTION_MARGIN))
     {
-        return true; // Main "free" space
-    } else if ((obstacle.y > DETECTION_MARGIN)
-               && (obstacle.y < SLOPES_END_Y + DETECTION_MARGIN)
-               && (((obstacle.x > DETECTION_MARGIN) && (obstacle.x < SLOPES_START_X))
-                  || ((obstacle.x > SLOPES_END_X) && (obstacle.x < TABLE_MAX_X - DETECTION_MARGIN)))) {
-        return true; // Base of the slopes
+        return true;
     } else {
         return false;
     }

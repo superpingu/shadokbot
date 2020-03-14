@@ -28,6 +28,8 @@ private:
 	Led mRedLed;
 	Led mGreenLed;
 	Led mYellowLed;
+	sf::Text mText;
+	char mTextContent[30];
 };
 
 #endif /* SIMU_ROBOT_HPP */
