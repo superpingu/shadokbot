@@ -26,11 +26,11 @@ TMC5130::TMC5130(bool _inv_direction, int _cs_pin, int _int_pin) {
   // enable stealthchop, inverse motor rotation direction if required
   write_data(TMC_GCONF, (_inv_direction ? 0x10 : 0) + 0x04);
   // current limits: Ihold = 0, Irun = 1A -> 24, IHOLDDELAY = 1
-  write_data(TMC_IHOLD_IRUN, 0x1600);
+  write_data(TMC_IHOLD_IRUN, 0x1A00);
   // powerdown delay = 500ms
   write_data(TMC_TPOWERDOWN, 500*(TMC5130_CLKFREQ/1000)/262144);
   // stealthchop/spreadcycle switching speed = 0.5turn/s
-  write_data(TMC_TPWMTHRS, TMC5130_CLKFREQ/(128*STEP_PER_TURN));
+  write_data(TMC_TPWMTHRS, TMC5130_CLKFREQ/(256*STEP_PER_TURN));
   // stealthchop configuration: 35kHz PWM with 12MHz clock, FREEWHEEL=LS short, PWM_GRAD=6, PWM_AMPL=127
   write_data(TMC_PWMCONF, 0x2504F0);
   // spreadcycle configuration: TOFF=4, TBL=2, HSTRT=6, HEND=0, spreadcycle enabled, vsense=0, no chopsync

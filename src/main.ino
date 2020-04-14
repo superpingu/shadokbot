@@ -46,7 +46,7 @@ void setup() {
 	// display.begin();
 
 	// initRobot();
-	delay(500);
+	delay(300);
 
 	motion->followPath(path);
 }
