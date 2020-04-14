@@ -7,8 +7,8 @@ SRCDIR = $(PROJECT_DIR)/src
 SIMUDIR = $(PROJECT_DIR)/simu
 
 # The configuration below is platform dependent
-ifeq ($(shell echo $$OSTYPE), darwin17)
-	ARDMK_DIR            = /usr/local/Cellar/arduino-mk/HEAD-4452f77
+ifeq ($(shell uname), Darwin)
+	ARDMK_DIR            = /usr/local/Cellar/arduino-mk/HEAD-e870443
 	ARDUINO_DIR          = /Applications/Arduino.app/Contents/Java
 	ARDUINO_PACKAGE_DIR := $(HOME)/Library/Arduino15/packages
 	MONITOR_PORT         = /dev/tty.usbmodem* # Arduino serial port
