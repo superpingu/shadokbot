@@ -2,16 +2,15 @@
 #include <stdio.h>
 #include "simu_robot.hpp"
 #include "simu_table.hpp"
-#include "SFML/Graphics.hpp"
 #include "simu_time.hpp"
 #include "board.h"
 #include "simu_sequence.hpp"
 #include "simu_obstacle.hpp"
-#include "motion/AbsoluteMotion.hpp"
 #include "actions/sequence.hpp"
-#include "mouseHandler.hpp"
+#include "eventManager.hpp"
 #include "event.h"
-
+#include "utils.hpp"
+#include "screen.hpp"
 #include <iostream>
 #include <fstream>
 #include <string.h>
@@ -23,14 +22,9 @@ using namespace std;
 #define LOOP_PERIOD_US 5000 // duration of each loop iteration
 #define MOUSE_POS_STR_LENGTH 50
 char mousePosStr[MOUSE_POS_STR_LENGTH];
-sf::Font font;
 list<Obstacle*> obstaclesList;
 list<EventHandler*> handlersList;
 Sequence *sequence = NULL;
-void initPin()
-{
-	digitalWrite(START_JACK, LOW);
-}
 
 void loadObstacles(sf::RenderWindow *window, const char* fileName)
 {
@@ -56,22 +50,22 @@ void loadObstacles(sf::RenderWindow *window, const char* fileName)
  */
 static int parseOptions(int argc, const char* argv[])
 {
+	static fstream file;
 	if ((argc % 2) == 0) { // Even number of parameters
-		printf("Invalid parameters\nUsage: %s [-i <inputFile>] [-o <outputFile>] [-b <obstacleFile>]\n", argv[0]);
+		printf("Invalid parameters\nUsage: %s [-f <file>] [-b <obstacleFile>]\n", argv[0]);
 		return -1;
 	}
 	for (int i = 1; i < argc; i = i+2) {
 		if(strcmp(argv[i], "-b") == 0) {
 			printf("Obstacle file: %s\n", argv[i+1]);
-			//loadObstacles(&window, argv[1]);
-		} else if (strcmp(argv[i], "-i") == 0) {
-			printf("Input file: %s\n", argv[i+1]);
-			sequence = new Sequence(argv[i+1]);
-		} else if (strcmp(argv[i], "-o") == 0) {
-			printf("Output file: %s\n", argv[i+1]);
-			handlersList.push_back(new Output(argv[i+1]));
+			loadObstacles(&Screen::getInstance()->getWindow(), argv[1]);
+		} else if (strcmp(argv[i], "-f") == 0) {
+			printf("Input/Output file: %s\n", argv[i+1]);
+			file.open(argv[i+1], ios::in | ios::out | ios::app);
+			handlersList.push_back(new Output(&file));
+			sequence = new Sequence(&file);
 		} else {
-			printf("Invalid parameter %s\nUsage: %s [-i <inputFile>] [-o <outputFile>] [-b <obstacleFile>]\n", argv[i], argv[0]);
+			printf("Invalid parameter %s\nUsage: %s [-f <file>] [-b <obstacleFile>]\n", argv[i], argv[0]);
 			return -1;
 		}
 	}
@@ -79,84 +73,64 @@ static int parseOptions(int argc, const char* argv[])
 	return 0;
 }
 
-#define DEG_TO_RAD(x) (((x) * M_PI) / 180)
-#define RAD_TO_DEG(x) (((x) * 180) / M_PI)
-
 int main(int argc, const char* argv[])
 {
-	if (!font.loadFromFile("data/JetBrainsMono-Italic.ttf")) {
-		printf("Fail to load font");
-		return -1;
-	}
-    sf::RenderWindow window(sf::VideoMode(MM_TO_PX(3000), MM_TO_PX(2000)), "Table");
-    sf::RenderWindow roof(sf::VideoMode(MM_TO_PX(600), MM_TO_PX(300)), "Toit");
-    Table table(MM_TO_PX(3000.f), MM_TO_PX(2000.f), &window);
-    Robot robot(MM_TO_PX(250), MM_TO_PX(250), &window, &roof);
-	MouseHandler* mouseHandler = new MouseHandler();
-	mouseHandler->setWindow(&window);
-	handlersList.push_back(mouseHandler);
+    Table table(MM_TO_PX(3000.f), MM_TO_PX(2000.f), &Screen::getInstance()->getWindow());
+    Robot robot(MM_TO_PX(250), MM_TO_PX(250), &Screen::getInstance()->getWindow(), &Screen::getInstance()->getRoof());
+	motion = robot.getMotion(); // Temporary Workaround
+	EventManager* eventManager = new EventManager();
+	eventManager->setWindow(&Screen::getInstance()->getWindow());
 	Time::reset();
-	initPin();
-	motion = new AbsoluteMotion();
-	motion->enable(false);
+	robot.getMotion()->enable(false);
 	sf::Text mousePos;
-	mousePos.setFont(font);
+	mousePos.setFont(Screen::getInstance()->getFont());
 	mousePos.setCharacterSize(18);
 	mousePos.setFillColor(sf::Color::Magenta);
 
 	if (parseOptions(argc, argv) != 0)
 		return -1;
-	if (sequence == NULL)
+	if (sequence == NULL) {
 		sequence = new Sequence(NULL);
+	}
+
 	handlersList.push_back(sequence);
+	sequence->setRobot(&robot);
 
 	// Main loop
-    while (window.isOpen()) {
+    while (Screen::getInstance()->getWindow().isOpen()) {
 		Time::increaseTime(LOOP_DURATION);
 		unsigned long loopStart = micros();
-		motion->update();
+		robot.getMotion()->update();
 		sequence->update();
 		unsigned long loopTime = micros() - loopStart;
 		delayMicroseconds(loopTime > LOOP_PERIOD_US ? 0 : LOOP_PERIOD_US - loopTime);
 
 		// Event handling
 		sf::Event event;
-		while (window.pollEvent(event)) {
-			switch (event.type) {
-			case sf::Event::Closed:
-				window.close();
-				break;
-			case sf::Event::KeyPressed:
-				digitalWrite(START_JACK, HIGH);
-				break;
-			case sf::Event::MouseMoved:
+		while (Screen::getInstance()->getWindow().pollEvent(event)) {
+			if (event.type == sf::Event::MouseMoved) {
 				snprintf(mousePosStr, MOUSE_POS_STR_LENGTH, "MOUSE X=%d Y=%d", (int)PX_TO_MM(event.mouseMove.x), (int)PX_TO_MM(event.mouseMove.y));
 				mousePos.setString(mousePosStr);
-			default:
-				break;
 			}
-			for (auto &handler :handlersList)
-				handler->onEvent(&event);
+			eventManager->onEvent(&event);
 		}
 
 		// Display
-		window.clear(sf::Color::White);
-		roof.clear(sf::Color::Black);
+		Screen::getInstance()->clear();
 		table.draw();
 		robot.draw();
-		roof.draw(mousePos);
+		Screen::getInstance()->getRoof().draw(mousePos);
 		for (auto &obstacle :obstaclesList)
 			obstacle->draw();
-		mouseHandler->draw();
-		window.display();
-		roof.display();
+		eventManager->draw();
+		Screen::getInstance()->display();
 	}
 	return 0;
 }
 
-void newTarget(int x, int y, int angle)
+void dispatchEvent(Event *event)
 {
-	printf("Event onNewTarget\n");
+	printf("Dispatch Event\n");
 	for (auto &handler :handlersList)
-		handler->onNewTarget(x, y, angle);
+		handler->onEvent(event);
 }

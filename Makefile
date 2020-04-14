@@ -52,13 +52,13 @@ LOCAL_CPP_SRCS = $(SHELL_CPP_SRCS) $(AX12_CPP_SRCS) $(DISPLAY_CPP_SRCS) \
 SIMU_SRC=$(SIMUDIR)/mockup/serial.cpp $(SIMUDIR)/mockup/arduino_time.cpp \
 	$(SIMUDIR)/mockup/dummy_ax12.cpp $(SIMUDIR)/mockup/Wire.cpp \
 	$(SRCDIR)/utils/trigo.cpp $(SIMUDIR)/mockup/dummy_abs_motion.cpp \
-	$(SIMUDIR)/mockup/dummy_motion.cpp $(SIMUDIR)/mockup/dummy_motor.cpp $(SIMUDIR)/mockup/dummy_imu.cpp \
+	$(SIMUDIR)/mockup/dummy_motion.cpp $(SIMUDIR)/mockup/dummy_motor.cpp \
 	$(SIMUDIR)/main.cpp \
 	$(SIMUDIR)/mockup/arduino_pin.cpp $(SIMUDIR)/mockup/dummy_timer.cpp  \
 	$(SIMUDIR)/mockup/dummy_display.cpp $(SHELL_CPP_SRCS) $(SIMUDIR)/simu_table.cpp \
 	$(SIMUDIR)/simu_robot.cpp $(SIMUDIR)/simu_time.cpp \
-    $(SIMUDIR)/simu_sequence.cpp \
-	$(SIMUDIR)/simu_obstacle.cpp $(SIMUDIR)/output.cpp $(SIMUDIR)/mouseHandler.cpp
+    $(SIMUDIR)/simu_sequence.cpp  $(SIMUDIR)/utils.cpp $(SIMUDIR)/screen.cpp \
+	$(SIMUDIR)/simu_obstacle.cpp $(SIMUDIR)/output.cpp $(SIMUDIR)/eventManager.cpp
 
 include $(ARDMK_DIR)/Sam.mk
 

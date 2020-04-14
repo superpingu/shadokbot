@@ -1,26 +1,23 @@
 #include "output.hpp"
 
-Output::Output(const char* fileName)
+Output::Output(std::fstream* file)
 {
-	file.open(fileName);
-	if (!file.is_open()) {
-		printf("Fail to open file %s\n", fileName);
+	mFile = file;
+	if (mFile == NULL || !mFile->is_open()) {
+		printf("Fail to open file\n");
 	}
 }
 
-void Output::onEvent(sf::Event* event)
+void Output::onEvent(Event* event)
 {
-	if (event->type == sf::Event::KeyPressed && event->key.code == sf::Keyboard::Key::Q) {
-		file.close();
+	if (event->type == EVENT_CLOSE) {
+		mFile->close();
 		printf("File closed\n");
-	}
-}
+	} else if (event->type == EVENT_NEW_TARGET) {
+		if (!mFile->is_open())
+			return;
 
-void Output::onNewTarget(int x, int y, int angle)
-{
-	if (!file.is_open()) {
-		return;
+		mFile->seekp(0, std::ios::end);
+		*mFile << event->targetEvent.x << " " << event->targetEvent.y << " " << event->targetEvent.angle << " 200 MOVE_TURN\n";
 	}
-
-	file << x << " " << y << " " << angle << " 200 MOVE_TURN\n";
 }

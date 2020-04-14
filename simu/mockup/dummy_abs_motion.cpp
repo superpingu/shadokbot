@@ -2,14 +2,15 @@
 #include "simu_time.hpp"
 #include <string.h>
 #include <stdio.h>
+#include "utils.hpp"
+
+// Delta below which two floats are considered equal
 #define EPSILON 0.2f
-AbsoluteMotion* motion;
-#define SIGN(x) ((x) < 0 ? -1 : 1)
-#define ABS(x) ((x) < 0 ? (-(x)) : (x))
-#define MIN(a,b) ((a) < (b) ? (a) : (b))
-#define DEG_TO_RAD(x) (((x) * M_PI) / 180)
-#define RAD_TO_DEG(x) (((x) * 180) / M_PI)
+
+// Unit: degree per ms
 #define ANGULAR_SPEED 1
+
+AbsoluteMotion* motion;
 typedef enum Direction {
 	FORWARD,
 	BACKWARD
@@ -24,20 +25,14 @@ AbsoluteMotion::AbsoluteMotion() {
 
 static double computeNewHeading(double current, double target, bool allowReverse)
 {
-	double deltaHeading = target - current;
-	while(deltaHeading > 180) deltaHeading -= 360;
-	while(deltaHeading <= -180) deltaHeading += 360;
+	double deltaHeading = Utils::normalizeAngle(target - current);
 	printf("Delta %f\n", deltaHeading);
 	if (allowReverse && ABS(deltaHeading) > 90) {
-		target += 180;
-		while (target > 180) target -= 360;
+		target = Utils::normalizeAngle(target + 180);
 		return computeNewHeading(current, target, false);
 	} else {
 		curHeading += ((double)SIGN(deltaHeading)) * MIN(ANGULAR_SPEED * (Time::getCurTime() - Time::getPrevTime()), ABS(deltaHeading));
-		while (curHeading > 180)
-			curHeading -= 360;
-		while (curHeading <= -180)
-			curHeading += 360;
+		curHeading = Utils::normalizeAngle(curHeading);
 		return curHeading;
 	}
 }
@@ -50,11 +45,7 @@ void AbsoluteMotion::update()
 		return;
 
 	speed = (double)currentMove.speed;
-	targetHeading = (double)currentMove.heading;
-	while (targetHeading > 180)
-		targetHeading -= 360.f;
-	while (targetHeading <= -180)
-		targetHeading += 360.f;
+	targetHeading = Utils::normalizeAngle((double)currentMove.heading);
 	if ((ABS(curX - currentMove.x) > EPSILON) || (ABS(curY - currentMove.y)  > EPSILON)) { // Target position not reached yet
 		// Compute motion direction as straight line from current position to target position
 		curMotionDirection = RAD_TO_DEG(atan2(currentMove.y-curY,currentMove.x - curX));

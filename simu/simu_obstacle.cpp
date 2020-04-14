@@ -1,5 +1,5 @@
 #include "simu_obstacle.hpp"
-#include "simu_table.hpp"
+#include "utils.hpp"
 
 Obstacle::Obstacle(sf::RenderWindow *window, const char* desc) :
 	mShape()

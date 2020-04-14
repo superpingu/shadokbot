@@ -1,18 +1,33 @@
 #ifndef EVENT_HANDLER_HPP
 #define EVENT_HANDLER_HPP
 
-#include "SFML/Graphics.hpp"
+struct Position {
+	int x;
+	int y;
+	int angle;
+};
+
+enum EventType {
+	EVENT_NEW_TARGET,
+	EVENT_CLOSE,
+	EVENT_RESTART
+};
+
+struct Event {
+	EventType type;
+	union {
+		Position targetEvent;
+	};
+};
 
 class EventHandler {
 public:
 	/**
-	 * Handler for SFML events, to call whenever an event is triggered
+	 * Handler for internal events, to call whenever an event is triggered
 	 * See implementation to know the list of handled events.
 	 * @param event The event to handle
 	 */
-	virtual void onEvent(sf::Event* event) = 0;
-
-	virtual void onNewTarget(int x, int y, int angle) = 0;
+	virtual void onEvent(Event* event) = 0;
 };
 
 #endif /* EVENT_HANDLER_HPP */

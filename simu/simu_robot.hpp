@@ -2,6 +2,7 @@
 #define SIMU_ROBOT_HPP
 
 #include "SFML/Graphics.hpp"
+#include "motion/AbsoluteMotion.hpp"
 
 class Led {
 public:
@@ -18,8 +19,11 @@ private:
 class Robot {
 public:
 	Robot(float length, float width, sf::RenderWindow* table, sf::RenderWindow *roof);
+	AbsoluteMotion* getMotion();
 	void draw();
 private:
+	AbsoluteMotion mMotion;
+
 	sf::RenderWindow *mWindow;
 	sf::RenderWindow *mRoof;
 	sf::RectangleShape* mShape;

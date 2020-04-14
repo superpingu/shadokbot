@@ -1,1 +1,1 @@
-void newTarget(int x, int y, int angle);
+void dispatchEvent(Event* event);

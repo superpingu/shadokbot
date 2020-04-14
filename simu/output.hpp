@@ -8,11 +8,10 @@
 class Output : public EventHandler
 {
 public:
-	Output(const char* fileName);
-	void onEvent(sf::Event* event);
-	void onNewTarget(int x , int y, int angle);
+	Output(std::fstream* file);
+	void onEvent(Event* event);
 private:
-	std::ofstream file;
+	std::fstream* mFile;
 };
 
 #endif /* OUTPUT_HPP */

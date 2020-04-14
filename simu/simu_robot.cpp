@@ -1,13 +1,13 @@
 #include "simu_robot.hpp"
-#include "motion/AbsoluteMotion.hpp"
-#include "simu_table.hpp"
+#include "utils.hpp"
 #include "mockup/arduino_pin.hpp"
 #include "board.h"
-extern sf::Font font;
+#include "screen.hpp"
 
 #define LED_SIZE MM_TO_PX(50)
 
 Robot::Robot(float length, float width, sf::RenderWindow *table, sf::RenderWindow *roof):
+	mMotion(),
 	mWindow(table),
 	mRoof(roof),
 	mDimensions(length, width),
@@ -25,9 +25,16 @@ Robot::Robot(float length, float width, sf::RenderWindow *table, sf::RenderWindo
 	mFront->setOrigin(length/2,width/2);
 	mFront->setFillColor(sf::Color::Black);
 
-	mText.setFont(font);
+	mText.setFont(Screen::getInstance()->getFont());
 	mText.setPosition(0, 0);
 	mText.setFillColor(sf::Color::Magenta);
+
+	digitalWrite(START_JACK, LOW);
+}
+
+AbsoluteMotion* Robot::getMotion()
+{
+	return &mMotion;
 }
 
 void Robot::draw() {

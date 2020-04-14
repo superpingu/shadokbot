@@ -2,9 +2,6 @@
 #define SIMU_TABLE_HPP
 #include "SFML/Graphics.hpp"
 
-#define MM_TO_PX(x) (0.5f * x)
-#define PX_TO_MM(x)(2.f * x)
-
 class Table {
 public:
 	Table(float length, float width, sf::RenderWindow* window);
