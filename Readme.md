@@ -54,7 +54,7 @@ To run the simulator, execute
 For the graphical display, the axis origin is located in the upper left corner.
 The X axes is oriented to the right and the Y axis is oriented to the bottom.
 
-A right click somewhere on the table will trigger a move of the robot toward this point (if the robot is not already moving).
+A left click somewhere on the table will trigger a move of the robot toward this point (if the robot is not already moving).
 When using an output file, don't forger to close it (by pressing "q") before closing the program if you want to save the path.
 
 Next feature: Obstacles
