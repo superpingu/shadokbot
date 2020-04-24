@@ -1,14 +1,19 @@
 #include "ax12/AX12.hpp"
 #include "motion/AbsoluteMotion.hpp"
+#include "lidar/detection.hpp"
+#include "actions/sequence.hpp"
 #include "actions/robot.hpp"
 #include "display/SevenSegDisplay.h"
 #include "board.h"
+#include "ranger/vl53l1x.hpp"
 
 #include "shell/Shell.hpp"
 #include "shell/commands.h"
 
+#include "motion/TMC5130.hpp"
+
 Shell* shell;
-// Detection *detection;
+VL53L1X sensor;
 
 // print shell invite, with battery voltage display
 void onShellInvite() {
@@ -21,34 +26,31 @@ void onShellInvite() {
 	Serial.print("V > ");
 }
 
-void cb() {
-	motion->goTo(0, 0, 0, 500, MOVE_TURN, cb);
-}
-
-const MotionElement path[] = {
-	{.x = 0, .y = 0, .heading = 0, .speed = 300, .strategy = MOVE_TURN},
-	{.x = -500, .y = 0, .heading = 90, .speed = 300, .strategy = TURN_MOVE},
-	{.x = -500, .y = -500, .heading = 180, .speed = 300, .strategy = TURN_MOVE},
-	{.x = 0, .y = -500, .heading = 270, .speed = 300, .strategy = TURN_MOVE},
-	{.x = 0, .y = 0, .heading = 0, .speed = 300, .strategy = TURN_MOVE},
-	END_PATH
-};
-
 // the setup function runs once when you press reset or power the board
 void setup() {
-	// AX12::init(&AX12_SERIALPORT, 115200);
 	shell = new Shell(115200, getComms(), onShellInvite);
-	motion = new AbsoluteMotion();
 
-	// detection = new Detection();
-	// detection->init();
-	//
-	// display.begin();
+	Wire1.begin();
+  Wire1.setClock(400000); // use 400 kHz I2C
 
-	// initRobot();
-	delay(300);
+  sensor.setTimeout(500);
+  if (!sensor.init()) {
+    Serial.println("Failed to detect and initialize sensor!");
+    while (1);
+  }
 
-	motion->followPath(path);
+  // Use long distance mode and allow up to 50000 us (50 ms) for a measurement.
+  // You can change these settings to adjust the performance of the sensor, but
+  // the minimum timing budget is 20 ms for short distance mode and 33 ms for
+  // medium and long distance modes. See the VL53L1X datasheet for more
+  // information on range and timing limits.
+  sensor.setDistanceMode(VL53L1X::Short);
+  sensor.setMeasurementTimingBudget(50000);
+
+  // Start continuous readings at a rate of one measurement every 50 ms (the
+  // inter-measurement period). This period should be at least as long as the
+  // timing budget.
+  sensor.startContinuous(50);
 }
 
 #define LOOP_PERIOD_US 40000 // duration of each loop iteration
@@ -56,15 +58,9 @@ void setup() {
 void loop() {
 	unsigned long loopStart = micros();
 
-	motion->update();
-	shell->update();
-	// AX12::update();
-
-	// while (Serial2.available())
-	// 	detection->lidar.pushSampleData(Serial2.read());
-	// detection->update();
-
-	// sequenceUpdate();
+	Serial.print(sensor.read());
+	Serial.print('\n');
+  if(sensor.timeoutOccurred()) { Serial.print(" TIMEOUT"); }
 
 	unsigned long loopTime = micros() - loopStart;
 	delayMicroseconds(loopTime > LOOP_PERIOD_US ? 0 : LOOP_PERIOD_US - loopTime);
