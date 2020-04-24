@@ -49,15 +49,18 @@ A small app is provided to visualize the LIDAR data. To build it, run `make lida
 
 To run the simulator, execute
 ```
-./build/shadokbot [-i <inputFile>] [-o <outputFile>]
+./build/shadokbot [-f <file>]
 ```
 For the graphical display, the axis origin is located in the upper left corner.
 The X axes is oriented to the right and the Y axis is oriented to the bottom.
 
 A left click somewhere on the table will trigger a move of the robot toward this point (if the robot is not already moving).
-When using an output file, don't forger to close it (by pressing "q") before closing the program if you want to save the path.
 
-Next feature: Obstacles
+The sequence can be restarted at any time by pressing the "r" key.
+
+**Warning**: The output file is saved when closing the window or when pressing "q" (don't use CTRL-C if you want your file to be saved).
+
+**Next feature**: Obstacles
 If provided, the *obstacle_file* must have the following syntax, one line per obstacle:
 ```
 x y length width angle
