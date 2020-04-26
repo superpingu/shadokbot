@@ -18,7 +18,7 @@ private:
 
 class Robot {
 public:
-	Robot(float length, float width, sf::RenderWindow* table, sf::RenderWindow *roof);
+	Robot(sf::RenderWindow* table, sf::RenderWindow *roof);
 	AbsoluteMotion* getMotion();
 	void draw();
 private:
@@ -26,9 +26,7 @@ private:
 
 	sf::RenderWindow *mWindow;
 	sf::RenderWindow *mRoof;
-	sf::RectangleShape* mShape;
-	sf::CircleShape* mFront;
-	sf::Vector2f mDimensions;
+	sf::ConvexShape* mShape;
 	Led mRedLed;
 	Led mGreenLed;
 	Led mYellowLed;

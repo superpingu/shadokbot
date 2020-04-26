@@ -11,7 +11,7 @@ static bool initDone = false;
 Sequence::Sequence(std::fstream* file)
 {
 	mFile = file;
-	mStartingPos = {135, 1245, 270}; // default starting position
+	mStartingPos = {135, 1245, 0}; // default starting position
 	if (mFile != NULL)
 		read();
 	if (path.empty()) {
