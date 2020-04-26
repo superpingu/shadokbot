@@ -6,6 +6,7 @@
 #include "board.h"
 #include "simu_sequence.hpp"
 #include "simu_obstacle.hpp"
+#include "buoy.hpp"
 #include "actions/sequence.hpp"
 #include "eventManager.hpp"
 #include "event.h"
@@ -22,18 +23,18 @@ using namespace std;
 #define LOOP_PERIOD_US 5000 // duration of each loop iteration
 #define MOUSE_POS_STR_LENGTH 50
 char mousePosStr[MOUSE_POS_STR_LENGTH];
-list<Obstacle*> obstaclesList;
+list<Buoy*> obstaclesList;
 list<EventHandler*> handlersList;
 Sequence *sequence = NULL;
 
-void loadObstacles(sf::RenderWindow *window, const char* fileName)
+void loadObstacles(const char* fileName)
 {
 	string line;
 	printf("Loading obstacles from file %s\n", fileName);
 	ifstream file(fileName);
 	if (file.is_open()) {
 		while (getline(file, line)) {
-			obstaclesList.push_back(new Obstacle(window, line.c_str()));
+			obstaclesList.push_back(new Buoy(line.c_str()));
 		}
 		file.close();
 	} else {
@@ -58,7 +59,7 @@ static int parseOptions(int argc, const char* argv[])
 	for (int i = 1; i < argc; i = i+2) {
 		if(strcmp(argv[i], "-b") == 0) {
 			printf("Obstacle file: %s\n", argv[i+1]);
-			loadObstacles(&Screen::getInstance()->getWindow(), argv[1]);
+			loadObstacles(argv[i+1]);
 		} else if (strcmp(argv[i], "-f") == 0) {
 			printf("Input/Output file: %s\n", argv[i+1]);
 			file.open(argv[i+1], ios::in | ios::out | ios::app);

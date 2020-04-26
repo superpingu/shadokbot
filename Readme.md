@@ -49,7 +49,7 @@ A small app is provided to visualize the LIDAR data. To build it, run `make lida
 
 To run the simulator, execute
 ```
-./build/shadokbot [-f <file>]
+./build/shadokbot [-f <file>] [-b data/buoys.txt]
 ```
 For the graphical display, the axis origin is located in the upper left corner.
 The X axes is oriented to the right and the Y axis is oriented to the bottom.
@@ -59,6 +59,8 @@ A left click somewhere on the table will trigger a move of the robot toward this
 The sequence can be restarted at any time by pressing the "r" key.
 
 **Warning**: The output file is saved when closing the window or when pressing "q" (don't use CTRL-C if you want your file to be saved).
+
+Use the "-b buoys.txt" option to display the buoys on the table.
 
 **Next feature**: Obstacles
 If provided, the *obstacle_file* must have the following syntax, one line per obstacle:

@@ -58,7 +58,8 @@ SIMU_SRC=$(SIMUDIR)/mockup/serial.cpp $(SIMUDIR)/mockup/arduino_time.cpp \
 	$(SIMUDIR)/mockup/dummy_display.cpp $(SHELL_CPP_SRCS) $(SIMUDIR)/simu_table.cpp \
 	$(SIMUDIR)/simu_robot.cpp $(SIMUDIR)/simu_time.cpp \
     $(SIMUDIR)/simu_sequence.cpp  $(SIMUDIR)/utils.cpp $(SIMUDIR)/screen.cpp \
-	$(SIMUDIR)/simu_obstacle.cpp $(SIMUDIR)/output.cpp $(SIMUDIR)/eventManager.cpp
+	$(SIMUDIR)/simu_obstacle.cpp $(SIMUDIR)/output.cpp $(SIMUDIR)/eventManager.cpp \
+	$(SIMUDIR)/buoy.cpp
 
 include $(ARDMK_DIR)/Sam.mk
 
