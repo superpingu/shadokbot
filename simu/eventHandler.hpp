@@ -10,7 +10,8 @@ struct Position {
 enum EventType {
 	EVENT_NEW_TARGET,
 	EVENT_CLOSE,
-	EVENT_RESTART
+	EVENT_RESTART,
+	EVENT_TOGGLE_DEPLOY
 };
 
 struct Event {

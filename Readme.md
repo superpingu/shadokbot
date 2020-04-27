@@ -56,7 +56,10 @@ The X axes is oriented to the right and the Y axis is oriented to the bottom.
 
 A left click somewhere on the table will trigger a move of the robot toward this point (if the robot is not already moving).
 
-The sequence can be restarted at any time by pressing the "r" key.
+Useful key bindings:
+- "r" -> Restart the sequence (can be used at any time)
+- "d" -> Deploy/retract clamps
+- "q" -> Close the sequence file (if any)
 
 **Warning**: The output file is saved when closing the window or when pressing "q" (don't use CTRL-C if you want your file to be saved).
 

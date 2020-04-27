@@ -78,6 +78,7 @@ int main(int argc, const char* argv[])
 {
     Table table(MM_TO_PX(3000.f), MM_TO_PX(2000.f), &Screen::getInstance()->getWindow());
     Robot robot(&Screen::getInstance()->getWindow(), &Screen::getInstance()->getRoof());
+	handlersList.push_back(&robot);
 	motion = robot.getMotion(); // Temporary Workaround
 	EventManager* eventManager = new EventManager();
 	eventManager->setWindow(&Screen::getInstance()->getWindow());

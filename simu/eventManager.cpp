@@ -41,12 +41,19 @@ void EventManager::onEvent(sf::Event *event)
 		dispatchEvent(&internalEvent);
 		break;
 	case sf::Event::KeyPressed:
-		if (event->key.code == sf::Keyboard::Key::Q) {
+		switch (event->key.code) {
+		case sf::Keyboard::Key::Q:
 			internalEvent.type = EVENT_CLOSE;
 			dispatchEvent(&internalEvent);
-		} else if (event->key.code == sf::Keyboard::Key::R) {
+			break;
+		case sf::Keyboard::Key::R:
 			internalEvent.type = EVENT_RESTART;
 			dispatchEvent(&internalEvent);
+			break;
+		case sf::Keyboard::Key::D:
+			internalEvent.type = EVENT_TOGGLE_DEPLOY;
+			dispatchEvent(&internalEvent);
+			break;
 		}
 		break;
 	}

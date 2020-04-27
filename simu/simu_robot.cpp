@@ -31,6 +31,10 @@ Robot::Robot(sf::RenderWindow *table, sf::RenderWindow *roof):
 	mText.setPosition(0, 0);
 	mText.setFillColor(sf::Color::Magenta);
 
+	mClampList[0] =new Clamp();
+	mClampList[1] =new Clamp();
+	mClampList[2] =new Clamp();
+
 	digitalWrite(START_JACK, LOW);
 }
 
@@ -39,13 +43,34 @@ AbsoluteMotion* Robot::getMotion()
 	return &mMotion;
 }
 
+void Robot::toggleDeployed()
+{
+	mDeployed = !mDeployed;
+}
+
 void Robot::draw() {
 	if (motion != NULL) {
+		int centerX = motion->getX() - 19*cos(DEG_TO_RAD(motion->getHeading()));
+		int centerY = motion->getY() - 19*sin(DEG_TO_RAD(motion->getHeading()));
+		mClampList[0]->setPosition(MM_TO_PX(centerX + 113*cos(DEG_TO_RAD(motion->getHeading()+60))), MM_TO_PX(centerY + 113*sin(DEG_TO_RAD(motion->getHeading()+60))));
+		mClampList[0]->rotate(motion->getHeading()+60);
+		mClampList[1]->setPosition(MM_TO_PX(centerX + 113*cos(DEG_TO_RAD(motion->getHeading()+180))), MM_TO_PX(centerY + 113*sin(DEG_TO_RAD(motion->getHeading()+180))));
+		mClampList[1]->rotate(motion->getHeading()+180);
+		mClampList[2]->setPosition(MM_TO_PX(centerX + 113*cos(DEG_TO_RAD(motion->getHeading()-60))), MM_TO_PX(centerY + 113*sin(DEG_TO_RAD(motion->getHeading()-60))));
+		mClampList[2]->rotate(motion->getHeading()-60);
+
 		mShape->setPosition(MM_TO_PX(motion->getX()), MM_TO_PX(motion->getY()));
 		mShape->setRotation(motion->getHeading());
-		sprintf(mTextContent, "ROBOT X=%d Y=%d heading=%d", (int)MM_TO_PX(motion->getX()), (int)MM_TO_PX(motion->getY()), motion->getHeading());
+		sprintf(mTextContent, "ROBOT X=%d Y=%d heading=%d", motion->getX(), motion->getY(), motion->getHeading());
 		mText.setString(mTextContent);
 	}
+
+	if (mDeployed) {
+		mClampList[0]->draw();
+		mClampList[1]->draw();
+		mClampList[2]->draw();
+	}
+
 	mWindow->draw(*mShape);
 	mWindow->draw(mText);
 
@@ -56,6 +81,13 @@ void Robot::draw() {
 	mRoof->draw(*mRedLed.getShape());
 	mRoof->draw(*mGreenLed.getShape());
 	mRoof->draw(*mYellowLed.getShape());
+}
+
+void Robot::onEvent(Event* event)
+{
+	if (event != NULL && event->type == EVENT_TOGGLE_DEPLOY) {
+		toggleDeployed();
+	}
 }
 
 Led::Led(int pin, sf::Color color, int x, int y)
@@ -81,4 +113,35 @@ void Led::update()
 const sf::CircleShape* Led::getShape()
 {
 	return mShape;
+}
+
+Clamp::Clamp():
+	mShape()
+{
+	mShape.setPointCount(8);
+	mShape.setPoint(0, sf::Vector2f(MM_TO_PX(34), MM_TO_PX(0)));
+	mShape.setPoint(1, sf::Vector2f(MM_TO_PX(98), MM_TO_PX(0)));
+	mShape.setPoint(2, sf::Vector2f(MM_TO_PX(132), MM_TO_PX(34)));
+	mShape.setPoint(3, sf::Vector2f(MM_TO_PX(132), MM_TO_PX(98)));
+	mShape.setPoint(4, sf::Vector2f(MM_TO_PX(98), MM_TO_PX(132)));
+	mShape.setPoint(5, sf::Vector2f(MM_TO_PX(34), MM_TO_PX(132)));
+	mShape.setPoint(6, sf::Vector2f(MM_TO_PX(0), MM_TO_PX(98)));
+	mShape.setPoint(7, sf::Vector2f(MM_TO_PX(0), MM_TO_PX(34)));
+
+	mShape.setOrigin(MM_TO_PX(66), MM_TO_PX(66));
+}
+
+void Clamp::setPosition(int x, int y)
+{
+	mShape.setPosition(x, y);
+}
+
+void Clamp::rotate(int angle)
+{
+	mShape.setRotation(angle);
+}
+
+void Clamp::draw()
+{
+	Screen::getInstance()->getWindow().draw(mShape);
 }
