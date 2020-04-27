@@ -7,6 +7,16 @@ struct Position {
 	int angle;
 };
 
+enum TargetEventSrc_t {
+	TARGET_EVENT_SRC_PATH_FILE,
+	TARGET_EVENT_SRC_USER
+};
+
+struct TargetEvent_t {
+	TargetEventSrc_t src;
+	Position target;
+};
+
 enum EventType {
 	EVENT_NEW_TARGET,
 	EVENT_CLOSE,
@@ -17,7 +27,7 @@ enum EventType {
 struct Event {
 	EventType type;
 	union {
-		Position targetEvent;
+		TargetEvent_t targetEvent;
 	};
 };
 

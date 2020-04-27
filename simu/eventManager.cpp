@@ -34,10 +34,10 @@ void EventManager::onEvent(sf::Event *event)
 	case sf::Event::MouseButtonReleased:
 		internalEvent.type = EVENT_NEW_TARGET;
 		mPressed = false;
-		internalEvent.targetEvent.angle = RAD_TO_DEG(atan2(event->mouseButton.y-mEventY,event->mouseButton.x - mEventX));
-		internalEvent.targetEvent.angle = Utils::normalizeAngle(internalEvent.targetEvent.angle);
-		internalEvent.targetEvent.x = mEventX*2;
-		internalEvent.targetEvent.y = mEventY*2;
+		internalEvent.targetEvent.target.angle = RAD_TO_DEG(atan2(event->mouseButton.y-mEventY,event->mouseButton.x - mEventX));
+		internalEvent.targetEvent.target.angle = Utils::normalizeAngle(internalEvent.targetEvent.target.angle);
+		internalEvent.targetEvent.target.x = mEventX*2;
+		internalEvent.targetEvent.target.y = mEventY*2;
 		dispatchEvent(&internalEvent);
 		break;
 	case sf::Event::KeyPressed:

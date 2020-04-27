@@ -16,6 +16,7 @@
 #include <fstream>
 #include <string.h>
 #include <list>
+#include "info.hpp"
 using namespace std;
 #include "output.hpp"
 
@@ -80,6 +81,8 @@ int main(int argc, const char* argv[])
     Table table(MM_TO_PX(3000.f), MM_TO_PX(2000.f), &Screen::getInstance()->getWindow());
     Robot robot(&Screen::getInstance()->getWindow(), &Screen::getInstance()->getRoof());
 	handlersList.push_back(&robot);
+	Info* info = new Info();
+	handlersList.push_back(info);
 	motion = robot.getMotion(); // Temporary Workaround
 	EventManager* eventManager = new EventManager();
 	eventManager->setWindow(&Screen::getInstance()->getWindow());
@@ -130,6 +133,7 @@ int main(int argc, const char* argv[])
 		for (auto &obstacle :obstaclesList)
 			obstacle->draw();
 		eventManager->draw();
+		info->draw();
 		Screen::getInstance()->display();
 
 	}

@@ -15,7 +15,7 @@ Sequence::Sequence(std::fstream* file)
 	if (mFile != NULL)
 		read();
 	if (path.empty()) {
-		Event event = {EVENT_NEW_TARGET, mStartingPos};
+		Event event = {EVENT_NEW_TARGET, {TARGET_EVENT_SRC_USER, mStartingPos}};
 		dispatchEvent(&event);
 	} else {
 		mStartingPos = path.front();
@@ -24,16 +24,19 @@ Sequence::Sequence(std::fstream* file)
 
 void Sequence::read()
 {
-	if (mFile->is_open()) {
+	if ((mFile != NULL) && mFile->is_open()) {
 		mFile->seekg(0);
 		std::string line;
-		Position pos;
+		TargetEvent_t targetEvent;
 		int speed;
 		do {
 			getline(*mFile, line);
-			if (sscanf(line.c_str(), "%d %d %d %d", &pos.x, &pos.y, &pos.angle, &speed) > 0) {
-				printf("Going to %d %d (%d°) at %d\n", pos.x, pos.y, pos.angle, speed);
-				path.push(pos);
+			if (sscanf(line.c_str(), "%d %d %d %d", &targetEvent.target.x, &targetEvent.target.y, &targetEvent.target.angle, &speed) > 0) {
+				printf("Going to %d %d (%d°) at %d\n", targetEvent.target.x, targetEvent.target.y, targetEvent.target.angle, speed);
+				targetEvent.src = TARGET_EVENT_SRC_PATH_FILE;
+				Event event = {EVENT_NEW_TARGET, targetEvent};
+				dispatchEvent(&event);
+				path.push(targetEvent.target);
 			}
 		} while (!mFile->eof());
 		mFile->clear();
@@ -48,7 +51,7 @@ void endOfMoveCb() {
 
 void Sequence::onEvent(Event *event) {
 	if (event->type == EVENT_NEW_TARGET) {
-		path.push(event->targetEvent);
+		path.push(event->targetEvent.target);
 	} else if (event->type == EVENT_RESTART) {
 		while (!path.empty())
 			path.pop();

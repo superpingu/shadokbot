@@ -13,11 +13,11 @@ void Output::onEvent(Event* event)
 	if (event->type == EVENT_CLOSE) {
 		mFile->close();
 		printf("File closed\n");
-	} else if (event->type == EVENT_NEW_TARGET) {
+	} else if (event->type == EVENT_NEW_TARGET && event->targetEvent.src != TARGET_EVENT_SRC_PATH_FILE) {
 		if (!mFile->is_open())
 			return;
 
 		mFile->seekp(0, std::ios::end);
-		*mFile << event->targetEvent.x << " " << event->targetEvent.y << " " << event->targetEvent.angle << " 200 MOVE_TURN\n";
+		*mFile << event->targetEvent.target.x << " " << event->targetEvent.target.y << " " << event->targetEvent.target.angle << " 200 MOVE_TURN\n";
 	}
 }
