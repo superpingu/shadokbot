@@ -20,6 +20,7 @@ using namespace std;
 #include "output.hpp"
 
 #define LOOP_DURATION 1 // in ms
+#define WINDOW_REFRESH_PERIOD 6 // number of iterations of the simulated Arduino loop for 1 refresh of the GUI
 #define LOOP_PERIOD_US 5000 // duration of each loop iteration
 #define MOUSE_POS_STR_LENGTH 50
 char mousePosStr[MOUSE_POS_STR_LENGTH];
@@ -98,14 +99,18 @@ int main(int argc, const char* argv[])
 	handlersList.push_back(sequence);
 	sequence->setRobot(&robot);
 
+	uint32_t iteration_counter = 0;
 	// Main loop
-    while (Screen::getInstance()->getWindow().isOpen()) {
+	while (Screen::getInstance()->getWindow().isOpen()) {
 		Time::increaseTime(LOOP_DURATION);
 		unsigned long loopStart = micros();
 		robot.getMotion()->update();
 		sequence->update();
 		unsigned long loopTime = micros() - loopStart;
 		delayMicroseconds(loopTime > LOOP_PERIOD_US ? 0 : LOOP_PERIOD_US - loopTime);
+
+		// skip GUI refresh most of the time to avoid overloading old computers ;)
+		if(iteration_counter++ % WINDOW_REFRESH_PERIOD) continue;
 
 		// Event handling
 		sf::Event event;
@@ -126,6 +131,7 @@ int main(int argc, const char* argv[])
 			obstacle->draw();
 		eventManager->draw();
 		Screen::getInstance()->display();
+
 	}
 	return 0;
 }

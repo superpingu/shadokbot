@@ -77,6 +77,11 @@ host_lidar: test/lidar_host.c lib/gnuplot_i/src/gnuplot_i.c
 	mkdir -p build
 	gcc $^ -o $(OBJDIR)/lidar_host -lm
 
-host: $(SIMU_SRC)
+HOST_TARGET = $(OBJDIR)/shadokbot
+$(HOST_TARGET): $(SIMU_SRC) $(wildcard $(SIMUDIR)/mockup/*.hpp) $(wildcard $(SIMUDIR)/*.hpp) $(wildcard $(SRCDIR)/*/*.hpp)
 	mkdir -p build
-	g++ -x c++ $(SIMU_SRC) -g -std=c++11 -DSIMU=1 -I$(SIMUDIR)/mockup -I$(SIMUDIR) -I$(SRCDIR) -lm -lsfml-graphics -lsfml-window -lsfml-system -o $(OBJDIR)/shadokbot
+	g++ -x c++ $(SIMU_SRC) -g -std=c++11 -DSIMU=1 -I$(SIMUDIR)/mockup -I$(SIMUDIR) -I$(SRCDIR) -lm -lsfml-graphics -lsfml-window -lsfml-system -o $@
+
+host: $(HOST_TARGET)
+sim: $(HOST_TARGET)
+	build/shadokbot	-b data/buoys.txt -f data/paths.txt
