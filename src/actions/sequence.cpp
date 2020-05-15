@@ -5,18 +5,23 @@
 #include "board.h"
 
 static int sequenceStep = 0;
+static int actionStep = -1;
 static uint32_t startTime = 0;
 static int iterationCounter = 0;
 
-void nextStepCallback() {
-	if(sequenceStep > 0)
-		sequenceStep++;
+void performNextAction() {
+	actionStep++;
+	switch (paths[getTeam()][actionStep].type) {
+	case SEQUENCE_ELEMENT_TYPE_ACTION:
+		paths[getTeam()][actionStep].action.cb(performNextAction);
+		break;
+	case SEQUENCE_ELEMENT_TYPE_MOTION_ELEMENT:
+		motion->followPath(paths[getTeam()][actionStep].action.motion, performNextAction);
+		break;
+	}
 }
-#define FIRSTSTEP if((step = 0) == sequenceStep)
-#define STEP else if(++step == sequenceStep)
-void sequenceUpdate() {
-	int step;
 
+void sequenceUpdate() {
 	// end of the match
 	if(micros() - startTime > 99000000 && sequenceStep > 1) {
 		motion->enable(false);
@@ -24,7 +29,7 @@ void sequenceUpdate() {
 		digitalWrite(GREEN_LED, LOW);
 	}
 
-	FIRSTSTEP { // ready
+	if (sequenceStep == 0) { // ready
 		if(iterationCounter % 200 == 0) {
 			display.show(getBatteryVoltage()/10);
 		}
@@ -33,29 +38,23 @@ void sequenceUpdate() {
 			digitalWrite(GREEN_LED, LOW);
 			digitalWrite(YELLOW_LED, HIGH);
 
-			initPosition(paletsPath);
+			initPosition(paths[getTeam()][0].action.motion);
 			motion->enable(true);
 
 			sequenceStep++;
 		}
-	} STEP { // jack removed
+	} else if (sequenceStep == 1) { // jack removed
 		if(digitalRead(START_JACK) == HIGH) {
 			digitalWrite(YELLOW_LED, LOW);
 			digitalWrite(GREEN_LED, HIGH);
 
-			sampleInputs();
-
-			startTime = micros();
-			followPath(paletsPath, nextStepCallback);
 			sequenceStep++;
+			sampleInputs();
+			startTime = micros();
 		}
-	} STEP {} STEP { // palet finished
-		deployArm(NULL);
-		followPath(acceleratorPath, nextStepCallback);
+	} else if (sequenceStep == 2) {
+		performNextAction();
 		sequenceStep++;
-	} STEP {} STEP { // first move finished
-		digitalWrite(GREEN_LED, LOW);
-		sequenceStep = 0;
 	}
 
 	iterationCounter++;

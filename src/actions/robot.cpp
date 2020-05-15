@@ -21,17 +21,11 @@ RobotTeam getTeam() {
         return team;
 }
 
-// follow the path of the selected team
-void followPath(const MotionElement* const* path, void (*callback)()) {
-    motion->followPath(path[getTeam() == YELLOW ? 0 : 1], callback);
-}
-
-// set the position of the robot to the first point of the path (according to the team)
-void initPosition(const MotionElement* const* path) {
-    const MotionElement* selectedPath = path[getTeam() == YELLOW ? 0 : 1];
-    motion->setX(selectedPath[0].x);
-    motion->setY(selectedPath[0].y);
-    motion->setHeading(selectedPath[0].heading);
+// set the position of the robot to the first point of the path
+void initPosition(const MotionElement* const path) {
+    motion->setX(path[0].x);
+    motion->setY(path[0].y);
+    motion->setHeading(path[0].heading);
 }
 
 void initRobot() {
