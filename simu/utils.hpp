@@ -11,6 +11,8 @@
 #define ABS(x) ((x) < 0 ? (-(x)) : (x))
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 
+// Delta below which two floats are considered equal
+#define EPSILON 0.2f
 
 class Utils {
 public:

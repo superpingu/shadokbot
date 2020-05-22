@@ -2,6 +2,8 @@
 #define SCREEN_HPP
 
 #include "SFML/Graphics.hpp"
+#include "buoy.hpp"
+#include <list>
 
 class Screen {
 public:
@@ -11,6 +13,8 @@ public:
 	sf::Font& getFont() {return mFont;};
 	void clear();
 	void display();
+
+	std::list<Buoy*> obstaclesList;
 private:
 	Screen();
 	sf::RenderWindow mWindow;
