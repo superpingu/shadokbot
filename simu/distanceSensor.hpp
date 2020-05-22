@@ -14,6 +14,8 @@ public:
 private:
 	struct Position mPos;
 	struct Position mOffset;
+	double mDeltaAlpha; // angle between the robot heading and the sensor position
+	double mGap; // distance between center of the robot and the sensor
 };
 
 #endif // DISTANCE_SENSOR_HPP

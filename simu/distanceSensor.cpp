@@ -6,12 +6,15 @@
 
 DistanceSensor::DistanceSensor(struct Position offset) :
 	mOffset(offset)
-{}
+{
+	mDeltaAlpha = atan((double)mOffset.y/(double)mOffset.x);
+	mGap = sqrt(mOffset.x*mOffset.x + mOffset.y*mOffset.y);
+}
 
 void DistanceSensor::setPosition(struct Position pos)
 {
-	mPos.x = pos.x + mOffset.x;
-	mPos.y = pos.y + mOffset.y;
+	mPos.x = pos.x + mGap*cos(DEG_TO_RAD(pos.angle) - mDeltaAlpha);
+	mPos.y = pos.y + mGap*sin(DEG_TO_RAD(pos.angle) - mDeltaAlpha);
 	mPos.angle = pos.angle + mOffset.angle;
 }
 
