@@ -101,6 +101,11 @@ int main(int argc, const char* argv[])
 	handlersList.push_back(sequence);
 	sequence->setRobot(&robot);
 
+	Screen::getInstance()->bordersList.push_back({1,0,0}); // left border
+	Screen::getInstance()->bordersList.push_back({1,0,-3000}); // rigth border
+	Screen::getInstance()->bordersList.push_back({0,1,0}); // top border
+	Screen::getInstance()->bordersList.push_back({0,1,-2000}); // bottom border
+
 	uint32_t iteration_counter = 0;
 	// Main loop
 	while (Screen::getInstance()->getWindow().isOpen()) {

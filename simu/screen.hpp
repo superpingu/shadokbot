@@ -5,6 +5,13 @@
 #include "buoy.hpp"
 #include <list>
 
+// Line is defined as a*x + b*y + c = 0
+typedef struct {
+	float a;
+	float b;
+	float c;
+} Line_t;
+
 class Screen {
 public:
 	static Screen *getInstance();
@@ -15,6 +22,8 @@ public:
 	void display();
 
 	std::list<Buoy*> obstaclesList;
+	std::list<Line_t> bordersList;
+
 private:
 	Screen();
 	sf::RenderWindow mWindow;
