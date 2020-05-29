@@ -8,6 +8,8 @@ DistanceSensor::DistanceSensor(struct Position offset) :
 	mOffset(offset)
 {
 	mDeltaAlpha = atan((double)mOffset.y/(double)mOffset.x);
+	if (SIGN(mOffset.x)  == SIGN(-1))
+		mDeltaAlpha += M_PI;
 	mGap = sqrt(mOffset.x*mOffset.x + mOffset.y*mOffset.y);
 }
 

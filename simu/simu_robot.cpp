@@ -35,12 +35,12 @@ Robot::Robot(sf::RenderWindow *table, sf::RenderWindow *roof):
 	mClampList[1] =new Clamp();
 	mClampList[2] =new Clamp();
 
-	mSensorList[0] = new DistanceSensor({91,-40,0});
+	mSensorList[0] = new DistanceSensor({91,40,0});
 	mSensorList[1] = new DistanceSensor({27,44,-60});
-	mSensorList[2] = new DistanceSensor({-11,99,-120});
+	mSensorList[2] = new DistanceSensor({-80,59,-120});
 	mSensorList[3] = new DistanceSensor({-51,0,-180});
 	mSensorList[4] = new DistanceSensor({24,-45,60});
-	mSensorList[5] = new DistanceSensor({-80,-59,120});
+	mSensorList[5] = new DistanceSensor({-11,-99,120});
 
 	digitalWrite(START_JACK, LOW);
 }
