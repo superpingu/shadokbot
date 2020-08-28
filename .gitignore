@@ -1,4 +1,4 @@
 test/test
 **/.DS_Store
 build
-src/main.cpp
+src/actions/paths.hpp
