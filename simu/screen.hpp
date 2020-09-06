@@ -2,6 +2,15 @@
 #define SCREEN_HPP
 
 #include "SFML/Graphics.hpp"
+#include "buoy.hpp"
+#include <list>
+
+// Line is defined as a*x + b*y + c = 0
+typedef struct {
+	float a;
+	float b;
+	float c;
+} Line_t;
 
 class Screen {
 public:
@@ -11,6 +20,10 @@ public:
 	sf::Font& getFont() {return mFont;};
 	void clear();
 	void display();
+
+	std::list<Buoy*> obstaclesList;
+	std::list<Line_t> bordersList;
+
 private:
 	Screen();
 	sf::RenderWindow mWindow;

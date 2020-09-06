@@ -4,6 +4,7 @@
 #include "SFML/Graphics.hpp"
 #include "motion/AbsoluteMotion.hpp"
 #include "eventHandler.hpp"
+#include "distanceSensor.hpp"
 
 class Led {
 public:
@@ -47,6 +48,7 @@ private:
 	sf::Text mText;
 	char mTextContent[30];
 	Clamp* mClampList[3];
+	DistanceSensor* mSensorList[6];
 };
 
 #endif /* SIMU_ROBOT_HPP */

@@ -4,9 +4,6 @@
 #include <stdio.h>
 #include "utils.hpp"
 
-// Delta below which two floats are considered equal
-#define EPSILON 0.2f
-
 // Unit: degree per ms
 #define ANGULAR_SPEED 1
 

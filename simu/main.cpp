@@ -25,7 +25,6 @@ using namespace std;
 #define LOOP_PERIOD_US 5000 // duration of each loop iteration
 #define MOUSE_POS_STR_LENGTH 50
 char mousePosStr[MOUSE_POS_STR_LENGTH];
-list<Buoy*> obstaclesList;
 list<EventHandler*> handlersList;
 Sequence *sequence = NULL;
 
@@ -36,7 +35,7 @@ void loadObstacles(const char* fileName)
 	ifstream file(fileName);
 	if (file.is_open()) {
 		while (getline(file, line)) {
-			obstaclesList.push_back(new Buoy(line.c_str()));
+			Screen::getInstance()->obstaclesList.push_back(new Buoy(line.c_str()));
 		}
 		file.close();
 	} else {
@@ -102,6 +101,11 @@ int main(int argc, const char* argv[])
 	handlersList.push_back(sequence);
 	sequence->setRobot(&robot);
 
+	Screen::getInstance()->bordersList.push_back({1,0,0}); // left border
+	Screen::getInstance()->bordersList.push_back({1,0,-3000}); // rigth border
+	Screen::getInstance()->bordersList.push_back({0,1,0}); // top border
+	Screen::getInstance()->bordersList.push_back({0,1,-2000}); // bottom border
+
 	uint32_t iteration_counter = 0;
 	// Main loop
 	while (Screen::getInstance()->getWindow().isOpen()) {
@@ -130,7 +134,7 @@ int main(int argc, const char* argv[])
 		table.draw();
 		robot.draw();
 		Screen::getInstance()->getRoof().draw(mousePos);
-		for (auto &obstacle :obstaclesList)
+		for (auto &obstacle : Screen::getInstance()->obstaclesList)
 			obstacle->draw();
 		eventManager->draw();
 		info->draw();

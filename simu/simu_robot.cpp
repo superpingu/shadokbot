@@ -35,6 +35,13 @@ Robot::Robot(sf::RenderWindow *table, sf::RenderWindow *roof):
 	mClampList[1] =new Clamp();
 	mClampList[2] =new Clamp();
 
+	mSensorList[0] = new DistanceSensor({91,40,0});
+	mSensorList[1] = new DistanceSensor({27,44,-60});
+	mSensorList[2] = new DistanceSensor({-80,59,-120});
+	mSensorList[3] = new DistanceSensor({-51,0,-180});
+	mSensorList[4] = new DistanceSensor({24,-45,60});
+	mSensorList[5] = new DistanceSensor({-11,-99,120});
+
 	digitalWrite(START_JACK, LOW);
 }
 
@@ -58,6 +65,11 @@ void Robot::draw() {
 		mClampList[1]->rotate(motion->getHeading()+180);
 		mClampList[2]->setPosition(MM_TO_PX(centerX + 113*cos(DEG_TO_RAD(motion->getHeading()-60))), MM_TO_PX(centerY + 113*sin(DEG_TO_RAD(motion->getHeading()-60))));
 		mClampList[2]->rotate(motion->getHeading()-60);
+
+		for (int i = 0; i < 6; i++) {
+			mSensorList[i]->setPosition({centerX, centerY, motion->getHeading()});
+			mSensorList[i]->getDistance();
+		}
 
 		mShape->setPosition(MM_TO_PX(motion->getX()), MM_TO_PX(motion->getY()));
 		mShape->setRotation(motion->getHeading());

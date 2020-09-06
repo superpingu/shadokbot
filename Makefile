@@ -59,7 +59,7 @@ SIMU_SRC=$(SIMUDIR)/mockup/serial.cpp $(SIMUDIR)/mockup/arduino_time.cpp \
 	$(SIMUDIR)/simu_robot.cpp $(SIMUDIR)/simu_time.cpp \
     $(SIMUDIR)/simu_sequence.cpp  $(SIMUDIR)/utils.cpp $(SIMUDIR)/screen.cpp \
 	$(SIMUDIR)/simu_obstacle.cpp $(SIMUDIR)/output.cpp $(SIMUDIR)/eventManager.cpp \
-	$(SIMUDIR)/buoy.cpp $(SIMUDIR)/info.cpp
+	$(SIMUDIR)/buoy.cpp $(SIMUDIR)/info.cpp $(SIMUDIR)/distanceSensor.cpp
 
 include $(ARDMK_DIR)/Sam.mk
 
@@ -77,11 +77,22 @@ host_lidar: test/lidar_host.c lib/gnuplot_i/src/gnuplot_i.c
 	mkdir -p build
 	gcc $^ -o $(OBJDIR)/lidar_host -lm
 
+# Force the C path file to be built if not existing
+$(SRCDIR)/shell/commands.cpp: $(SRCDIR)/actions/paths.hpp
+
+# Generate the path C header file from the corresponding text file
+$(SRCDIR)/actions/paths.hpp: data/paths.txt
+	./simu/buildPath.sh $< $<
+
+# Internal rules needed to compile the simulator
 HOST_TARGET = $(OBJDIR)/shadokbot
 $(HOST_TARGET): $(SIMU_SRC) $(wildcard $(SIMUDIR)/mockup/*.hpp) $(wildcard $(SIMUDIR)/*.hpp) $(wildcard $(SRCDIR)/*/*.hpp)
 	mkdir -p build
 	g++ -x c++ $(SIMU_SRC) -g -std=c++11 -DSIMU=1 -I$(SIMUDIR)/mockup -I$(SIMUDIR) -I$(SRCDIR) -lm -lsfml-graphics -lsfml-window -lsfml-system -o $@
 
+# Compile the simulator
 host: $(HOST_TARGET)
+
+# Run the simulator
 sim: $(HOST_TARGET)
 	build/shadokbot	-b data/buoys.txt -f data/paths.txt
