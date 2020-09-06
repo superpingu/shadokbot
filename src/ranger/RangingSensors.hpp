@@ -13,7 +13,7 @@ class RangingSensors {
 public:
 	RangingSensors(TwoWire* port);
 
-	// get the distance from the center of the robot in the given direction (in mm)
+	// get the distance (in mm) from the center of the robot in the given direction (in deg)
 	// the direction is relative to the robot, 0 being in front, then rotating counter-clockwise
 	// The sensor closer to the specified direction will be selected.
 	// The sensor is automatically activated when a read is requested and stay active until a read

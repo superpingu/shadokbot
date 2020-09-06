@@ -34,9 +34,12 @@ void VL53L1X::setAddress(uint8_t new_addr)
 bool VL53L1X::init(bool io_2v8)
 {
   // check model ID and module type registers (values specified in datasheet)
-  if (readReg16Bit(IDENTIFICATION__MODEL_ID) != 0xEACC) { return false; }
-
+  int i = 0;
+  // while(i++ < 10 && readReg16Bit(IDENTIFICATION__MODEL_ID) != 0xEACC);
+  // if(i == 10) { return false; }
+  if(readReg16Bit(IDENTIFICATION__MODEL_ID) != 0xEACC) { return false; }
   // VL53L1_software_reset() begin
+  Serial.println("a");
 
   writeReg(SOFT_RESET, 0x00);
   delayMicroseconds(100);
@@ -44,7 +47,7 @@ bool VL53L1X::init(bool io_2v8)
 
   // give it some time to boot; otherwise the sensor NACKs during the readReg()
   // call below and the Arduino 101 doesn't seem to handle that well
-  delay(1);
+  delay(10);
 
   // VL53L1_poll_for_boot_completion() begin
 
@@ -59,6 +62,7 @@ bool VL53L1X::init(bool io_2v8)
       return false;
     }
   }
+  Serial.println("a");
   // VL53L1_poll_for_boot_completion() end
 
   // VL53L1_software_reset() end

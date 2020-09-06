@@ -30,17 +30,24 @@
 // IMU I2C port
 #define IMU_I2C Wire
 
-// roof connections
-#define GREEN_LED 10
-#define YELLOW_LED 9
-#define RED_LED 8
-#define TEAM_SWITCH 13
-#define MATCH_SWITCH 12
-#define MODE_SWITCH 11
-#define START_JACK 7
+// Ranging sensors I2C port
+#define RANGER_I2C Wire1
 
-// AX12 IDs
-#define ARM_LEFT_ID 198
-#define ARM_RIGHT_ID 199
+// Ranging sensors XSHUT pins
+#define RANGER_0_XSHUT 9
+#define RANGER_60_XSHUT 10
+#define RANGER_120_XSHUT 11
+#define RANGER_180_XSHUT 12
+#define RANGER_240_XSHUT 13
+#define RANGER_300_XSHUT 8
+
+// roof connections
+#define TEAM_SWITCH 53
+#define MATCH_SWITCH 51
+#define MODE_SWITCH 49
+#define GREEN_LED 47
+#define YELLOW_LED 45
+#define RED_LED 43
+#define START_JACK 41
 
 #endif

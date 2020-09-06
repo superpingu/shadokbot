@@ -48,7 +48,6 @@ void sequenceUpdate() {
 			sequenceStep++;
 		}
 	} STEP {} STEP { // palet finished
-		deployArm(NULL);
 		followPath(acceleratorPath, nextStepCallback);
 		sequenceStep++;
 	} STEP {} STEP { // first move finished

@@ -38,7 +38,7 @@ RangingSensors::RangingSensors(TwoWire* port) {
 	}
 	delay(10);
 
-	// port->setClock(400000); // use 400 kHz I2C
+	port->setClock(400000); // use 400 kHz I2C
 	port->begin();
 
 	// enable the sensors 1 by 1
@@ -67,6 +67,7 @@ RangingSensors::RangingSensors(TwoWire* port) {
 int RangingSensors::getDistance(int direction) {
 	while(direction < 0) direction += 360;
 	int selected_sensor = ((direction+30)/60) % 6;
+
 	// start the sensor measurements if not active previously
 	if(selected_sensor != active_sensor) {
 		if(active_sensor > 0)
@@ -74,9 +75,10 @@ int RangingSensors::getDistance(int direction) {
 		sensors[selected_sensor]->startContinuous(100);
 		active_sensor = selected_sensor;
 	}
+
 	// return the last measurement if any is available, don't wait
-	//if(sensors[selected_sensor]->dataReady())
-	return sensors[selected_sensor]->read() + SENSORS_OFFSET[selected_sensor];
-	//else
-		//return -1;
+	if(sensors[selected_sensor]->dataReady())
+		return sensors[selected_sensor]->read() + SENSORS_OFFSET[selected_sensor];
+	else
+		return -1;
 }

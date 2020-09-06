@@ -42,24 +42,8 @@ void initRobot() {
     pinMode(MATCH_SWITCH, INPUT_PULLUP);
     pinMode(MODE_SWITCH, INPUT_PULLUP);
     pinMode(START_JACK, INPUT_PULLUP);
-
-    armLeft = new AX12(ARM_LEFT_ID);
-    armRight = new AX12(ARM_RIGHT_ID);
 }
 
-void deployArm(void (*callback)()) {
-    armRight->setTorque(300);
-    armLeft->setTorque(300);
-    if(getTeam() == PURPLE)
-        armLeft->move(512);
-    else
-        armRight->move(512);
-}
-
-void increaseArmTorque() {
-    armRight->setTorque(500);
-    armLeft->setTorque(500);
-}
 
 #define BATT_PROBE_COEFF (3270*(11+33)/11)
 // returns battery voltage in millivolts

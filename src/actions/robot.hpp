@@ -17,8 +17,6 @@ void followPath(const MotionElement* const* path, void (*callback)()=NULL);
 // set the position of the robot to the first point of the path (according to the team)
 void initPosition(const MotionElement* const* path);
 
-void deployArm(void (*callback)());
-void increaseArmTorque();
 
 void initRobot();
 
