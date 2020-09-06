@@ -62,16 +62,8 @@ $(SRCDIR)/actions/paths.hpp: data/paths.txt
 ###################################################### simulator ######################################################
 
 # Simulation source
-SIMU_SRC=$(SIMUDIR)/mockup/serial.cpp $(SIMUDIR)/mockup/arduino_time.cpp \
-	$(SIMUDIR)/mockup/dummy_ax12.cpp $(SIMUDIR)/mockup/Wire.cpp \
-	$(SRCDIR)/utils/trigo.cpp $(SIMUDIR)/mockup/dummy_abs_motion.cpp \
-	$(SIMUDIR)/mockup/dummy_motion.cpp $(SIMUDIR)/main.cpp \
-	$(SIMUDIR)/mockup/arduino_pin.cpp $(SIMUDIR)/mockup/dummy_timer.cpp  \
-	$(SIMUDIR)/mockup/dummy_display.cpp $(SHELL_CPP_SRCS) $(SIMUDIR)/simu_table.cpp \
-	$(SIMUDIR)/simu_robot.cpp $(SIMUDIR)/simu_time.cpp \
-	$(SIMUDIR)/simu_sequence.cpp  $(SIMUDIR)/utils.cpp $(SIMUDIR)/screen.cpp \
-	$(SIMUDIR)/simu_obstacle.cpp $(SIMUDIR)/output.cpp $(SIMUDIR)/eventManager.cpp \
-	$(SIMUDIR)/buoy.cpp $(SIMUDIR)/info.cpp $(SIMUDIR)/distanceSensor.cpp $(SIMUDIR)/mockup/dummy_TMC5130.cpp \
+SIMU_SRC=$(wildcard $(SIMUDIR)/*/*.cpp) $(wildcard $(SIMUDIR)/*.cpp) \
+	$(SRCDIR)/utils/trigo.cpp $(SHELL_CPP_SRCS)
 
 # Internal rules needed to compile the simulator
 HOST_TARGET = $(OBJDIR)/shadokbot
