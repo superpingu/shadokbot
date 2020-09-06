@@ -3,29 +3,17 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-// front left motor
-#define FL_EN 32
-#define FL_DIR 36
-#define FL_CK 40
-#define FL_INVDIR false
+#define TMC_ENABLEN 52 // motor driver enable (active low)
+#define TMC_INTN 48 // motor driver interrupt (active low)
 
-// front right motor
-#define FR_EN 33
-#define FR_DIR 37
-#define FR_CK 41
-#define FR_INVDIR true // inverse direction
-
-// rear left motor
-#define RL_EN 53
-#define RL_DIR 49
-#define RL_CK 45
+// inverse rotation direction of motors
+#define F_INVDIR false
+#define RR_INVDIR false
 #define RL_INVDIR false
-
-// rear right motor
-#define RR_EN 44
-#define RR_DIR 48
-#define RR_CK 52
-#define RR_INVDIR true // inverse direction
+// SPI chipselect pin of the motor drivers (active low)
+#define F_CHIPSELECT 42
+#define RL_CHIPSELECT 46
+#define RR_CHIPSELECT 44
 
 // AX12 serial port
 #define AX12_SERIALPORT Serial1
@@ -42,17 +30,24 @@
 // IMU I2C port
 #define IMU_I2C Wire
 
-// roof connections
-#define GREEN_LED 10
-#define YELLOW_LED 9
-#define RED_LED 8
-#define TEAM_SWITCH 13
-#define MATCH_SWITCH 12
-#define MODE_SWITCH 11
-#define START_JACK 7
+// Ranging sensors I2C port
+#define RANGER_I2C Wire1
 
-// AX12 IDs
-#define ARM_LEFT_ID 198
-#define ARM_RIGHT_ID 199
+// Ranging sensors XSHUT pins
+#define RANGER_0_XSHUT 9
+#define RANGER_60_XSHUT 10
+#define RANGER_120_XSHUT 11
+#define RANGER_180_XSHUT 12
+#define RANGER_240_XSHUT 13
+#define RANGER_300_XSHUT 8
+
+// roof connections
+#define TEAM_SWITCH 53
+#define MATCH_SWITCH 51
+#define MODE_SWITCH 49
+#define GREEN_LED 47
+#define YELLOW_LED 45
+#define RED_LED 43
+#define START_JACK 41
 
 #endif

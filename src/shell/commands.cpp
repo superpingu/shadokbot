@@ -9,7 +9,6 @@ static int currentPathIndex = 0;
 static bool pathLock = false;
 
 static void moveCallback() {
-	//motion->enable(false);
 	Serial.print("\nMove done.\n");
 }
 
@@ -55,8 +54,6 @@ static void execPathCommand(int argc, char** argv) {
 	}
 
 	shellPath[currentPathIndex] = END_PATH;
-
-	motion->enable(true);
 	motion->followPath(shellPath, pathCallback);
 
 	pathLock = true;
@@ -68,7 +65,6 @@ static void moveCommand(int argc, char** argv) {
 		Serial.print("Oops ! Syntax: m <dist mm> <angle deg> <speed mm/s>\n");
 		return;
 	}
-	motion->enable(true);
 	motion->move(str2int(argv[1]), str2int(argv[2]), str2int(argv[3]), moveCallback, true);
 }
 
@@ -77,14 +73,22 @@ static void gotoCommand(int argc, char** argv) {
 		Serial.print("Oops ! Syntax: g <x mm> <y mm> <heading deg> <speed mm/s> <strategy>\n");
 		return;
 	}
-	motion->enable(true);
 	motion->goTo(str2int(argv[1]), str2int(argv[2]), str2int(argv[3]), str2int(argv[4]),
 		(MotionStrategy) str2int(argv[5]), moveCallback);
+}
+
+static void stopCommand(int argc, char** argv) {
+	motion->emergencyStop();
+}
+static void resumeCommand(int argc, char** argv) {
+	motion->emergencyResume();
 }
 
 const command_t comms[] = {
 	{"m", moveCommand},
 	{"g", gotoCommand},
+	{"s", stopCommand},
+	{"r", resumeCommand},
 	{"addpoint", addPointCommand},
 	{"execpath", execPathCommand},
 	{NULL, NULL}

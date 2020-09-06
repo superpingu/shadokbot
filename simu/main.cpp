@@ -86,7 +86,6 @@ int main(int argc, const char* argv[])
 	EventManager* eventManager = new EventManager();
 	eventManager->setWindow(&Screen::getInstance()->getWindow());
 	Time::reset();
-	robot.getMotion()->enable(false);
 	sf::Text mousePos;
 	mousePos.setFont(Screen::getInstance()->getFont());
 	mousePos.setCharacterSize(18);

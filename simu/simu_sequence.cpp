@@ -83,7 +83,6 @@ void Sequence::update() {
 		mRobot->getMotion()->setX(mStartingPos.x);
 		mRobot->getMotion()->setY(mStartingPos.y);
 		mRobot->getMotion()->setHeading(mStartingPos.angle);
-		mRobot->getMotion()->enable(true);
 		initDone = true;
 	} else if (!ongoingMove) {
 		int speed;

@@ -2,6 +2,7 @@
 #define ABSOLUTEMOTION_HPP
 
 #include "Motion.hpp"
+#include "imu/IMU.hpp"
 
 enum MotionStrategy {
 	MOVE_TURN = 0, // translation then turn
@@ -42,6 +43,8 @@ class AbsoluteMotion : public Motion {
 	void (*gotoCallback)();
 	void (*followPathCallback)();
 
+	IMU* imu;
+
 	friend void absmOnEndOfFirstTurn();
 	friend void absmOnEndOfMove();
 	friend void absmOnEndOfGoTo();
@@ -77,8 +80,6 @@ public:
 	void emergencyStop();
 	// resume the move stopped by emergency stop
 	void emergencyResume();
-
-	bool isOnSlopes();
 };
 
 extern AbsoluteMotion* motion; // pointer to absolute motion instance

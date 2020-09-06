@@ -131,4 +131,3 @@ void AbsoluteMotion::setY(int32_t y) {curY = (double)y;}
 void AbsoluteMotion::setHeading(int heading) {curHeading = (double)heading;}
 void AbsoluteMotion::emergencyStop() {}
 void AbsoluteMotion::emergencyResume() {}
-bool AbsoluteMotion::isOnSlopes() {return false;}

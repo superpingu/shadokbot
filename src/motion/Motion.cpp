@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "Motor.hpp"
+#include "TMC5130.hpp"
 #include "Motion.hpp"
 #include "../board.h"
 #include "motionconf.h"
@@ -10,45 +10,35 @@
 
 Motion::Motion() {
 	moveCallback = NULL;
+	minSpeed = DEFAULT_MIN_SPEED;
+	maxAcceleration = DEFAULT_MAX_ACCELERATION;
+	endTime = 0;
 
-	// initialize all motors
-	motor_FL = new Motor(FL_EN, FL_DIR, FL_CK, FL_INVDIR);
-	motor_FR = new Motor(FR_EN, FR_DIR, FR_CK, FR_INVDIR);
-	motor_RL = new Motor(RL_EN, RL_DIR, RL_CK, RL_INVDIR);
-	motor_RR = new Motor(RR_EN, RR_DIR, RR_CK, RR_INVDIR);
+	// enable motor drivers output stage
+	pinMode(TMC_ENABLEN, OUTPUT);
+	digitalWrite(TMC_ENABLEN, LOW);
 
-	// initialize IMU
-	imu = new IMU(&IMU_I2C);
+	// initialize all motor drivers
+	motor_F = new TMC5130(F_INVDIR, F_CHIPSELECT, TMC_INTN);
+	motor_RL = new TMC5130(RL_INVDIR, RL_CHIPSELECT, TMC_INTN);
+	motor_RR = new TMC5130(RR_INVDIR, RR_CHIPSELECT, TMC_INTN);
+
+	// use 4-points ramp
+	motor_F->setTransitionSpeed(0);
+	motor_RL->setTransitionSpeed(0);
+	motor_RR->setTransitionSpeed(0);
+	motor_F->setLowSpeedAcceleration(maxAcceleration, maxAcceleration);
+	motor_RL->setLowSpeedAcceleration(maxAcceleration, maxAcceleration);
+	motor_RR->setLowSpeedAcceleration(maxAcceleration, maxAcceleration);
 }
 
 void Motion::update() {
-	static int stopRecal = -1;
-	motor_FL->update();
-	motor_FR->update();
-	motor_RL->update();
-	motor_RR->update();
-
-	// all motors have entered the recalibration constant speed phase : detect collision with the wall
-	if(motor_FL->recalibrating() && motor_FR->recalibrating() && motor_RL->recalibrating() && motor_RR->recalibrating()) {
-
-		uint32_t accX = imu->getAccelerationX();
-		uint32_t accY = imu->getAccelerationY();
-
-		if(accX*accX + accY*accY > RECAL_COLLISION_THRESHOLD) {
-			stopRecal = 50;
-		}
+	if(!motor_F->isMoving() && !motor_RL->isMoving() && !motor_RR->isMoving() && endTime == 0 && moveCallback != NULL) {
+		endTime = micros();
 	}
 
-	if(stopRecal > -1) {
-		if(stopRecal == 0) {
-			motor_FL->stopRecal();
-			motor_FR->stopRecal();
-			motor_RL->stopRecal();
-			motor_RR->stopRecal();
-		}
-		stopRecal--;
-	}
-	if(motor_FL->finished() && motor_FR->finished() && motor_RL->finished() && motor_RR->finished() && moveCallback != NULL) {
+	if(endTime != 0 && micros() > endTime + MOTION_BLANK_TIME) {
+		endTime = 0;
 		// save and set moveCallback to NULL before calling it (a new value might be given during call)
 		void (*callback)() = moveCallback;
 		moveCallback = NULL;
@@ -56,82 +46,110 @@ void Motion::update() {
 	}
 }
 
-void Motion::maxAcceleration(int32_t acc) {
-	motor_FL->maxAcceleration = motor_FR->maxAcceleration = acc;
-	motor_RL->maxAcceleration = motor_RR->maxAcceleration = acc;
-}
-
-void Motion::minSpeed(int32_t speed) {
-	motor_FL->minSpeed = motor_FR->minSpeed = speed;
-	motor_RL->minSpeed = motor_RR->minSpeed = speed;
-}
-
 void Motion::recalSpeed(int32_t speed) {
-	motor_FL->recalSpeed = motor_FR->recalSpeed = speed;
-	motor_RL->recalSpeed = motor_RR->recalSpeed = speed;
 }
 
 void Motion::recalDistance(int32_t distance) {
-	motor_FL->recalDistance = motor_FR->recalDistance = distance;
-	motor_RL->recalDistance = motor_RR->recalDistance = distance;
-}
-
-void Motion::enable(bool enabled) {
-	motor_FL->enable(enabled);
-	motor_FR->enable(enabled);
-	motor_RL->enable(enabled);
-	motor_RR->enable(enabled);
 }
 
 void Motion::turn(int32_t angle, int32_t angular_speed, void (*callback)()) {
-	uint32_t dist = ABS(angle)*DEG_TO_HALTICK;
-	int32_t speed = angular_speed*DEG_PER_S_TO_HALFTICK_PER_SPEEDTU*SIGN(angle);
+	int32_t dist = angle*DEG_TO_USTEP;
+	uint32_t speed = angular_speed*DEG_TO_USTEP;
 	moveCallback = callback;
 
-	motor_FL->move(-speed, dist);
-	motor_FR->move(speed, dist);
-	motor_RL->move(-speed, dist);
-	motor_RR->move(speed, dist);
+	motor_F->setCruiseSpeed(speed);
+	motor_F->setMinSpeed(minSpeed, minSpeed);
+	motor_F->setHighSpeedAcceleration(maxAcceleration, maxAcceleration);
+	motor_RL->setCruiseSpeed(speed);
+	motor_RL->setMinSpeed(minSpeed, minSpeed);
+	motor_RL->setHighSpeedAcceleration(maxAcceleration, maxAcceleration);
+	motor_RR->setCruiseSpeed(speed);
+	motor_RR->setMinSpeed(minSpeed, minSpeed);
+	motor_RR->setHighSpeedAcceleration(maxAcceleration, maxAcceleration);
+
+	motor_F->move(dist);
+	motor_RL->move(dist);
+	motor_RR->move(dist);
 }
 
 void Motion::move(int32_t distance, int32_t angle, int32_t speed, void (*callback)(), bool recal) {
-	float y_coeff = mcos(angle*M_PI/180);
-	float x_coeff = msin(angle*M_PI/180);
 	moveCallback = callback;
 
-	int32_t yx_speed_sum = speed*MM_PER_S_TO_HALFTICK_PER_SPEEDTU*(y_coeff + x_coeff);
-	int32_t yx_speed_diff = speed*MM_PER_S_TO_HALFTICK_PER_SPEEDTU*(y_coeff - x_coeff);
-	int32_t yx_dist_sum = distance*MM_TO_HALFTICK*ABS(y_coeff + x_coeff);
-	int32_t yx_dist_diff = distance*MM_TO_HALFTICK*ABS(y_coeff - x_coeff);
+	float sin_a = msin(angle*M_PI/180.0);
+	float cos_a_cos_30 = 0.866*mcos(angle*M_PI/180.0);
+	float sin_a_sin_30 = sin_a/2;
+	float coeff_f = -sin_a;
+	float coeff_rl = sin_a_sin_30 - cos_a_cos_30;
+	float coeff_rr = sin_a_sin_30 + cos_a_cos_30;
 
-	motor_FL->move(yx_speed_diff, ABS(yx_dist_diff), recal);
-	motor_FR->move(yx_speed_sum, ABS(yx_dist_sum), recal);
-	motor_RL->move(yx_speed_sum, ABS(yx_dist_sum), recal);
-	motor_RR->move(yx_speed_diff, ABS(yx_dist_diff), recal);
+	int32_t dist = distance*MM_TO_USTEP;
+	uint32_t spd = speed*MM_TO_USTEP;
+
+	motor_F->setCruiseSpeed(ABS(spd*coeff_f));
+	motor_F->setMinSpeed(ABS(minSpeed*coeff_f), ABS(minSpeed*coeff_f));
+	motor_F->setHighSpeedAcceleration(ABS(maxAcceleration*coeff_f), ABS(maxAcceleration*coeff_f));
+	motor_RL->setCruiseSpeed(ABS(spd*coeff_rl));
+	motor_RL->setMinSpeed(ABS(minSpeed*coeff_rl), ABS(minSpeed*coeff_rl));
+	motor_RL->setHighSpeedAcceleration(ABS(maxAcceleration*coeff_rl), ABS(maxAcceleration*coeff_rl));
+	motor_RR->setCruiseSpeed(ABS(spd*coeff_rr));
+	motor_RR->setMinSpeed(ABS(minSpeed*coeff_rr), ABS(minSpeed*coeff_rr));
+	motor_RR->setHighSpeedAcceleration(ABS(maxAcceleration*coeff_rr), ABS(maxAcceleration*coeff_rr));
+
+	motor_F->move(dist*coeff_f);
+	motor_RL->move(dist*coeff_rl);
+	motor_RR->move(dist*coeff_rr);
 }
 
 void Motion::moveXY(int32_t deltaX, int32_t deltaY, int32_t speed, void (*callback)(), bool recal) {
-	moveCallback = callback;
-	int32_t dist;
-	if(deltaX == 0)
-	 	dist = ABS(deltaY);
-	else if(deltaY == 0)
-		dist = ABS(deltaX);
-	else
-		dist = sqrt(deltaX*deltaX + deltaY*deltaY);
-	deltaY -=1;
-	deltaX += 1;
+	moveCallback = callback; // set end of move callback
 
-	int32_t speedX = dist != 0 ? (speed*deltaX)/dist : 0; // extract X component of speed
-	int32_t speedY = dist != 0 ? (speed*deltaY)/dist : 0; // extract Y component of speed
+	// convert to ustep units
+	int32_t dX = (deltaX == 0 ? 0 : deltaX)*MM_TO_USTEP;
+	int32_t dY = (deltaY == 0 ? 0 : deltaY)*MM_TO_USTEP;
+	int32_t spd = speed*MM_TO_USTEP;
+	// compute distance to travel, sign doesn't matter, we'll take absolute value later
+	float dist = dX == 0 || dY == 0 ? dX + dY : sqrt(((int64_t) dX)*((int64_t) dX) + ((int64_t) dY)*((int64_t) dY));
+	// compute coefficient for each motor, see formulas in Motion::move
+	float coeff_f = dX/dist;
+	float coeff_rl = (dX/2 - 0.866*dY)/dist;
+	float coeff_rr = (dX/2 + 0.866*dY)/dist;
+	// use absolute values, only distances are signed and they are computed separately
+	coeff_f = ABS(coeff_f);
+	coeff_rl = ABS(coeff_rl);
+	coeff_rr = ABS(coeff_rr);
 
-	int32_t yxSpeedSum = MM_PER_S_TO_HALFTICK_PER_SPEEDTU*(speedY + speedX);
-	int32_t yxSpeedDiff = MM_PER_S_TO_HALFTICK_PER_SPEEDTU*(speedY - speedX);
-	int32_t yxDistSum = MM_TO_HALFTICK*ABS(deltaY + deltaX);
-	int32_t yxDistDiff = MM_TO_HALFTICK*ABS(deltaY - deltaX);
+	uint32_t minSpd = minSpeed*coeff_f;
+	uint32_t maxAcc = maxAcceleration*coeff_f;
+	motor_F->setCruiseSpeed(spd*coeff_f);
+	motor_F->setMinSpeed(minSpd, minSpd*2);
+	motor_F->setHighSpeedAcceleration(maxAcc, maxAcc*2);
 
-	motor_FL->move(yxSpeedSum, yxDistSum, recal);
-	motor_FR->move(yxSpeedDiff, yxDistDiff, recal);
-	motor_RL->move(yxSpeedDiff, yxDistDiff, recal);
-	motor_RR->move(yxSpeedSum, yxDistSum, recal);
+	minSpd = minSpeed*coeff_rl;
+	maxAcc = maxAcceleration*coeff_rl;
+	motor_RL->setCruiseSpeed(spd*coeff_rl);
+	motor_RL->setMinSpeed(minSpd, minSpd*2);
+	motor_RL->setHighSpeedAcceleration(maxAcc, maxAcc*2);
+
+	minSpd = minSpeed*coeff_rr;
+	maxAcc = maxAcceleration*coeff_rr;
+	motor_RR->setCruiseSpeed(spd*coeff_rr);
+	motor_RR->setMinSpeed(minSpd, minSpd*2);
+	motor_RR->setHighSpeedAcceleration(maxAcc, maxAcc*2);
+
+	motor_F->move(-dX);
+	motor_RR->move(dX/2 + 0.866*dY);
+	motor_RL->move(dX/2 - 0.866*dY);
+}
+
+float Motion::getMotionProgress() {
+	// use the motor with the largest distance to travel for more accurate result
+	if(motor_F->getMoveGoal() > motor_RL->getMoveGoal() && motor_F->getMoveGoal() > motor_RR->getMoveGoal() && motor_F->getMoveGoal() != 0) {
+		return ((float) motor_F->getMovePosition())/motor_F->getMoveGoal();
+	} else if(motor_RL->getMoveGoal() > motor_RR->getMoveGoal() && motor_RL->getMoveGoal() != 0) {
+		return ((float) motor_RL->getMovePosition())/motor_RL->getMoveGoal();
+	} else if(motor_RR->getMoveGoal() != 0) {
+		return ((float) motor_RR->getMovePosition())/motor_RR->getMoveGoal();
+	}
+	// no move has been executed yet
+	return 1.0;
 }

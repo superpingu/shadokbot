@@ -24,7 +24,6 @@ void performNextAction() {
 void sequenceUpdate() {
 	// end of the match
 	if(micros() - startTime > 99000000 && sequenceStep > 1) {
-		motion->enable(false);
 		sequenceStep = 0;
 		digitalWrite(GREEN_LED, LOW);
 	}
@@ -39,7 +38,6 @@ void sequenceUpdate() {
 			digitalWrite(YELLOW_LED, HIGH);
 
 			initPosition(paths[getTeam()][0].action.motion);
-			motion->enable(true);
 
 			sequenceStep++;
 		}

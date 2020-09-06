@@ -13,10 +13,9 @@ bool mEnable;
 
 Motion::Motion() {
 	// initialize all motors
-	motor_FL = new Motor(0, 0, 0, false);
-	motor_FR = new Motor(0, 0, 0, false);
-	motor_RL = new Motor(0, 0, 0, false);
-	motor_RR = new Motor(0, 0, 0, false);
+	motor_F = new TMC5130(false, 0, 0);
+	motor_RL = new TMC5130(false, 0, 0);
+	motor_RR = new TMC5130(false, 0, 0);
 }
 
 void Motion::update()
@@ -28,11 +27,8 @@ void Motion::update()
 	}
 }
 
-void Motion::maxAcceleration(int32_t acc) {mMaxAcceleration = acc;}
-void Motion::minSpeed(int32_t speed) {mMinSpeed = speed;}
 void Motion::recalSpeed(int32_t speed) {mRecalSpeed = speed;}
 void Motion::recalDistance(int32_t distance) {mRecalDistance = distance;}
-void Motion::enable(bool enabled) {mEnable = enabled;}
 void Motion::turn(int32_t angle, int32_t angular_speed, void (*callback)())
 {
 	turnOngoing = true;

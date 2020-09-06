@@ -3,14 +3,14 @@
 #include "lidar/detection.hpp"
 #include "actions/sequence.hpp"
 #include "actions/robot.hpp"
-#include "display/SevenSegDisplay.h"
 #include "board.h"
+#include "ranger/RangingSensors.hpp"
 
 #include "shell/Shell.hpp"
 #include "shell/commands.h"
 
 Shell* shell;
-Detection *detection;
+RangingSensors* rangers;
 
 // print shell invite, with battery voltage display
 void onShellInvite() {
@@ -26,33 +26,19 @@ void onShellInvite() {
 // the setup function runs once when you press reset or power the board
 void setup() {
 	shell = new Shell(115200, getComms(), onShellInvite);
-	AX12::init(&AX12_SERIALPORT, 115200);
-
-	motion = new AbsoluteMotion();
-	motion->enable(false);
-
-	detection = new Detection();
-	detection->init();
-
-	display.begin();
-
-	initRobot();
+	rangers = new RangingSensors(&RANGER_I2C);
 }
 
-#define LOOP_PERIOD_US 5000 // duration of each loop iteration
+#define LOOP_PERIOD_US 20000 // duration of each loop iteration
 // the loop function runs over and over again forever
 void loop() {
 	unsigned long loopStart = micros();
 
-	motion->update();
-	shell->update();
-	AX12::update();
-
-	while (Serial2.available())
-		detection->lidar.pushSampleData(Serial2.read());
-	detection->update();
-
-	sequenceUpdate();
+	int dist = rangers->getDistance(120);
+	if(dist != -1) {
+		Serial.print(dist);
+		Serial.print('\n');
+	}
 
 	unsigned long loopTime = micros() - loopStart;
 	delayMicroseconds(loopTime > LOOP_PERIOD_US ? 0 : LOOP_PERIOD_US - loopTime);
