@@ -3,6 +3,7 @@
 #include "lidar/detection.hpp"
 #include "actions/sequence.hpp"
 #include "actions/robot.hpp"
+#include "display/SevenSegDisplay.h"
 #include "board.h"
 #include "ranger/RangingSensors.hpp"
 
@@ -11,6 +12,7 @@
 
 Shell* shell;
 RangingSensors* rangers;
+Detection *detection;
 
 // print shell invite, with battery voltage display
 void onShellInvite() {
@@ -27,9 +29,19 @@ void onShellInvite() {
 void setup() {
 	shell = new Shell(115200, getComms(), onShellInvite);
 	rangers = new RangingSensors(&RANGER_I2C);
+	AX12::init(&AX12_SERIALPORT, 115200);
+
+	motion = new AbsoluteMotion();
+
+	detection = new Detection();
+	detection->init();
+
+	display.begin();
+
+	initRobot();
 }
 
-#define LOOP_PERIOD_US 20000 // duration of each loop iteration
+#define LOOP_PERIOD_US 5000 // duration of each loop iteration
 // the loop function runs over and over again forever
 void loop() {
 	unsigned long loopStart = micros();
@@ -39,6 +51,15 @@ void loop() {
 		Serial.print(dist);
 		Serial.print('\n');
 	}
+	motion->update();
+	shell->update();
+	AX12::update();
+
+	while (Serial2.available())
+		detection->lidar.pushSampleData(Serial2.read());
+	detection->update();
+
+	sequenceUpdate();
 
 	unsigned long loopTime = micros() - loopStart;
 	delayMicroseconds(loopTime > LOOP_PERIOD_US ? 0 : LOOP_PERIOD_US - loopTime);
