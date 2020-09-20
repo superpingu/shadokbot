@@ -7,11 +7,13 @@
 #include <iostream>
 #include <fstream>
 #include <queue>
+#include "actions/path_type.h"
 
 class Sequence : public EventHandler
 {
 public:
 	Sequence(std::fstream* file);
+	void init();
 	void onEvent(Event* event);
 	void update();
 	void setRobot(Robot* robot);
@@ -22,7 +24,7 @@ private:
 	Robot* mRobot;
 	Position mStartingPos;
 	MotionElement* buildPath(int targetX, int targetY, int angle);
-	std::queue<Position> path;
+	std::queue<SequenceElement> path;
 };
 
 #endif // SIMU_SEQUENCE_H

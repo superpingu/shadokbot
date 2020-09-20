@@ -9,7 +9,7 @@ enum SequenceElementType {
 };
 
 union SequenceElementAction {
-	const MotionElement* motion;
+	MotionElement* motion;
 	void (*cb)(void(*callback)());
 };
 

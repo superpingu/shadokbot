@@ -99,6 +99,7 @@ int main(int argc, const char* argv[])
 
 	handlersList.push_back(sequence);
 	sequence->setRobot(&robot);
+	sequence->init();
 
 	Screen::getInstance()->bordersList.push_back({1,0,0}); // left border
 	Screen::getInstance()->bordersList.push_back({1,0,-3000}); // rigth border

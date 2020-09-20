@@ -21,14 +21,13 @@ enum EventType {
 	EVENT_NEW_TARGET,
 	EVENT_CLOSE,
 	EVENT_RESTART,
-	EVENT_TOGGLE_DEPLOY
+	EVENT_TOGGLE_DEPLOY,
+	EVENT_CATCH_BUOY
 };
 
 struct Event {
 	EventType type;
-	union {
-		TargetEvent_t targetEvent;
-	};
+	TargetEvent_t targetEvent;
 };
 
 class EventHandler {
