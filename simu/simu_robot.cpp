@@ -102,6 +102,14 @@ void Robot::onEvent(Event* event)
 	}
 }
 
+int Robot::getDistance(int direction)
+{
+	while(direction < 0) direction += 360;
+	int selected_sensor = ((direction+30)/60) % 6;
+
+	return mSensorList[selected_sensor]->getDistance();
+}
+
 Led::Led(int pin, sf::Color color, int x, int y)
 {
 	mColor = color;

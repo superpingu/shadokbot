@@ -35,6 +35,12 @@ public:
 	void toggleDeployed();
 	void draw();
 	void onEvent(Event* event);
+	/**
+	 * Read distance using the most relevant ranging sensor
+	 * @param  direction Relative angle
+	 * @return           Distance in mm
+	 */
+	int getDistance(int direction);
 private:
 	AbsoluteMotion mMotion;
 	bool mDeployed = false;
